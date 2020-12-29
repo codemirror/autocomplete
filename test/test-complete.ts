@@ -1,7 +1,7 @@
-import {EditorView} from "@codemirror/next/view"
-import {EditorState, EditorSelection, Transaction} from "@codemirror/next/state"
+import {EditorView} from "@codemirror/view"
+import {EditorState, EditorSelection, Transaction} from "@codemirror/state"
 import {CompletionSource, autocompletion, CompletionContext, startCompletion,
-        currentCompletions, completionStatus, completeFromList} from "@codemirror/next/autocomplete"
+        currentCompletions, completionStatus, completeFromList} from "@codemirror/autocomplete"
 import ist from "ist"
 
 const Timeout = 1000, Chunk = 15

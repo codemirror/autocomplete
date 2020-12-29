@@ -1,5 +1,5 @@
-import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException} from "@codemirror/next/view"
-import {Transaction} from "@codemirror/next/state"
+import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException} from "@codemirror/view"
+import {Transaction} from "@codemirror/state"
 import {completionState, setSelectedEffect, startCompletionEffect, closeCompletionEffect, setActiveEffect, State,
         ActiveSource, ActiveResult} from "./state"
 import {completionConfig} from "./config"

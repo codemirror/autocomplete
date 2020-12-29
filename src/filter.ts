@@ -1,4 +1,4 @@
-import {codePointAt, codePointSize, fromCodePoint} from "@codemirror/next/text"
+import {codePointAt, codePointSize, fromCodePoint} from "@codemirror/text"
 
 // Scores are counted from 0 (great match) down to negative numbers,
 // assigning specific penalty values for specific shortcomings.

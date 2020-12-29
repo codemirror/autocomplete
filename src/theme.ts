@@ -1,4 +1,4 @@
-import {EditorView} from "@codemirror/next/view"
+import {EditorView} from "@codemirror/view"
 
 export const MaxInfoWidth = 300
 

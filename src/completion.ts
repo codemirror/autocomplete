@@ -1,6 +1,6 @@
-import {EditorView} from "@codemirror/next/view"
-import {EditorState} from "@codemirror/next/state"
-import {syntaxTree} from "@codemirror/next/language"
+import {EditorView} from "@codemirror/view"
+import {EditorState} from "@codemirror/state"
+import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "lezer-tree"
 import {ActiveResult} from "./state"
 

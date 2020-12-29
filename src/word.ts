@@ -1,4 +1,4 @@
-import {CharCategory} from "@codemirror/next/state"
+import {CharCategory} from "@codemirror/state"
 import {Completion, CompletionSource} from "./completion"
 
 const enum C { Range = 50000 }
