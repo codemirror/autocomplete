@@ -81,7 +81,7 @@ function handleInput(view: EditorView, from: number, to: number, insert: string)
   let sel = view.state.selection.main
   if (insert.length > 2 || insert.length == 2 && codePointSize(codePointAt(insert, 0)) == 1 ||
       from != sel.from || to != sel.to) return false
-  let tr = handleInsertion(view.state, insert)
+  let tr = insertBracket(view.state, insert)
   if (!tr) return false
   view.dispatch(tr)
   return true
@@ -114,16 +114,24 @@ export const closeBracketsKeymap: readonly KeyBinding[] = [
   {key: "Backspace", run: deleteBracketPair}
 ]
 
-/// Implements the extension's behavior on text insertion. @internal
-export function handleInsertion(state: EditorState, ch: string): Transaction | null {
+/// Implements the extension's behavior on text insertion. If the
+/// given string counts as a bracket in the language around the
+/// selection, and replacing the selection with it requires custom
+/// behavior (inserting a closing version or skipping past a
+/// previously-closed bracket), this function returns a transaction
+/// representing that custom behavior. (You only need this if you want
+/// to programmatically insert brackets—the
+/// [`closeBrackets`](#closebrackets.closeBrackets) extension will
+/// take care of running this for user input.)
+export function insertBracket(state: EditorState, bracket: string): Transaction | null {
   let conf = config(state, state.selection.main.head)
   let tokens = conf.brackets || defaults.brackets
   for (let tok of tokens) {
     let closed = closing(codePointAt(tok, 0))
-    if (ch == tok)
+    if (bracket == tok)
       return closed == tok ? handleSame(state, tok, tokens.indexOf(tok + tok + tok) > -1) 
         : handleOpen(state, tok, closed, conf.before || defaults.before)
-    if (ch == closed && closedBracketAt(state, state.selection.main.from))
+    if (bracket == closed && closedBracketAt(state, state.selection.main.from))
       return handleClose(state, tok, closed)
   }
   return null
