@@ -26,7 +26,7 @@ export function autocompletion(config: CompletionConfig = {}): Extension {
 
 /// Basic keybindings for autocompletion.
 ///
-///  - Ctrl-Space (Cmd-Space on macOS): [`startCompletion`](#autocomplete.startCompletion)
+///  - Ctrl-Space: [`startCompletion`](#autocomplete.startCompletion)
 ///  - Escape: [`closeCompletion`](#autocomplete.closeCompletion)
 ///  - ArrowDown: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(true)`
 ///  - ArrowUp: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(false)`
@@ -34,7 +34,7 @@ export function autocompletion(config: CompletionConfig = {}): Extension {
 ///  - PageDown: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(true, "page")`
 ///  - Enter: [`acceptCompletion`](#autocomplete.acceptCompletion)
 export const completionKeymap: readonly KeyBinding[] = [
-  {key: "Mod-Space", run: startCompletion},
+  {key: "Ctrl-Space", run: startCompletion},
   {key: "Escape", run: closeCompletion},
   {key: "ArrowDown", run: moveCompletionSelection(true)},
   {key: "ArrowUp", run: moveCompletionSelection(false)},
