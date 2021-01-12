@@ -1,6 +1,6 @@
 {
   "name": "@codemirror/autocomplete",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "Autocompletion for the CodeMirror code editor",
   "scripts": {
     "test": "echo 'Test runner in wrapper package'",
