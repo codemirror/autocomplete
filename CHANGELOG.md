@@ -1,3 +1,9 @@
+## 0.17.3 (2021-01-18)
+
+### Bug fixes
+
+Fix a bug where uppercase completions would be incorrectly matched against the typed input.
+
 ## 0.17.2 (2021-01-12)
 
 ### Bug fixes
