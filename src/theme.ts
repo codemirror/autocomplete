@@ -45,8 +45,8 @@ export const baseTheme = EditorView.baseTheme({
   "$tooltip.completionInfo.left": { right: "100%" },
   "$tooltip.completionInfo.right": { left: "100%" },
 
-  "$$light $snippetField": {backgroundColor: "#ddd"},
-  "$$dark $snippetField": {backgroundColor: "#333"},
+  "$$light $snippetField": {backgroundColor: "#00000022"},
+  "$$dark $snippetField": {backgroundColor: "#ffffff22"},
   "$snippetFieldPosition": {
     verticalAlign: "text-top",
     width: 0,
