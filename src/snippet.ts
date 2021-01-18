@@ -152,7 +152,7 @@ export function snippet(template: string) {
     if (ranges.length > 1) {
       spec.effects = setActive.of(new ActiveSnippet(ranges, 0))
       if (editor.state.field(snippetState, false) === undefined)
-        spec.reconfigure = {append: [snippetState, addSnippetKeymap, baseTheme]}
+        spec.reconfigure = {append: [snippetState, addSnippetKeymap, snippetPointerHandler, baseTheme]}
     }
     editor.dispatch(editor.state.update(spec))
   }
@@ -207,3 +207,17 @@ const addSnippetKeymap = Prec.override(keymap.compute([snippetKeymap], state => 
 export function snippetCompletion(template: string, completion: Completion): Completion {
   return {...completion, apply: snippet(template)}
 }
+
+const snippetPointerHandler = EditorView.domEventHandlers({
+  mousedown(event, view) {
+    let active = view.state.field(snippetState, false), pos: number | null
+    if (!active || (pos = view.posAtCoords({x: event.clientX, y: event.clientY})) == null) return false
+    let match = active.ranges.find(r => r.from <= pos! && r.to >= pos!)
+    if (!match || match.field == active.active) return false
+    view.dispatch({
+      selection: fieldSelection(active.ranges, match.field),
+      effects: setActive.of(active.ranges.some(r => r.field > match!.field) ? new ActiveSnippet(active.ranges, match.field) : null)
+    })
+    return true
+  }
+})
