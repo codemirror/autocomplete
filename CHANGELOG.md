@@ -1,3 +1,13 @@
+## 0.17.4 (2021-01-18)
+
+### Bug fixes
+
+Fix a styling issue where the selection had become invisible inside snippet fields (when using `drawSelection`).
+
+### New features
+
+Snippet fields can now be selected with the pointing device (so that they are usable on touch devices).
+
 ## 0.17.3 (2021-01-18)
 
 ### Bug fixes
