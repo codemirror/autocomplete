@@ -68,9 +68,17 @@ export class FuzzyMatcher {
       if (anyTo < len) return null
     }
 
+    // This tracks the extent of the precise (non-folded, not
+    // necessarily adjacent) match
     let preciseTo = 0
+    // Tracks whether there is a match that hits only characters that
+    // appear to be starting words. `byWordFolded` is set to true when
+    // a case folded character is encountered in such a match
     let byWordTo = 0, byWordFolded = false
+    // If we've found a partial adjacent match, these track its state
     let adjacentTo = 0, adjacentStart = -1, adjacentEnd = -1
+    let hasLower = /[a-z]/.test(word)
+    // Go over the option's text, scanning for the various kinds of matches
     for (let i = 0, e = Math.min(word.length, 200), prevType = Tp.NonWord; i < e && byWordTo < len;) {
       let next = codePointAt(word, i)
       if (direct < 0) {
@@ -89,8 +97,8 @@ export class FuzzyMatcher {
       let ch, type = next < 0xff
         ? (next >= 48 && next <= 57 || next >= 97 && next <= 122 ? Tp.Lower : next >= 65 && next <= 90 ? Tp.Upper : Tp.NonWord)
         : ((ch = fromCodePoint(next)) != ch.toLowerCase() ? Tp.Upper : ch != ch.toUpperCase() ? Tp.Lower : Tp.NonWord)
-      if (type == Tp.Upper || prevType == Tp.NonWord && type != Tp.NonWord &&
-          (this.chars[byWordTo] == next || (this.folded[byWordTo] == next && (byWordFolded = true))))
+      if ((type == Tp.Upper && hasLower || prevType == Tp.NonWord && type != Tp.NonWord) &&
+          (chars[byWordTo] == next || (folded[byWordTo] == next && (byWordFolded = true))))
         byWord[byWordTo++] = i
       prevType = type
       i += codePointSize(next)

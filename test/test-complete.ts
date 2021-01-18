@@ -142,6 +142,8 @@ describe("autocomplete", () => {
 
     run.options("removes duplicate options", "t", [from("two"), from("two three")], "three two")
 
+    run.options("handles all-uppercase words", "sel", [from("SCOPE_CATALOG SELECT SELECTIVE")], "SELECT SELECTIVE SCOPE_CATALOG")
+
     run.test("will eagerly populate the result list when a source is slow", {
       doc: "on",
       sources: [from("one two"), slow(from("ono"), 100)]
