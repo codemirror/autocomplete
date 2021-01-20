@@ -187,7 +187,9 @@ describe("autocomplete", () => {
       await sync(options, "okay one")
     })
 
-    run.test("selects correct entry after refinement", {sources: [once(from("primitive-classnames print proxy"))]}, async (view, sync) => {
+    run.test("resets selection after refinement", {
+      sources: [once(from("primitive-classnames print proxy"))]
+    }, async (view, sync) => {
       type(view, "p")
       await sync(options, "primitive-classnames print proxy")
       type(view, "rin")
