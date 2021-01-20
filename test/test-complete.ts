@@ -187,6 +187,14 @@ describe("autocomplete", () => {
       await sync(options, "okay one")
     })
 
+    run.test("selects correct entry after refinement", {sources: [once(from("primitive-classnames print proxy"))]}, async (view, sync) => {
+      type(view, "p")
+      await sync(options, "primitive-classnames print proxy")
+      type(view, "rin")
+      await sync(options, "print primitive-classnames")
+      ist(view.dom.querySelector("[aria-selected]")?.textContent, "print")
+    })
+
     run.test("calls sources again when necessary", {sources: [tagged(true)]}, async (view, sync) => {
       type(view, "t")
       await sync(options, "tag1")
