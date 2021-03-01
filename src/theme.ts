@@ -3,7 +3,7 @@ import {EditorView} from "@codemirror/view"
 export const MaxInfoWidth = 300
 
 export const baseTheme = EditorView.baseTheme({
-  "$tooltip.autocomplete": {
+  ".cm-tooltip.cm-tooltip-autocomplete": {
     "& > ul": {
       fontFamily: "monospace",
       overflowY: "auto",
@@ -28,26 +28,26 @@ export const baseTheme = EditorView.baseTheme({
     }
   },
 
-  "$completionListIncompleteTop:before, $completionListIncompleteBottom:after": {
+  ".cm-completionListIncompleteTop:before, .cm-completionListIncompleteBottom:after": {
     content: '"···"',
     opacity: 0.5,
     display: "block",
     textAlign: "center"
   },
 
-  "$tooltip.completionInfo": {
+  ".cm-tooltip.cm-completionInfo": {
     position: "absolute",
     padding: "3px 9px",
     width: "max-content",
     maxWidth: MaxInfoWidth + "px",
   },
 
-  "$tooltip.completionInfo.left": { right: "100%" },
-  "$tooltip.completionInfo.right": { left: "100%" },
+  ".cm-completionInfo.cm-completionInfo-left": { right: "100%" },
+  ".cm-completionInfo.cm-completionInfo-right": { left: "100%" },
 
-  "$$light $snippetField": {backgroundColor: "#00000022"},
-  "$$dark $snippetField": {backgroundColor: "#ffffff22"},
-  "$snippetFieldPosition": {
+  "&light .cm-snippetField": {backgroundColor: "#00000022"},
+  "&dark .cm-snippetField": {backgroundColor: "#ffffff22"},
+  ".cm-snippetFieldPosition": {
     verticalAlign: "text-top",
     width: 0,
     height: "1.15em",
@@ -55,16 +55,16 @@ export const baseTheme = EditorView.baseTheme({
     borderLeft: "1.4px dotted #888"
   },
 
-  $completionMatchedText: {
+  ".cm-completionMatchedText": {
     textDecoration: "underline"
   },
 
-  $completionDetail: {
+  ".cm-completionDetail": {
     marginLeft: "0.5em",
     fontStyle: "italic"
   },
 
-  $completionIcon: {
+  ".cm-completionIcon": {
     fontSize: "90%",
     width: ".8em",
     display: "inline-block",
@@ -73,37 +73,37 @@ export const baseTheme = EditorView.baseTheme({
     opacity: "0.6"
   },
 
-  "$completionIcon.function, $completionIcon.method": {
+  ".cm-completionIcon-function, .cm-completionIcon-method": {
     "&:after": { content: "'ƒ'" }
   },
-  "$completionIcon.class": {
+  ".cm-completionIcon-class": {
     "&:after": { content: "'○'" }
   },
-  "$completionIcon.interface": {
+  ".cm-completionIcon-interface": {
     "&:after": { content: "'◌'" }
   },
-  "$completionIcon.variable": {
+  ".cm-completionIcon-variable": {
     "&:after": { content: "'𝑥'" }
   },
-  "$completionIcon.constant": {
+  ".cm-completionIcon-constant": {
     "&:after": { content: "'𝐶'" }
   },
-  "$completionIcon.type": {
+  ".cm-completionIcon-type": {
     "&:after": { content: "'𝑡'" }
   },
-  "$completionIcon.enum": {
+  ".cm-completionIcon-enum": {
     "&:after": { content: "'∪'" }
   },
-  "$completionIcon.property": {
+  ".cm-completionIcon-property": {
     "&:after": { content: "'□'" }
   },
-  "$completionIcon.keyword": {
+  ".cm-completionIcon-keyword": {
     "&:after": { content: "'🔑\uFE0E'" } // Disable emoji rendering
   },
-  "$completionIcon.namespace": {
+  ".cm-completionIcon-namespace": {
     "&:after": { content: "'▢'" }
   },
-  "$completionIcon.text": {
+  ".cm-completionIcon-text": {
     "&:after": { content: "'abc'", fontSize: "50%", verticalAlign: "middle" }
   }
 })

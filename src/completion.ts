@@ -24,13 +24,12 @@ export interface Completion {
   /// completion.
   apply?: string | ((view: EditorView, completion: Completion, from: number, to: number) => void),
   /// The type of the completion. This is used to pick an icon to show
-  /// for the completion. Icons are styled with a [theme
-  /// class](#view.themeClass) created by appending the given type
-  /// name to `"completionIcon."`. You can define or restyle icons by
-  /// defining these selectors. The base library defines simple icons
-  /// for `class`, `constant`, `enum`, `function`, `interface`,
-  /// `keyword`, `method`, `namespace`, `property`, `text`, `type`,
-  /// and `variable`.
+  /// for the completion. Icons are styled with a CSS class created by
+  /// appending the type name to `"cm-completionIcon-"`. You can
+  /// define or restyle icons by defining these selectors. The base
+  /// library defines simple icons for `class`, `constant`, `enum`,
+  /// `function`, `interface`, `keyword`, `method`, `namespace`,
+  /// `property`, `text`, `type`, and `variable`.
   type?: string,
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that

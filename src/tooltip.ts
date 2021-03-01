@@ -1,4 +1,4 @@
-import {EditorView, themeClass, ViewUpdate, Direction} from "@codemirror/view"
+import {EditorView, ViewUpdate, Direction} from "@codemirror/view"
 import {StateField} from "@codemirror/state"
 import {TooltipView} from "@codemirror/tooltip"
 import {CompletionState} from "./state"
@@ -16,35 +16,36 @@ function createListBox(options: readonly Option[], id: string, range: {from: num
     const li = ul.appendChild(document.createElement("li"))
     li.id = id + "-" + i
     let icon = li.appendChild(document.createElement("div"))
-    icon.className = themeClass("completionIcon" + (completion.type ? "." + completion.type : ""))
+    icon.classList.add("cm-completionIcon")
+    if (completion.type) icon.classList.add("cm-completionIcon-" + completion.type)
     icon.setAttribute("aria-hidden", "true")
     let labelElt = li.appendChild(document.createElement("span"))
-    labelElt.className = themeClass("completionLabel")
+    labelElt.className = "cm-completionLabel"
     let {label, detail} = completion, off = 0
     for (let j = 1; j < match.length;) {
       let from = match[j++], to = match[j++]
       if (from > off) labelElt.appendChild(document.createTextNode(label.slice(off, from)))
       let span = labelElt.appendChild(document.createElement("span"))
       span.appendChild(document.createTextNode(label.slice(from, to)))
-      span.className = themeClass("completionMatchedText")
+      span.className = "cm-completionMatchedText"
       off = to
     }
     if (off < label.length) labelElt.appendChild(document.createTextNode(label.slice(off)))
     if (detail) {
       let detailElt = li.appendChild(document.createElement("span"))
-      detailElt.className = themeClass("completionDetail")
+      detailElt.className = "cm-completionDetail"
       detailElt.textContent = detail
     }
     li.setAttribute("role", "option")
   }
-  if (range.from) ul.classList.add(themeClass("completionListIncompleteTop"))
-  if (range.to < options.length) ul.classList.add(themeClass("completionListIncompleteBottom"))
+  if (range.from) ul.classList.add("cm-completionListIncompleteTop")
+  if (range.to < options.length) ul.classList.add("cm-completionListIncompleteBottom")
   return ul
 }
 
 function createInfoDialog(option: Option) {
   let dom = document.createElement("div")
-  dom.className = themeClass("tooltip.completionInfo")
+  dom.className = "cm-tooltip cm-completionInfo"
   let {info} = option.completion
   if (typeof info == "string") dom.textContent = info
   else dom.appendChild(info!(option.completion))
@@ -161,8 +162,8 @@ class CompletionTooltip {
   positionInfo(pos: {top: number, left: boolean} | null) {
     if (this.info && pos) {
       this.info.style.top = pos.top + "px"
-      this.info.classList.toggle("cm-tooltip-completionInfo-left", pos.left)
-      this.info.classList.toggle("cm-tooltip-completionInfo-right", !pos.left)
+      this.info.classList.toggle("cm-completionInfo-left", pos.left)
+      this.info.classList.toggle("cm-completionInfo-right", !pos.left)
     }
   }
 }

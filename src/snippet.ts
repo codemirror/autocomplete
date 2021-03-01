@@ -1,4 +1,4 @@
-import {Decoration, DecorationSet, themeClass, WidgetType, EditorView, keymap, KeyBinding} from "@codemirror/view"
+import {Decoration, DecorationSet, WidgetType, EditorView, keymap, KeyBinding} from "@codemirror/view"
 import {StateField, StateEffect, ChangeDesc, EditorState, EditorSelection,
         Transaction, TransactionSpec, Text, StateCommand, Prec, Facet} from "@codemirror/state"
 import {indentUnit} from "@codemirror/language"
@@ -69,12 +69,12 @@ class Snippet {
 let fieldMarker = Decoration.widget({widget: new class extends WidgetType {
   toDOM() {
     let span = document.createElement("span")
-    span.className = themeClass("snippetFieldPosition")
+    span.className = "cm-snippetFieldPosition"
     return span
   }
   ignoreEvent() { return false }
 }})
-let fieldRange = Decoration.mark({class: themeClass("snippetField")})
+let fieldRange = Decoration.mark({class: "cm-snippetField"})
 
 class ActiveSnippet {
   deco: DecorationSet
