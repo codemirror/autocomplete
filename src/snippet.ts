@@ -150,9 +150,9 @@ export function snippet(template: string) {
     let spec: TransactionSpec = {changes: {from, to, insert: Text.of(text)}}
     if (ranges.length) spec.selection = fieldSelection(ranges, 0)
     if (ranges.length > 1) {
-      spec.effects = setActive.of(new ActiveSnippet(ranges, 0))
+      let effects: StateEffect<unknown>[] = spec.effects = [setActive.of(new ActiveSnippet(ranges, 0))]
       if (editor.state.field(snippetState, false) === undefined)
-        spec.reconfigure = {append: [snippetState, addSnippetKeymap, snippetPointerHandler, baseTheme]}
+        effects.push(StateEffect.appendConfig.of([snippetState, addSnippetKeymap, snippetPointerHandler, baseTheme]))
     }
     editor.dispatch(editor.state.update(spec))
   }
