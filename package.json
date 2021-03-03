@@ -1,6 +1,6 @@
 {
   "name": "@codemirror/autocomplete",
-  "version": "0.17.4",
+  "version": "0.18.0",
   "description": "Autocompletion for the CodeMirror code editor",
   "scripts": {
     "test": "echo 'Test runner in wrapper package'",
@@ -26,11 +26,11 @@
   "sideEffects": false,
   "license": "MIT",
   "dependencies": {
-    "@codemirror/language": "^0.17.0",
-    "@codemirror/state": "^0.17.0",
-    "@codemirror/text": "^0.17.0",
-    "@codemirror/tooltip": "^0.17.0",
-    "@codemirror/view": "^0.17.0",
+    "@codemirror/language": "^0.18.0",
+    "@codemirror/state": "^0.18.0",
+    "@codemirror/text": "^0.18.0",
+    "@codemirror/tooltip": "^0.18.0",
+    "@codemirror/view": "^0.18.0",
     "lezer-tree": "^0.13.0"
   },
   "devDependencies": {

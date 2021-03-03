@@ -1,3 +1,9 @@
+## 0.18.0 (2021-03-03)
+
+### Bug fixes
+
+Only preserve selected option across updates when it isn't the first option.
+
 ## 0.17.4 (2021-01-18)
 
 ### Bug fixes
