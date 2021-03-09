@@ -4,6 +4,8 @@ export const MaxInfoWidth = 300
 
 export const baseTheme = EditorView.baseTheme({
   ".cm-tooltip.cm-tooltip-autocomplete": {
+    maxWidth_fallback: "700px",
+    maxWidth: "min(700px, 95vw)",
     "& > ul": {
       fontFamily: "monospace",
       overflowY: "auto",
@@ -16,7 +18,8 @@ export const baseTheme = EditorView.baseTheme({
       "& > li": {
         cursor: "pointer",
         padding: "1px 1em 1px 3px",
-        lineHeight: 1.2
+        lineHeight: 1.2,
+        minWidth: "max-content"
       },
 
       "& > li[aria-selected]": {
