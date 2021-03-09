@@ -1,4 +1,4 @@
-import {EditorView, ViewUpdate, Direction} from "@codemirror/view"
+import {EditorView, ViewUpdate, Direction, logException} from "@codemirror/view"
 import {StateField} from "@codemirror/state"
 import {TooltipView} from "@codemirror/tooltip"
 import {CompletionState} from "./state"
@@ -43,12 +43,19 @@ function createListBox(options: readonly Option[], id: string, range: {from: num
   return ul
 }
 
-function createInfoDialog(option: Option) {
+function createInfoDialog(option: Option, view: EditorView) {
   let dom = document.createElement("div")
   dom.className = "cm-tooltip cm-completionInfo"
   let {info} = option.completion
-  if (typeof info == "string") dom.textContent = info
-  else dom.appendChild(info!(option.completion))
+  if (typeof info == "string") {
+    dom.textContent = info
+  } else {
+    let content = info!(option.completion)
+    if ((content as any).then)
+      (content as Promise<Node>).then(node => dom.appendChild(node), e => logException(view.state, e, "completion info"))
+    else
+      dom.appendChild(content as Node)
+  }
   return dom
 }
 
@@ -123,7 +130,7 @@ class CompletionTooltip {
       if (this.info) {this.info.remove(); this.info = null}
       let option = open.options[open.selected]
       if (option.completion.info) {
-        this.info = this.dom.appendChild(createInfoDialog(option)) as HTMLElement
+        this.info = this.dom.appendChild(createInfoDialog(option, this.view)) as HTMLElement
         this.view.requestMeasure(this.placeInfo)
       }
     }

@@ -16,7 +16,7 @@ export interface Completion {
   /// Additional info to show when the completion is selected. Can be
   /// a plain string or a function that'll render the DOM structure to
   /// show when invoked.
-  info?: string | ((completion: Completion) => Node),
+  info?: string | ((completion: Completion) => (Node | Promise<Node>)),
   /// How to apply the completion. The default is to replace it with
   /// its [label](#autocomplete.Completion.label). When this holds a
   /// string, the completion range is replaced by that string. When it
