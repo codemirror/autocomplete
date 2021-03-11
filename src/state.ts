@@ -97,6 +97,8 @@ export class CompletionState {
     let open = tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
       !sameResults(active, this.active) ? CompletionDialog.build(active, state, this.id, this.open)
       : this.open && tr.docChanged ? this.open.map(tr.changes) : this.open
+    if (!open && active.every(a => a.state != State.Pending) && active.some(a => a.hasResult()))
+      active = active.map(a => a.hasResult() ? new ActiveSource(a.source, State.Inactive, false) : a)
     for (let effect of tr.effects) if (effect.is(setSelectedEffect)) open = open && open.setSelected(effect.value, this.id)
 
     return active == this.active && open == this.open ? this : new CompletionState(active, this.id, open)

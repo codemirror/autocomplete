@@ -178,13 +178,24 @@ describe("autocomplete", () => {
       await sync(options, "")
     })
 
-    run.test("can backspace out entire word when explicit", {sources: [from("one okay")]}, async (view, sync) => {
+    run.test("can backspace out entire word when explicit", {sources: [from("one two")]}, async (view, sync) => {
       startCompletion(view)
-      await sync(options, "okay one")
-      type(view, "p")
+      await sync(options, "one two")
+      type(view, "o")
+      await sync(options, "one")
+      del(view)
+      await sync(options, "one two")
+    })
+
+    run.test("stops explicit completion on non-spanning input", {sources: [from("one two")]}, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "one two")
+      type(view, "o")
+      await sync(options, "one")
+      type(view, " ")
       await sync(options, "")
       del(view)
-      await sync(options, "okay one")
+      await sync(options, "")
     })
 
     run.test("resets selection after refinement", {
