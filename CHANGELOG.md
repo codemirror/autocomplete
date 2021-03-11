@@ -1,3 +1,13 @@
+## 0.18.1 (2021-03-11)
+
+### Bug fixes
+
+Stop active completion when all sources resolve without producing any matches.
+
+### New features
+
+`Completion.info` may now return a promise.
+
 ## 0.18.0 (2021-03-03)
 
 ### Bug fixes
