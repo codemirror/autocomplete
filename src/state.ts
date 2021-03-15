@@ -64,7 +64,6 @@ class CompletionDialog {
     }
     return new CompletionDialog(options, makeAttrs(id, selected), [{
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
-      class: "cm-tooltip-autocomplete",
       create: completionTooltip(completionState)
     }], prev ? prev.timestamp : Date.now(), selected)
   }

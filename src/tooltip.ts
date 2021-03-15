@@ -88,6 +88,7 @@ class CompletionTooltip {
     this.range = rangeAroundSelected(options.length, selected, config.maxRenderedOptions)
 
     this.dom = document.createElement("div")
+    this.dom.className = "cm-tooltip-autocomplete"
     this.dom.addEventListener("mousedown", (e: MouseEvent) => {
       for (let dom = e.target as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
         if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < options.length) {
