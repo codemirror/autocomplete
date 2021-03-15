@@ -29,7 +29,7 @@
     "@codemirror/language": "^0.18.0",
     "@codemirror/state": "^0.18.0",
     "@codemirror/text": "^0.18.0",
-    "@codemirror/tooltip": "^0.18.0",
+    "@codemirror/tooltip": "^0.18.4",
     "@codemirror/view": "^0.18.0",
     "lezer-tree": "^0.13.0"
   },
