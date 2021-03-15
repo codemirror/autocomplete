@@ -1,4 +1,3 @@
-import {tooltips} from "@codemirror/tooltip"
 import {Prec, Extension, EditorState} from "@codemirror/state"
 import {keymap, KeyBinding} from "@codemirror/view"
 import {Completion} from "./completion"
@@ -19,8 +18,7 @@ export function autocompletion(config: CompletionConfig = {}): Extension {
     completionConfig.of(config),
     completionPlugin,
     completionKeymapExt,
-    baseTheme,
-    tooltips()
+    baseTheme
   ]
 }
 
