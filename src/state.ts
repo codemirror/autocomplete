@@ -38,7 +38,7 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
 class CompletionDialog {
   constructor(readonly options: readonly Option[],
               readonly attrs: {[name: string]: string},
-              readonly tooltip: readonly [Tooltip],
+              readonly tooltip: Tooltip,
               readonly timestamp: number,
               readonly selected: number) {}
 
@@ -62,14 +62,14 @@ class CompletionDialog {
         if (options[i].completion == selectedValue) selected = i
       }
     }
-    return new CompletionDialog(options, makeAttrs(id, selected), [{
+    return new CompletionDialog(options, makeAttrs(id, selected), {
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
       create: completionTooltip(completionState)
-    }], prev ? prev.timestamp : Date.now(), selected)
+    }, prev ? prev.timestamp : Date.now(), selected)
   }
 
   map(changes: ChangeDesc) {
-    return new CompletionDialog(this.options, this.attrs, [{...this.tooltip[0], pos: changes.mapPos(this.tooltip[0].pos)}],
+    return new CompletionDialog(this.options, this.attrs, {...this.tooltip, pos: changes.mapPos(this.tooltip.pos)},
                                 this.timestamp, this.selected)
   }
 }
@@ -103,7 +103,7 @@ export class CompletionState {
     return active == this.active && open == this.open ? this : new CompletionState(active, this.id, open)
   }
 
-  get tooltip(): readonly Tooltip[] { return this.open ? this.open.tooltip : none }
+  get tooltip(): Tooltip | null { return this.open ? this.open.tooltip : null }
 
   get attrs() { return this.open ? this.open.attrs : baseAttrs }
 }
@@ -222,7 +222,7 @@ export const completionState = StateField.define<CompletionState>({
   update(value, tr) { return value.update(tr) },
 
   provide: f => [
-    showTooltip.computeN([f], state => state.field(f).tooltip),
+    showTooltip.from(f, val => val.tooltip),
     EditorView.contentAttributes.from(f, state => state.attrs)
   ]
 })
