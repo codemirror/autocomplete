@@ -189,8 +189,11 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       this.composing = CompositionState.Started
     },
     compositionend(this: {view: EditorView, composing: CompositionState}) {
-      if (this.composing == CompositionState.ChangedAndMoved)
-        this.view.dispatch({effects: startCompletionEffect.of(false)})
+      if (this.composing == CompositionState.ChangedAndMoved) {
+        // Safari fires compositionend events synchronously, possibly
+        // from inside an update, so dispatch asynchronously to avoid reentrancy
+        setTimeout(() => this.view.dispatch({effects: startCompletionEffect.of(false)}), 20)
+      }
       this.composing = CompositionState.None
     }
   }
