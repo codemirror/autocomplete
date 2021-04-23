@@ -6,7 +6,7 @@ import {baseTheme} from "./theme"
 import {Completion} from "./completion"
 
 class FieldPos {
-  constructor(readonly field: number,
+  constructor(public field: number,
               readonly line: number,
               readonly from: number,
               readonly to: number) {}
@@ -49,13 +49,14 @@ class Snippet {
       while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|([^}]*))\}/.exec(line)) {
         let seq = m[1] ? +m[1] : null, name = m[2] || m[3], found = -1
         for (let i = 0; i < fields.length; i++) {
-          if (name ? fields[i].name == name : seq != null && fields[i].seq == seq) found = i
+          if (seq != null ? fields[i].seq == seq : name ? fields[i].name == name : false) found = i
         }
         if (found < 0) {
           let i = 0
           while (i < fields.length && (seq == null || (fields[i].seq != null && fields[i].seq! < seq))) i++
           fields.splice(i, 0, {seq, name: name || null})
           found = i
+          for (let pos of positions) if (pos.field >= found) pos.field++
         }
         positions.push(new FieldPos(found, lines.length, m.index, m.index + name.length))
         line = line.slice(0, m.index) + name + line.slice(m.index + m[0].length)
