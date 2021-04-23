@@ -1,3 +1,11 @@
+## 0.18.5 (2021-04-23)
+
+### Bug fixes
+
+Fix a regression where snippet field selection didn't work with @codemirror/state 0.18.6.
+
+Fix a bug where snippet fields with different position numbers were inappropriately merged.
+
 ## 0.18.4 (2021-04-20)
 
 ### Bug fixes
