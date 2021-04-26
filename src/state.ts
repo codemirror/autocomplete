@@ -88,7 +88,8 @@ export class CompletionState {
     let sources = conf.override ||
       state.languageDataAt<CompletionSource | readonly (string | Completion)[]>("autocomplete", cur(state)).map(asSource)
     let active: readonly ActiveSource[] = sources.map(source => {
-      let value = this.active.find(s => s.source == source) || new ActiveSource(source, State.Inactive, false)
+      let value = this.active.find(s => s.source == source) ||
+        new ActiveSource(source, this.active.some(a => a.state != State.Inactive) ? State.Pending : State.Inactive, false)
       return value.update(tr, conf)
     })
     if (active.length == this.active.length && active.every((a, i) => a == this.active[i])) active = this.active
