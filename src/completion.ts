@@ -30,7 +30,9 @@ export interface Completion {
   /// library defines simple icons for `class`, `constant`, `enum`,
   /// `function`, `interface`, `keyword`, `method`, `namespace`,
   /// `property`, `text`, `type`, and `variable`.
-  type?: string,
+  /// If an array is provided, all class names are added to the
+  /// icon element without the `"cm-completionIcon-"` prefix.
+  type?: string | string[],
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that
   /// match the input as well as this one. A negative number moves it
