@@ -1,3 +1,13 @@
+## 0.18.6 (2021-06-03)
+
+### Bug fixes
+
+Adding or reconfiguring completion sources will now cause them to be activated right away if a completion was active.
+
+### New features
+
+You can now specify multiple types in `Completion.type` by separating them by spaces. Small doc comment tweak for Completion.type
+
 ## 0.18.5 (2021-04-23)
 
 ### Bug fixes
