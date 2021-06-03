@@ -31,7 +31,7 @@ export interface Completion {
   /// `function`, `interface`, `keyword`, `method`, `namespace`,
   /// `property`, `text`, `type`, and `variable`.
   ///
-  /// Multiple classes can be provided by separating them with spaces.
+  /// Multiple types can be provided by separating them with spaces.
   type?: string,
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that
