@@ -17,7 +17,8 @@ function createListBox(options: readonly Option[], id: string, range: {from: num
     li.id = id + "-" + i
     let icon = li.appendChild(document.createElement("div"))
     icon.classList.add("cm-completionIcon")
-    if (completion.type) icon.classList.add("cm-completionIcon-" + completion.type)
+    if (completion.type)
+      icon.classList.add(...completion.type.split(/\s+/g).map(cls => "cm-completionIcon-" + cls))
     icon.setAttribute("aria-hidden", "true")
     let labelElt = li.appendChild(document.createElement("span"))
     labelElt.className = "cm-completionLabel"
