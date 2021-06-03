@@ -33,10 +33,6 @@ export interface Completion {
   ///
   /// Multiple classes can be provided by separating them with spaces.
   type?: string,
-  /// Changes the class prefix of the type option. Defaults to
-  /// `cm-completionIcon-` if not set. The prefix can be disabled
-  /// by setting it to an empty string.
-  typeClassPrefix?: string,
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that
   /// match the input as well as this one. A negative number moves it
