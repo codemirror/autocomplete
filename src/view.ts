@@ -3,7 +3,7 @@ import {Transaction} from "@codemirror/state"
 import {completionState, setSelectedEffect, startCompletionEffect, closeCompletionEffect, setActiveEffect, State,
         ActiveSource, ActiveResult} from "./state"
 import {completionConfig} from "./config"
-import {cur, CompletionResult, CompletionSource, CompletionContext, applyCompletion, ensureAnchor} from "./completion"
+import {cur, CompletionResult, CompletionContext, applyCompletion, ensureAnchor} from "./completion"
 
 const CompletionInteractMargin = 75
 
@@ -55,7 +55,7 @@ class RunningQuery {
   // 'query returned null'.
   done: undefined | CompletionResult | null = undefined
 
-  constructor(readonly source: CompletionSource,
+  constructor(readonly active: ActiveSource,
               readonly context: CompletionContext) {}
 }
 
@@ -98,7 +98,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     }
 
     if (this.debounceUpdate > -1) clearTimeout(this.debounceUpdate)
-    this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.source == a.source))
+    this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.active.source == a.source))
       ? setTimeout(() => this.startUpdate(), DebounceTime) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
@@ -113,15 +113,15 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     this.debounceUpdate = -1
     let {state} = this.view, cState = state.field(completionState)
     for (let active of cState.active) {
-      if (active.state == State.Pending && !this.running.some(r => r.source == active.source))
+      if (active.state == State.Pending && !this.running.some(r => r.active.source == active.source))
         this.startQuery(active)
     }
   }
 
   startQuery(active: ActiveSource) {
     let {state} = this.view, pos = cur(state)
-    let context = new CompletionContext(state, pos, active.explicitAt(pos))
-    let pending = new RunningQuery(active.source, context)
+    let context = new CompletionContext(state, pos, active.explicitPos == pos)
+    let pending = new RunningQuery(active, context)
     this.running.push(pending)
     Promise.resolve(active.source(context)).then(result => {
       if (!pending.context.aborted) {
@@ -154,7 +154,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
       if (query.done) {
         let active: ActiveSource = new ActiveResult(
-          query.source, query.context.explicit ? query.context.pos : -1, query.done, query.done.from,
+          query.active.source, query.active.explicitPos, query.done, query.done.from,
           query.done.to ?? cur(query.updates.length ? query.updates[0].startState : this.view.state),
           query.done.span ? ensureAnchor(query.done.span, true) : null)
         // Replay the transactions that happened since the start of
@@ -166,12 +166,12 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
         }
       }
 
-      let current = this.view.state.field(completionState).active.find(a => a.source == query.source)
+      let current = this.view.state.field(completionState).active.find(a => a.source == query.active.source)
       if (current && current.state == State.Pending) {
         if (query.done == null) {
           // Explicitly failed. Should clear the pending status if it
           // hasn't been re-set in the meantime.
-          let active = new ActiveSource(query.source, State.Inactive, false)
+          let active = new ActiveSource(query.active.source, State.Inactive)
           for (let tr of query.updates) active = active.update(tr, conf)
           if (active.state != State.Pending) updated.push(active)
         } else {

@@ -89,7 +89,7 @@ export class CompletionState {
       state.languageDataAt<CompletionSource | readonly (string | Completion)[]>("autocomplete", cur(state)).map(asSource)
     let active: readonly ActiveSource[] = sources.map(source => {
       let value = this.active.find(s => s.source == source) ||
-        new ActiveSource(source, this.active.some(a => a.state != State.Inactive) ? State.Pending : State.Inactive, false)
+        new ActiveSource(source, this.active.some(a => a.state != State.Inactive) ? State.Pending : State.Inactive)
       return value.update(tr, conf)
     })
     if (active.length == this.active.length && active.every((a, i) => a == this.active[i])) active = this.active
@@ -98,7 +98,7 @@ export class CompletionState {
       !sameResults(active, this.active) ? CompletionDialog.build(active, state, this.id, this.open)
       : this.open && tr.docChanged ? this.open.map(tr.changes) : this.open
     if (!open && active.every(a => a.state != State.Pending) && active.some(a => a.hasResult()))
-      active = active.map(a => a.hasResult() ? new ActiveSource(a.source, State.Inactive, false) : a)
+      active = active.map(a => a.hasResult() ? new ActiveSource(a.source, State.Inactive) : a)
     for (let effect of tr.effects) if (effect.is(setSelectedEffect)) open = open && open.setSelected(effect.value, this.id)
 
     return active == this.active && open == this.open ? this : new CompletionState(active, this.id, open)
@@ -142,11 +142,9 @@ export const enum State { Inactive = 0, Pending = 1, Result = 2 }
 export class ActiveSource {
   constructor(readonly source: CompletionSource,
               readonly state: State,
-              readonly explicit: boolean) {}
+              readonly explicitPos: number = -1) {}
 
   hasResult(): this is ActiveResult { return false }
-
-  explicitAt(_pos: number) { return this.explicit }
 
   update(tr: Transaction, conf: Required<CompletionConfig>): ActiveSource {
     let event = tr.annotation(Transaction.userEvent), value: ActiveSource = this
@@ -155,70 +153,70 @@ export class ActiveSource {
     else if (tr.docChanged)
       value = value.handleChange(tr)
     else if (tr.selection && value.state != State.Inactive)
-      value = new ActiveSource(value.source, State.Inactive, false)
+      value = new ActiveSource(value.source, State.Inactive)
 
     for (let effect of tr.effects) {
       if (effect.is(startCompletionEffect))
-        value = new ActiveSource(value.source, State.Pending, effect.value)
+        value = new ActiveSource(value.source, State.Pending, effect.value ? cur(tr.state) : -1)
       else if (effect.is(closeCompletionEffect))
-        value = new ActiveSource(value.source, State.Inactive, false)
+        value = new ActiveSource(value.source, State.Inactive)
       else if (effect.is(setActiveEffect))
         for (let active of effect.value) if (active.source == value.source) value = active
     }
     return value
   }
 
-  handleUserEvent(_tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
-    return type == "delete" || !conf.activateOnTyping ? this : new ActiveSource(this.source, State.Pending, false)
+  handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
+    return type == "delete" || !conf.activateOnTyping ? this.map(tr.changes) : new ActiveSource(this.source, State.Pending)
   }
 
   handleChange(tr: Transaction): ActiveSource {
-    return tr.changes.touchesRange(cur(tr.startState)) ? new ActiveSource(this.source, State.Inactive, false) : this
+    return tr.changes.touchesRange(cur(tr.startState)) ? new ActiveSource(this.source, State.Inactive) : this.map(tr.changes)
+  }
+
+  map(changes: ChangeDesc) {
+    return changes.empty || this.explicitPos < 0 ? this : new ActiveSource(this.source, this.state, changes.mapPos(this.explicitPos))
   }
 }
 
 export class ActiveResult extends ActiveSource {
   constructor(source: CompletionSource,
-              readonly explicitPos: number,
+              explicitPos: number,
               readonly result: CompletionResult,
               readonly from: number,
               readonly to: number,
               readonly span: RegExp | null) {
-    super(source, State.Result, explicitPos > -1)
+    super(source, State.Result, explicitPos)
   }
 
   hasResult(): this is ActiveResult { return true }
 
-  explicitAt(pos: number) { return this.explicitPos == pos }
-
-  private mapExplicit(mapping: ChangeDesc) {
-    return this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos)
-  }
-
   handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
     let from = tr.changes.mapPos(this.from), to = tr.changes.mapPos(this.to, 1)
     let pos = cur(tr.state)
-    if ((this.explicit ? pos < from : pos <= from) || pos > to)
-      return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive, false)
+    if ((this.explicitPos > -1 ? pos < from : pos <= from) || pos > to)
+      return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive)
+    let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos)
     if (this.span && (from == to || this.span.test(tr.state.sliceDoc(from, to))))
-      return new ActiveResult(this.source, this.mapExplicit(tr.changes), this.result, from, to, this.span)
-    return new ActiveSource(this.source, State.Pending, false)
+      return new ActiveResult(this.source, explicitPos, this.result, from, to, this.span)
+    return new ActiveSource(this.source, State.Pending, explicitPos)
   }
 
   handleChange(tr: Transaction): ActiveSource {
-    return tr.changes.touchesRange(this.from, this.to) ? new ActiveSource(this.source, State.Inactive, false) : this.map(tr.changes)
+    return tr.changes.touchesRange(this.from, this.to) ? new ActiveSource(this.source, State.Inactive) : this.map(tr.changes)
   }
 
   map(mapping: ChangeDesc) {
-    return new ActiveResult(this.source, this.mapExplicit(mapping), this.result,
-                            mapping.mapPos(this.from), mapping.mapPos(this.to, 1), this.span)
+    return mapping.empty ? this :
+      new ActiveResult(this.source, this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos), this.result,
+                       mapping.mapPos(this.from), mapping.mapPos(this.to, 1), this.span)
   }
 }
 
 export const startCompletionEffect = StateEffect.define<boolean>()
 export const closeCompletionEffect = StateEffect.define<null>()
 export const setActiveEffect = StateEffect.define<readonly ActiveSource[]>({
-  map(sources, mapping) { return sources.map(s => s.hasResult() && !mapping.empty ? s.map(mapping) : s) }
+  map(sources, mapping) { return sources.map(s => s.map(mapping)) }
 })
 export const setSelectedEffect = StateEffect.define<number>()
 
