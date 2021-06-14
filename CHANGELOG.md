@@ -1,3 +1,9 @@
+## 0.18.7 (2021-06-14)
+
+### Bug fixes
+
+Don't treat continued completions when typing after an explicit completion as explicit.
+
 ## 0.18.6 (2021-06-03)
 
 ### Bug fixes
