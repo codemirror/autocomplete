@@ -120,7 +120,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
   startQuery(active: ActiveSource) {
     let {state} = this.view, pos = cur(state)
-    let context = new CompletionContext(state, pos, active.explicit)
+    let context = new CompletionContext(state, pos, active.explicitAt(pos))
     let pending = new RunningQuery(active.source, context)
     this.running.push(pending)
     Promise.resolve(active.source(context)).then(result => {
@@ -154,7 +154,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
       if (query.done) {
         let active: ActiveSource = new ActiveResult(
-          query.source, query.context.explicit, query.done, query.done.from,
+          query.source, query.context.explicit ? query.context.pos : -1, query.done, query.done.from,
           query.done.to ?? cur(query.updates.length ? query.updates[0].startState : this.view.state),
           query.done.span ? ensureAnchor(query.done.span, true) : null)
         // Replay the transactions that happened since the start of

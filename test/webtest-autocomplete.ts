@@ -198,6 +198,15 @@ describe("autocomplete", () => {
       await sync(options, "")
     })
 
+    run.test("stops explicit completions for non-matching input", {sources: [from("one")]}, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "one")
+      type(view, "x")
+      await sync(options, "")
+      del(view)
+      await sync(options, "")
+    })
+
     run.test("resets selection after refinement", {
       sources: [once(from("primitive-classnames print proxy"))]
     }, async (view, sync) => {

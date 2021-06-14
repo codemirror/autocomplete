@@ -146,6 +146,8 @@ export class ActiveSource {
 
   hasResult(): this is ActiveResult { return false }
 
+  explicitAt(_pos: number) { return this.explicit }
+
   update(tr: Transaction, conf: Required<CompletionConfig>): ActiveSource {
     let event = tr.annotation(Transaction.userEvent), value: ActiveSource = this
     if (event == "input" || event == "delete")
@@ -177,15 +179,21 @@ export class ActiveSource {
 
 export class ActiveResult extends ActiveSource {
   constructor(source: CompletionSource,
-              explicit: boolean,
+              readonly explicitPos: number,
               readonly result: CompletionResult,
               readonly from: number,
               readonly to: number,
               readonly span: RegExp | null) {
-    super(source, State.Result, explicit)
+    super(source, State.Result, explicitPos > -1)
   }
 
   hasResult(): this is ActiveResult { return true }
+
+  explicitAt(pos: number) { return this.explicitPos == pos }
+
+  private mapExplicit(mapping: ChangeDesc) {
+    return this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos)
+  }
 
   handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
     let from = tr.changes.mapPos(this.from), to = tr.changes.mapPos(this.to, 1)
@@ -193,19 +201,16 @@ export class ActiveResult extends ActiveSource {
     if ((this.explicit ? pos < from : pos <= from) || pos > to)
       return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive, false)
     if (this.span && (from == to || this.span.test(tr.state.sliceDoc(from, to))))
-      return new ActiveResult(this.source, this.explicit, this.result, from, to, this.span)
-    return new ActiveSource(this.source, State.Pending, this.explicit)
+      return new ActiveResult(this.source, this.mapExplicit(tr.changes), this.result, from, to, this.span)
+    return new ActiveSource(this.source, State.Pending, false)
   }
 
   handleChange(tr: Transaction): ActiveSource {
-    return tr.changes.touchesRange(this.from, this.to)
-      ? new ActiveSource(this.source, State.Inactive, false)
-      : new ActiveResult(this.source, this.explicit, this.result,
-                         tr.changes.mapPos(this.from), tr.changes.mapPos(this.to, 1), this.span)
+    return tr.changes.touchesRange(this.from, this.to) ? new ActiveSource(this.source, State.Inactive, false) : this.map(tr.changes)
   }
 
   map(mapping: ChangeDesc) {
-    return new ActiveResult(this.source, this.explicit, this.result,
+    return new ActiveResult(this.source, this.mapExplicit(mapping), this.result,
                             mapping.mapPos(this.from), mapping.mapPos(this.to, 1), this.span)
   }
 }
