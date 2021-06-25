@@ -1,7 +1,7 @@
 import {EditorView} from "@codemirror/view"
 import {EditorState} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
-import {SyntaxNode} from "lezer-tree"
+import {SyntaxNode} from "@lezer/common"
 import {ActiveResult} from "./state"
 
 /// Objects type used to represent individual completions.

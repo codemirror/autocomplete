@@ -31,7 +31,7 @@
     "@codemirror/text": "^0.18.0",
     "@codemirror/tooltip": "^0.18.4",
     "@codemirror/view": "^0.18.0",
-    "lezer-tree": "^0.13.0"
+    "@lezer/common": "^0.14.0"
   },
   "devDependencies": {
     "@codemirror/buildhelper": "^0.1.5"
