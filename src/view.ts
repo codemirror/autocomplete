@@ -156,7 +156,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
         let active: ActiveSource = new ActiveResult(
           query.active.source, query.active.explicitPos, query.done, query.done.from,
           query.done.to ?? cur(query.updates.length ? query.updates[0].startState : this.view.state),
-          query.done.span ? ensureAnchor(query.done.span, true) : null)
+          query.done.span && query.done.filter !== false ? ensureAnchor(query.done.span, true) : null)
         // Replay the transactions that happened since the start of
         // the request and see if that preserves the result
         for (let tr of query.updates) active = active.update(tr, conf)

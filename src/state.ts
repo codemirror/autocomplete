@@ -16,12 +16,16 @@ function score(option: Completion) {
 }
 
 function sortOptions(active: readonly ActiveSource[], state: EditorState) {
-  let options = []
+  let options = [], i = 0
   for (let a of active) if (a.hasResult()) {
-    let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
-    for (let option of a.result.options) if (match = matcher.match(option.label)) {
-      if (option.boost != null) match[0] += option.boost
-      options.push(new Option(option, a, match))
+    if (a.result.filter === false) {
+      for (let option of a.result.options) options.push(new Option(option, a, [1e9 - i++]))
+    } else {
+      let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
+      for (let option of a.result.options) if (match = matcher.match(option.label)) {
+        if (option.boost != null) match[0] += option.boost
+        options.push(new Option(option, a, match))
+      }
     }
   }
   options.sort(cmpOption)

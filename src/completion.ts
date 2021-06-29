@@ -166,6 +166,13 @@ export interface CompletionResult {
   /// help a lot with responsiveness, since it allows the completion
   /// list to be updated synchronously.
   span?: RegExp
+  /// By default, the library filters and scores completions. Set
+  /// `filter` to `false` to disable this, and cause your completions
+  /// to all be included, in the order they were given. When there are
+  /// other sources, unfiltered completions appear at the top of the
+  /// list of completions. `span` must not be given `filter` is
+  /// `false`, because it only works when filtering.
+  filter?: boolean
 }
 
 export class Option {

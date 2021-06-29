@@ -305,6 +305,14 @@ describe("autocomplete", () => {
       ist(events.join(", "), "start false, aborted, fin true")
     })
 
+    run.test("supports unfitered completions", {
+      sources: [completeFromList(["one", "two"]), cx => ({from: cx.pos, options: [{label: "ok"}, {label: "hah"}], filter: false})],
+      doc: "o"
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "ok hah one")
+    })
+
     return run.finish()
   })
 })
