@@ -120,6 +120,16 @@ export function completeFromList(list: readonly (string | Completion)[]): Comple
   }
 }
 
+/// Wrap the given completion source so that it will only fire when the
+/// cursor is in a syntax node with one of the given names.
+export function ifIn(nodes: readonly string[], source: CompletionSource): CompletionSource {
+  return (context: CompletionContext) => {
+    for (let pos: SyntaxNode | null = syntaxTree(context.state).resolve(context.pos, -1); pos; pos = pos.parent)
+      if (nodes.indexOf(pos.name) > -1) return source(context)
+    return null
+  }
+}
+
 /// Wrap the given completion source so that it will not fire when the
 /// cursor is in a syntax node with one of the given names.
 export function ifNotIn(nodes: readonly string[], source: CompletionSource): CompletionSource {

@@ -16,6 +16,8 @@
 
 @completeFromList
 
+@ifIn
+
 @ifNotIn
 
 @completeAnyWord

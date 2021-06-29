@@ -7,7 +7,7 @@ import {completionPlugin, moveCompletionSelection, acceptCompletion, startComple
 import {baseTheme} from "./theme"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
-export {Completion, CompletionContext, CompletionSource, CompletionResult, completeFromList, ifNotIn} from "./completion"
+export {Completion, CompletionContext, CompletionSource, CompletionResult, completeFromList, ifIn, ifNotIn} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 
