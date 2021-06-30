@@ -1,3 +1,11 @@
+## 0.18.8 (2021-06-30)
+
+### New features
+
+Add an `ifIn` helper function that constrains a completion source to only fire when in a given syntax node. Add support for unfiltered completions
+
+A completion result can now set a `filter: false` property to disable filtering and sorting of completions, when it already did so itself.
+
 ## 0.18.7 (2021-06-14)
 
 ### Bug fixes
