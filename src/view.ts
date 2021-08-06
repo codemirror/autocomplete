@@ -1,7 +1,7 @@
 import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException} from "@codemirror/view"
 import {Transaction} from "@codemirror/state"
 import {completionState, setSelectedEffect, startCompletionEffect, closeCompletionEffect, setActiveEffect, State,
-        ActiveSource, ActiveResult} from "./state"
+        ActiveSource, ActiveResult, getUserEvent} from "./state"
 import {completionConfig} from "./config"
 import {cur, CompletionResult, CompletionContext, applyCompletion, ensureAnchor} from "./completion"
 
@@ -79,8 +79,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     if (!update.selectionSet && !update.docChanged && update.startState.field(completionState) == cState) return
 
     let doesReset = update.transactions.some(tr => {
-      let event = tr.annotation(Transaction.userEvent)
-      return (tr.selection || tr.docChanged) && event != "input" && event != "delete"
+      return (tr.selection || tr.docChanged) && !getUserEvent(tr)
     })
     for (let i = 0; i < this.running.length; i++) {
       let query = this.running[i]
@@ -102,7 +101,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       ? setTimeout(() => this.startUpdate(), DebounceTime) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
-      if (tr.annotation(Transaction.userEvent) == "input")
+      if (getUserEvent(tr) == "input")
         this.composing = CompositionState.Changed
       else if (this.composing == CompositionState.Changed && tr.selection)
         this.composing = CompositionState.ChangedAndMoved

@@ -1,5 +1,5 @@
 import {EditorView} from "@codemirror/view"
-import {EditorState, EditorSelection, Transaction} from "@codemirror/state"
+import {EditorState, EditorSelection} from "@codemirror/state"
 import {CompletionSource, autocompletion, CompletionContext, startCompletion,
         currentCompletions, completionStatus, completeFromList} from "@codemirror/autocomplete"
 import ist from "ist"
@@ -107,13 +107,13 @@ function type(view: EditorView, text: string) {
   let cur = view.state.selection.main.head
   view.dispatch({changes: {from: cur, insert: text},
                  selection: {anchor: cur + text.length},
-                 annotations: Transaction.userEvent.of("input")})
+                 userEvent: "input.type"})
 }
 
 function del(view: EditorView) {
   let cur = view.state.selection.main.head
   view.dispatch({changes: {from: cur - 1, to: cur},
-                 annotations: Transaction.userEvent.of("delete")})
+                 userEvent: "delete.backward"})
 }
 
 const words = "one onetwothree OneTwoThree two three"

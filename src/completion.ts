@@ -199,7 +199,8 @@ export function applyCompletion(view: EditorView, option: Option) {
   if (typeof apply == "string") {
     view.dispatch({
       changes: {from: result.from, to: result.to, insert: apply},
-      selection: {anchor: result.from + apply.length}
+      selection: {anchor: result.from + apply.length},
+      userEvent: "input.complete"
     })
   } else {
     apply(view, option.completion, result.from, result.to)

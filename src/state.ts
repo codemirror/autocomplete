@@ -143,6 +143,10 @@ function cmpOption(a: Option, b: Option) {
 
 export const enum State { Inactive = 0, Pending = 1, Result = 2 }
 
+export function getUserEvent(tr: Transaction): "input" | "delete" | null {
+  return tr.isUserEvent("input.type") ? "input" : tr.isUserEvent("delete.backward") ? "delete" : null
+}
+
 export class ActiveSource {
   constructor(readonly source: CompletionSource,
               readonly state: State,
@@ -151,8 +155,8 @@ export class ActiveSource {
   hasResult(): this is ActiveResult { return false }
 
   update(tr: Transaction, conf: Required<CompletionConfig>): ActiveSource {
-    let event = tr.annotation(Transaction.userEvent), value: ActiveSource = this
-    if (event == "input" || event == "delete")
+    let event = getUserEvent(tr), value: ActiveSource = this
+    if (event)
       value = value.handleUserEvent(tr, event, conf)
     else if (tr.docChanged)
       value = value.handleChange(tr)
