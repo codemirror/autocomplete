@@ -226,6 +226,6 @@ function handleSame(state: EditorState, token: string, allowTriple: boolean) {
 }
 
 function nodeStart(state: EditorState, pos: number) {
-  let tree = syntaxTree(state).resolve(pos + 1)
+  let tree = syntaxTree(state).resolveInner(pos + 1)
   return tree.parent && tree.from == pos
 }
