@@ -137,8 +137,7 @@ const baseAttrs = {"aria-autocomplete": "list"}, none: readonly any[] = []
 function cmpOption(a: Option, b: Option) {
   let dScore = b.match[0] - a.match[0]
   if (dScore) return dScore
-  let lA = a.completion.label, lB = b.completion.label
-  return lA < lB ? -1 : lA == lB ? 0 : 1
+  return a.completion.label.localeCompare(b.completion.label)
 }
 
 export const enum State { Inactive = 0, Pending = 1, Result = 2 }
