@@ -170,7 +170,7 @@ export interface CompletionResult {
   /// `filter` to `false` to disable this, and cause your completions
   /// to all be included, in the order they were given. When there are
   /// other sources, unfiltered completions appear at the top of the
-  /// list of completions. `span` must not be given `filter` is
+  /// list of completions. `span` must not be given when `filter` is
   /// `false`, because it only works when filtering.
   filter?: boolean
 }

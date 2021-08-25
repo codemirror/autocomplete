@@ -7,6 +7,7 @@ const enum C { Range = 50000 }
 /// [character categorizer](#state.EditorState.charCategorizer)), and
 /// return those as completions.
 export const completeAnyWord: CompletionSource = context => {
+  if (!context.explicit && !context.matchBefore(/\w+$/)) return null
   let options: Completion[] = [], seen: {[word: string]: boolean} = Object.create(null)
   let cat = context.state.charCategorizer(context.pos)
   let start = Math.max(0, context.pos - C.Range), end = Math.min(context.state.doc.length, start + C.Range * 2)
