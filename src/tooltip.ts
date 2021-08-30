@@ -15,11 +15,15 @@ function createListBox(options: readonly Option[], id: string, range: {from: num
     let {completion, match} = options[i]
     const li = ul.appendChild(document.createElement("li"))
     li.id = id + "-" + i
+    const {customRenderer} = completion
     let icon = li.appendChild(document.createElement("div"))
     icon.classList.add("cm-completionIcon")
     if (completion.type)
       icon.classList.add(...completion.type.split(/\s+/g).map(cls => "cm-completionIcon-" + cls))
     icon.setAttribute("aria-hidden", "true")
+    if (customRenderer.before) {
+      li.appendChild(customRenderer.before(completion))
+    }
     let labelElt = li.appendChild(document.createElement("span"))
     labelElt.className = "cm-completionLabel"
     let {label, detail} = completion, off = 0
@@ -32,6 +36,9 @@ function createListBox(options: readonly Option[], id: string, range: {from: num
       off = to
     }
     if (off < label.length) labelElt.appendChild(document.createTextNode(label.slice(off)))
+    if (customRenderer.after) {
+      li.appendChild(customRenderer.after(completion))
+    }
     if (detail) {
       let detailElt = li.appendChild(document.createElement("span"))
       detailElt.className = "cm-completionDetail"

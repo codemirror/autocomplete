@@ -10,6 +10,12 @@ export interface Completion {
   /// is matched agains to determine whether a completion matches (and
   /// how well it matches).
   label: string,
+  /// An optional object with functions for rendering additional
+  /// DOM elements before and/or after the label
+  customRenderer?: {
+    before?: (completion: Completion) => Node;
+    after?: (completion: Completion) => Node;
+  };
   /// An optional short piece of information to show (with a different
   /// style) after the label.
   detail?: string,
