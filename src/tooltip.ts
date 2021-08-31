@@ -1,47 +1,54 @@
 import {EditorView, ViewUpdate, Direction, logException} from "@codemirror/view"
-import {StateField} from "@codemirror/state"
+import {StateField, EditorState} from "@codemirror/state"
 import {TooltipView} from "@codemirror/tooltip"
 import {CompletionState} from "./state"
-import {completionConfig} from "./config"
-import {Option, applyCompletion} from "./completion"
+import {completionConfig, CompletionConfig} from "./config"
+import {Option, applyCompletion, Completion} from "./completion"
 import {MaxInfoWidth} from "./theme"
 
-function createListBox(options: readonly Option[], id: string, range: {from: number, to: number}) {
-  const ul = document.createElement("ul")
-  ul.id = id
-  ul.setAttribute("role", "listbox")
-  ul.setAttribute("aria-expanded", "true")
-  for (let i = range.from; i < range.to; i++) {
-    let {completion, match} = options[i]
-    const li = ul.appendChild(document.createElement("li"))
-    li.id = id + "-" + i
-    let icon = li.appendChild(document.createElement("div"))
-    icon.classList.add("cm-completionIcon")
-    if (completion.type)
-      icon.classList.add(...completion.type.split(/\s+/g).map(cls => "cm-completionIcon-" + cls))
-    icon.setAttribute("aria-hidden", "true")
-    let labelElt = li.appendChild(document.createElement("span"))
-    labelElt.className = "cm-completionLabel"
-    let {label, detail} = completion, off = 0
-    for (let j = 1; j < match.length;) {
-      let from = match[j++], to = match[j++]
-      if (from > off) labelElt.appendChild(document.createTextNode(label.slice(off, from)))
-      let span = labelElt.appendChild(document.createElement("span"))
-      span.appendChild(document.createTextNode(label.slice(from, to)))
-      span.className = "cm-completionMatchedText"
-      off = to
-    }
-    if (off < label.length) labelElt.appendChild(document.createTextNode(label.slice(off)))
-    if (detail) {
-      let detailElt = li.appendChild(document.createElement("span"))
+type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
+
+function optionContent(config: Required<CompletionConfig>): OptionContentSource[] {
+  let content = config.addToOptions.slice() as {render: OptionContentSource, position: number}[]
+  if (config.icons) content.push({
+    render(completion: Completion) {
+      let icon = document.createElement("div")
+      icon.classList.add("cm-completionIcon")
+      if (completion.type)
+        icon.classList.add(...completion.type.split(/\s+/g).map(cls => "cm-completionIcon-" + cls))
+      icon.setAttribute("aria-hidden", "true")
+      return icon
+    },
+    position: 20
+  })
+  content.push({
+    render(completion: Completion, _s: EditorState, match: readonly number[]) {
+      let labelElt = document.createElement("span")
+      labelElt.className = "cm-completionLabel"
+      let {label} = completion, off = 0
+      for (let j = 1; j < match.length;) {
+        let from = match[j++], to = match[j++]
+        if (from > off) labelElt.appendChild(document.createTextNode(label.slice(off, from)))
+        let span = labelElt.appendChild(document.createElement("span"))
+        span.appendChild(document.createTextNode(label.slice(from, to)))
+        span.className = "cm-completionMatchedText"
+        off = to
+      }
+      if (off < label.length) labelElt.appendChild(document.createTextNode(label.slice(off)))
+      return labelElt
+    },
+    position: 50
+  }, {
+    render(completion: Completion) {
+      if (!completion.detail) return null
+      let detailElt = document.createElement("span")
       detailElt.className = "cm-completionDetail"
-      detailElt.textContent = detail
-    }
-    li.setAttribute("role", "option")
-  }
-  if (range.from) ul.classList.add("cm-completionListIncompleteTop")
-  if (range.to < options.length) ul.classList.add("cm-completionListIncompleteBottom")
-  return ul
+      detailElt.textContent = completion.detail
+      return detailElt
+    },
+    position: 80
+  })
+  return content.sort((a, b) => a.position - b.position).map(a => a.render)
 }
 
 function createInfoDialog(option: Option, view: EditorView) {
@@ -80,12 +87,17 @@ class CompletionTooltip {
     key: this
   }
   range: {from: number, to: number}
+  optionContent: OptionContentSource[]
+  optionClass: (option: Completion) => string
 
   constructor(readonly view: EditorView,
               readonly stateField: StateField<CompletionState>) {
     let cState = view.state.field(stateField)
     let {options, selected} = cState.open!
     let config = view.state.facet(completionConfig)
+    this.optionContent = optionContent(config)
+    this.optionClass = config.optionClass
+
     this.range = rangeAroundSelected(options.length, selected, config.maxRenderedOptions)
 
     this.dom = document.createElement("div")
@@ -99,7 +111,7 @@ class CompletionTooltip {
         }
       }
     })
-    this.list = this.dom.appendChild(createListBox(options, cState.id, this.range))
+    this.list = this.dom.appendChild(this.createListBox(options, cState.id, this.range))
     this.list.addEventListener("scroll", () => {
       if (this.info) this.view.requestMeasure(this.placeInfo)
     })
@@ -122,7 +134,7 @@ class CompletionTooltip {
       this.range = rangeAroundSelected(open.options.length, open.selected,
                                        this.view.state.facet(completionConfig).maxRenderedOptions)
       this.list.remove()
-      this.list = this.dom.appendChild(createListBox(open.options, cState.id, this.range))
+      this.list = this.dom.appendChild(this.createListBox(open.options, cState.id, this.range))
       this.list.addEventListener("scroll", () => {
         if (this.info) this.view.requestMeasure(this.placeInfo)
       })
@@ -174,6 +186,28 @@ class CompletionTooltip {
       this.info.classList.toggle("cm-completionInfo-left", pos.left)
       this.info.classList.toggle("cm-completionInfo-right", !pos.left)
     }
+  }
+
+  createListBox(options: readonly Option[], id: string, range: {from: number, to: number}) {
+    const ul = document.createElement("ul")
+    ul.id = id
+    ul.setAttribute("role", "listbox")
+    ul.setAttribute("aria-expanded", "true")
+    for (let i = range.from; i < range.to; i++) {
+      let {completion, match} = options[i]
+      const li = ul.appendChild(document.createElement("li"))
+      li.id = id + "-" + i
+      li.setAttribute("role", "option")
+      let cls = this.optionClass(completion)
+      if (cls) li.className = cls
+      for (let source of this.optionContent) {
+        let node = source(completion, this.view.state, match)
+        if (node) li.appendChild(node)
+      }
+    }
+    if (range.from) ul.classList.add("cm-completionListIncompleteTop")
+    if (range.to < options.length) ul.classList.add("cm-completionListIncompleteBottom")
+    return ul
   }
 }
 
