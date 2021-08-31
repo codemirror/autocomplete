@@ -124,15 +124,21 @@ function sameResults(a: readonly ActiveSource[], b: readonly ActiveSource[]) {
   }
 }
 
+const baseAttrs = {
+  "aria-autocomplete": "list",
+  "aria-expanded": "false"
+}
+
 function makeAttrs(id: string, selected: number): {[name: string]: string} {
   return {
     "aria-autocomplete": "list",
+    "aria-expanded": "true",
     "aria-activedescendant": id + "-" + selected,
-    "aria-owns": id
+    "aria-controls": id
   }
 }
 
-const baseAttrs = {"aria-autocomplete": "list"}, none: readonly any[] = []
+const none: readonly any[] = []
 
 function cmpOption(a: Option, b: Option) {
   let dScore = b.match[0] - a.match[0]
