@@ -1,3 +1,19 @@
+## 0.19.3 (2021-08-31)
+
+### Bug fixes
+
+Improve the sorting of completions by using `localeCompare`.
+
+Fix reading of autocompletions in NVDA screen reader.
+
+### New features
+
+The new `icons` option can be used to turn off icons in the completion list.
+
+The `optionClass` option can now be used to add CSS classes to the options in the completion list.
+
+It is now possible to inject additional content into rendered completion options with the `addToOptions` configuration option.
+
 ## 0.19.2 (2021-08-25)
 
 ### Bug fixes
