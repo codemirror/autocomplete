@@ -27,7 +27,8 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
 /// Accept the current completion.
 export const acceptCompletion: Command = (view: EditorView) => {
   let cState = view.state.field(completionState, false)
-  if (!cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin) return false
+  if (view.state.readOnly || !cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin)
+    return false
   applyCompletion(view, cState.open.options[cState.open.selected])
   return true
 }
