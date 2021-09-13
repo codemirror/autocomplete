@@ -77,7 +77,7 @@ function config(state: EditorState, pos: number) {
 }
 
 function handleInput(view: EditorView, from: number, to: number, insert: string) {
-  if (view.composing) return false
+  if (view.composing || view.state.readOnly) return false
   let sel = view.state.selection.main
   if (insert.length > 2 || insert.length == 2 && codePointSize(codePointAt(insert, 0)) == 1 ||
       from != sel.from || to != sel.to) return false
@@ -90,6 +90,7 @@ function handleInput(view: EditorView, from: number, to: number, insert: string)
 /// Command that implements deleting a pair of matching brackets when
 /// the cursor is between them.
 export const deleteBracketPair: StateCommand = ({state, dispatch}) => {
+  if (state.readOnly) return false
   let conf = config(state, state.selection.main.head)
   let tokens = conf.brackets || defaults.brackets
   let dont = null, changes = state.changeByRange(range => {
