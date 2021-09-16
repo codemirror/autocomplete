@@ -20,14 +20,17 @@ export const baseTheme = EditorView.baseTheme({
         padding: "1px 1em 1px 3px",
         lineHeight: 1.2
       },
-
-      "& > li[aria-selected]": {
-        background_fallback: "#bdf",
-        backgroundColor: "Highlight",
-        color_fallback: "white",
-        color: "HighlightText"
-      }
     }
+  },
+
+  "&light .cm-tooltip-autocomplete ul li[aria-selected]": {
+    background: "#39e",
+    color: "white",
+  },
+
+  "&dark .cm-tooltip-autocomplete ul li[aria-selected]": {
+    background: "#347",
+    color: "white",
   },
 
   ".cm-completionListIncompleteTop:before, .cm-completionListIncompleteBottom:after": {
