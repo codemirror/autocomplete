@@ -8,7 +8,8 @@ export interface CompletionConfig {
   /// Override the completion sources used. By default, they will be
   /// taken from the `"autocomplete"` [language
   /// data](#state.EditorState.languageDataAt) (which should hold
-  /// [completion sources](#autocomplete.CompletionSource)).
+  /// [completion sources](#autocomplete.CompletionSource) or arrays
+  /// of [completions](#autocomplete.Completion)).
   override?: readonly CompletionSource[] | null,
   /// The maximum number of options to render to the DOM.
   maxRenderedOptions?: number,
