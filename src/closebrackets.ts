@@ -61,7 +61,7 @@ const bracketState = StateField.define<RangeSet<typeof closedBracket>>({
 /// closing bracket inserted by the extension, the cursor moves over
 /// that bracket.
 export function closeBrackets(): Extension {
-  return [EditorView.inputHandler.of(handleInput), bracketState]
+  return [inputHandler, bracketState]
 }
 
 const definedClosing = "()[]{}<>"
@@ -76,7 +76,7 @@ function config(state: EditorState, pos: number) {
   return state.languageDataAt<CloseBracketConfig>("closeBrackets", pos)[0] || defaults
 }
 
-function handleInput(view: EditorView, from: number, to: number, insert: string) {
+const inputHandler = EditorView.inputHandler.of((view, from, to, insert) => {
   if (view.composing || view.state.readOnly) return false
   let sel = view.state.selection.main
   if (insert.length > 2 || insert.length == 2 && codePointSize(codePointAt(insert, 0)) == 1 ||
@@ -85,7 +85,7 @@ function handleInput(view: EditorView, from: number, to: number, insert: string)
   if (!tr) return false
   view.dispatch(tr)
   return true
-}
+})
 
 /// Command that implements deleting a pair of matching brackets when
 /// the cursor is between them.
