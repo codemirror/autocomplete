@@ -87,7 +87,7 @@ export class FuzzyMatcher {
         if (adjacentTo < len) {
           if (next == chars[adjacentTo] || next == folded[adjacentTo]) {
             if (adjacentTo == 0) adjacentStart = i
-            adjacentEnd = i
+            adjacentEnd = i + 1
             adjacentTo++
           } else {
             adjacentTo = 0
