@@ -1,3 +1,11 @@
+## 0.19.4 (2021-10-24)
+
+### Bug fixes
+
+Don't rely on the platform's highlight colors for the active completion, since those are inconsistent and may not be appropriate for the theme.
+
+Fix incorrect match underline for some kinds of matched completions.
+
 ## 0.19.3 (2021-08-31)
 
 ### Bug fixes
