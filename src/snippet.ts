@@ -202,7 +202,7 @@ export const snippetKeymap = Facet.define<readonly KeyBinding[], readonly KeyBin
   combine(maps) { return maps.length ? maps[0] : defaultSnippetKeymap }
 })
 
-const addSnippetKeymap = Prec.override(keymap.compute([snippetKeymap], state => state.facet(snippetKeymap)))
+const addSnippetKeymap = Prec.highest(keymap.compute([snippetKeymap], state => state.facet(snippetKeymap)))
 
 /// Create a completion from a snippet. Returns an object with the
 /// properties from `completion`, plus an `apply` function that

@@ -41,7 +41,7 @@ export const completionKeymap: readonly KeyBinding[] = [
   {key: "Enter", run: acceptCompletion}
 ]
 
-const completionKeymapExt = Prec.override(keymap.computeN([completionConfig], state => 
+const completionKeymapExt = Prec.highest(keymap.computeN([completionConfig], state => 
   state.facet(completionConfig).defaultKeymap ? [completionKeymap] : []))
 
 /// Get the current completion status. When completions are available,

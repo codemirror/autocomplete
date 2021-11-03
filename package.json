@@ -27,7 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "@codemirror/language": "^0.19.0",
-    "@codemirror/state": "^0.19.2",
+    "@codemirror/state": "^0.19.3",
     "@codemirror/text": "^0.19.2",
     "@codemirror/tooltip": "^0.19.0",
     "@codemirror/view": "^0.19.0",
