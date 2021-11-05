@@ -154,8 +154,7 @@ export function snippet(template: string) {
       let active = new ActiveSnippet(ranges, 0)
       let effects: StateEffect<unknown>[] = spec.effects = [setActive.of(active)]
       if (editor.state.field(snippetState, false) === undefined)
-        effects.push(StateEffect.appendConfig.of([snippetState.init(() => active), addSnippetKeymap,
-                                                  snippetPointerHandler, baseTheme]))
+        effects.push(StateEffect.appendConfig.of([snippetState, addSnippetKeymap, snippetPointerHandler, baseTheme]))
     }
     editor.dispatch(editor.state.update(spec))
   }
