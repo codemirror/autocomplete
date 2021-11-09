@@ -1,3 +1,15 @@
+## 0.19.5 (2021-11-09)
+
+### Bug fixes
+
+Make sure info tooltips don't stick out of the bottom of the page.
+
+### New features
+
+The package exports a new function `selectedCompletion`, which can be used to find out which completion is currently selected.
+
+Transactions created by picking a completion now have an annotation (`pickedCompletion`) holding the original completion.
+
 ## 0.19.4 (2021-10-24)
 
 ### Bug fixes
