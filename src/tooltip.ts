@@ -4,7 +4,6 @@ import {TooltipView} from "@codemirror/tooltip"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, applyCompletion, Completion} from "./completion"
-import {MaxInfoWidth} from "./theme"
 
 type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
 
@@ -169,14 +168,14 @@ class CompletionTooltip {
 
   measureInfo() {
     let sel = this.dom.querySelector("[aria-selected]") as HTMLElement | null
-    if (!sel) return null
-    let rect = this.dom.getBoundingClientRect()
-    let top = sel.getBoundingClientRect().top - rect.top
+    if (!sel || !this.info) return null
+    let rect = this.dom.getBoundingClientRect(), infoRect = this.info!.getBoundingClientRect()
+    let top = Math.min(sel.getBoundingClientRect().top, innerHeight - infoRect.height) - rect.top
     if (top < 0 || top > this.list.clientHeight - 10) return null
     let left = this.view.textDirection == Direction.RTL
     let spaceLeft = rect.left, spaceRight = innerWidth - rect.right
-    if (left && spaceLeft < Math.min(MaxInfoWidth, spaceRight)) left = false
-    else if (!left && spaceRight < Math.min(MaxInfoWidth, spaceLeft)) left = true
+    if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
+    else if (!left && spaceRight < Math.min(infoRect.width, spaceLeft)) left = true
     return {top, left}
   }
 

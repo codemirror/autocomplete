@@ -1,7 +1,5 @@
 import {EditorView} from "@codemirror/view"
 
-export const MaxInfoWidth = 300
-
 export const baseTheme = EditorView.baseTheme({
   ".cm-tooltip.cm-tooltip-autocomplete": {
     "& > ul": {
@@ -44,7 +42,7 @@ export const baseTheme = EditorView.baseTheme({
     position: "absolute",
     padding: "3px 9px",
     width: "max-content",
-    maxWidth: MaxInfoWidth + "px",
+    maxWidth: "300px",
   },
 
   ".cm-completionInfo.cm-completionInfo-left": { right: "100%" },
