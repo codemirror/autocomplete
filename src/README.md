@@ -6,6 +6,10 @@
 
 @currentCompletions
 
+@selectedCompletion
+
+@pickedCompletion
+
 ### Sources
 
 @CompletionContext

@@ -1,5 +1,5 @@
 import {EditorView} from "@codemirror/view"
-import {EditorState} from "@codemirror/state"
+import {EditorState, Annotation} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {ActiveResult} from "./state"
@@ -21,7 +21,9 @@ export interface Completion {
   /// its [label](#autocomplete.Completion.label). When this holds a
   /// string, the completion range is replaced by that string. When it
   /// is a function, that function is called to perform the
-  /// completion.
+  /// completion. If it fires a transaction, it is responsible for
+  /// adding the [`pickedCompletion`](#autocomplete.pickedCompletion)
+  /// annotation to it.
   apply?: string | ((view: EditorView, completion: Completion, from: number, to: number) => void),
   /// The type of the completion. This is used to pick an icon to show
   /// for the completion. Icons are styled with a CSS class created by
@@ -193,6 +195,10 @@ export function ensureAnchor(expr: RegExp, start: boolean) {
                     expr.flags ?? (expr.ignoreCase ? "i" : ""))
 }
 
+/// This annotation is added to transactions that are produced by
+/// picking a completion.
+export const pickedCompletion = Annotation.define<Completion>()
+
 export function applyCompletion(view: EditorView, option: Option) {
   let apply = option.completion.apply || option.completion.label
   let result = option.source
@@ -200,7 +206,8 @@ export function applyCompletion(view: EditorView, option: Option) {
     view.dispatch({
       changes: {from: result.from, to: result.to, insert: apply},
       selection: {anchor: result.from + apply.length},
-      userEvent: "input.complete"
+      userEvent: "input.complete",
+      annotations: pickedCompletion.of(option.completion)
     })
   } else {
     apply(view, option.completion, result.from, result.to)

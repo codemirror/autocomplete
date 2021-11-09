@@ -7,7 +7,8 @@ import {completionPlugin, moveCompletionSelection, acceptCompletion, startComple
 import {baseTheme} from "./theme"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
-export {Completion, CompletionContext, CompletionSource, CompletionResult, completeFromList, ifIn, ifNotIn} from "./completion"
+export {Completion, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
+        completeFromList, ifIn, ifNotIn} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 
@@ -58,4 +59,10 @@ export function completionStatus(state: EditorState): null | "active" | "pending
 export function currentCompletions(state: EditorState): readonly Completion[] {
   let open = state.field(completionState, false)?.open
   return open ? open.options.map(o => o.completion) : []
+}
+
+/// Return the currently selected completion, if any.
+export function selectedCompletion(state: EditorState): Completion | null {
+  let open = state.field(completionState, false)?.open
+  return open ? open.options[open.selected].completion : null
 }
