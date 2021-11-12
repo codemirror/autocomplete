@@ -1,3 +1,9 @@
+## 0.19.6 (2021-11-12)
+
+### Bug fixes
+
+Fix an issue where parsing a snippet with a field that was labeled only by a number crashed.
+
 ## 0.19.5 (2021-11-09)
 
 ### Bug fixes
