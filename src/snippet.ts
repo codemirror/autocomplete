@@ -43,18 +43,18 @@ class Snippet {
   }
 
   static parse(template: string) {
-    let fields: {seq: number | null, name: string | null}[] = []
+    let fields: {seq: number | null, name: string}[] = []
     let lines = [], positions = [], m
     for (let line of template.split(/\r\n?|\n/)) {
       while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|([^}]*))\}/.exec(line)) {
-        let seq = m[1] ? +m[1] : null, name = m[2] || m[3], found = -1
+        let seq = m[1] ? +m[1] : null, name = m[2] || m[3] || "", found = -1
         for (let i = 0; i < fields.length; i++) {
           if (seq != null ? fields[i].seq == seq : name ? fields[i].name == name : false) found = i
         }
         if (found < 0) {
           let i = 0
           while (i < fields.length && (seq == null || (fields[i].seq != null && fields[i].seq! < seq))) i++
-          fields.splice(i, 0, {seq, name: name || null})
+          fields.splice(i, 0, {seq, name})
           found = i
           for (let pos of positions) if (pos.field >= found) pos.field++
         }
