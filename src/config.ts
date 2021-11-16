@@ -19,6 +19,10 @@ export interface CompletionConfig {
   /// probably have a higher precedence than other bindings for the
   /// same keys.)
   defaultKeymap?: boolean,
+  /// By default, completions are shown below the cursor when there is
+  /// space. Setting this to true will make the extension put the
+  /// completions above the cursor when possible.
+  aboveCursor?: boolean,
   /// This can be used to add additional CSS classes to completion
   /// options.
   optionClass?: (completion: Completion) => string,
@@ -45,6 +49,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       maxRenderedOptions: 100,
       defaultKeymap: true,
       optionClass: () => "",
+      aboveCursor: false,
       icons: true,
       addToOptions: []
     }, {

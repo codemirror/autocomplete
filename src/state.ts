@@ -56,7 +56,8 @@ class CompletionDialog {
     active: readonly ActiveSource[],
     state: EditorState,
     id: string,
-    prev: CompletionDialog | null
+    prev: CompletionDialog | null,
+    conf: Required<CompletionConfig>
   ): CompletionDialog | null {
     let options = sortOptions(active, state)
     if (!options.length) return null
@@ -69,7 +70,8 @@ class CompletionDialog {
     }
     return new CompletionDialog(options, makeAttrs(id, selected), {
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
-      create: completionTooltip(completionState)
+      create: completionTooltip(completionState),
+      above: conf.aboveCursor,
     }, prev ? prev.timestamp : Date.now(), selected)
   }
 
@@ -100,7 +102,7 @@ export class CompletionState {
     if (active.length == this.active.length && active.every((a, i) => a == this.active[i])) active = this.active
 
     let open = tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
-      !sameResults(active, this.active) ? CompletionDialog.build(active, state, this.id, this.open)
+      !sameResults(active, this.active) ? CompletionDialog.build(active, state, this.id, this.open, conf)
       : this.open && tr.docChanged ? this.open.map(tr.changes) : this.open
     if (!open && active.every(a => a.state != State.Pending) && active.some(a => a.hasResult()))
       active = active.map(a => a.hasResult() ? new ActiveSource(a.source, State.Inactive) : a)
