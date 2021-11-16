@@ -1,3 +1,9 @@
+## 0.19.7 (2021-11-16)
+
+### Bug fixes
+
+Make option deduplication less aggressive, so that options with different `type` or `apply` fields don't get merged.
+
 ## 0.19.6 (2021-11-12)
 
 ### Bug fixes
