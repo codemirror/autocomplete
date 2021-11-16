@@ -32,7 +32,8 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
   let result = [], prev = null
   for (let opt of options.sort(cmpOption)) {
     if (result.length == MaxOptions) break
-    if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail) result.push(opt)
+    if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail ||
+        prev.type != opt.completion.type || prev.apply != opt.completion.apply) result.push(opt)
     else if (score(opt.completion) > score(prev)) result[result.length - 1] = opt
     prev = opt.completion
   }
