@@ -1,3 +1,13 @@
+## 0.19.8 (2021-11-17)
+
+### Bug fixes
+
+Give the completion tooltip a minimal width, and show ellipsis when completions overflow the tooltip width.
+
+### New features
+
+`autocompletion` now accepts an `aboveCursor` option to make the completion tooltip show up above the cursor.
+
 ## 0.19.7 (2021-11-16)
 
 ### Bug fixes
