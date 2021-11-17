@@ -5,17 +5,20 @@ export const baseTheme = EditorView.baseTheme({
     "& > ul": {
       fontFamily: "monospace",
       whiteSpace: "nowrap",
-      overflow: "auto",
+      overflow: "hidden auto",
       maxWidth_fallback: "700px",
       maxWidth: "min(700px, 95vw)",
+      minWidth: "250px",
       maxHeight: "10em",
       listStyle: "none",
       margin: 0,
       padding: 0,
 
       "& > li": {
+        overflowX: "hidden",
+        textOverflow: "ellipsis",
         cursor: "pointer",
-        padding: "1px 1em 1px 3px",
+        padding: "1px 3px",
         lineHeight: 1.2
       },
     }
