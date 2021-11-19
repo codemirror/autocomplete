@@ -213,7 +213,7 @@ function handleSame(state: EditorState, token: string, allowTriple: boolean) {
               range: EditorSelection.cursor(pos + token.length)}
     } else if (state.charCategorizer(pos)(next) != CharCategory.Word) {
       let prev = state.sliceDoc(pos - 1, pos)
-      if (prev != token && state.charCategorizer(pos)(prev) != CharCategory.Word)
+      if (prev != token && state.charCategorizer(pos)(prev) != CharCategory.Word && !probablyInString(state, pos, token))
         return {changes: {insert: token + token, from: pos},
                 effects: closeBracketEffect.of(pos + token.length),
                 range: EditorSelection.cursor(pos + token.length)}
@@ -229,4 +229,15 @@ function handleSame(state: EditorState, token: string, allowTriple: boolean) {
 function nodeStart(state: EditorState, pos: number) {
   let tree = syntaxTree(state).resolveInner(pos + 1)
   return tree.parent && tree.from == pos
+}
+
+function probablyInString(state: EditorState, pos: number, quoteToken: string) {
+  let node = syntaxTree(state).resolveInner(pos, -1)
+  for (let i = 0; i < 5; i++) {
+    if (state.sliceDoc(node.from, node.from + quoteToken.length) == quoteToken) return true
+    let parent = node.to == pos && node.parent
+    if (!parent) break
+    node = parent
+  }
+  return false
 }
