@@ -170,8 +170,8 @@ class CompletionTooltip {
     let sel = this.dom.querySelector("[aria-selected]") as HTMLElement | null
     if (!sel || !this.info) return null
     let rect = this.dom.getBoundingClientRect(), infoRect = this.info!.getBoundingClientRect()
+    if (rect.top > innerHeight - 10 || rect.bottom < 10) return null
     let top = Math.min(sel.getBoundingClientRect().top, innerHeight - infoRect.height) - rect.top
-    if (top < 0 || top > this.list.clientHeight - 10) return null
     let left = this.view.textDirection == Direction.RTL
     let spaceLeft = rect.left, spaceRight = innerWidth - rect.right
     if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
@@ -180,10 +180,12 @@ class CompletionTooltip {
   }
 
   positionInfo(pos: {top: number, left: boolean} | null) {
-    if (this.info && pos) {
-      this.info.style.top = pos.top + "px"
-      this.info.classList.toggle("cm-completionInfo-left", pos.left)
-      this.info.classList.toggle("cm-completionInfo-right", !pos.left)
+    if (this.info) {
+      this.info.style.top = (pos ? pos.top : -1e6) + "px"
+      if (pos) {
+        this.info.classList.toggle("cm-completionInfo-left", pos.left)
+        this.info.classList.toggle("cm-completionInfo-right", !pos.left)
+      }
     }
   }
 
