@@ -171,7 +171,7 @@ class CompletionTooltip {
     if (!sel || !this.info) return null
     let rect = this.dom.getBoundingClientRect(), infoRect = this.info!.getBoundingClientRect()
     if (rect.top > innerHeight - 10 || rect.bottom < 10) return null
-    let top = Math.min(sel.getBoundingClientRect().top, innerHeight - infoRect.height) - rect.top
+    let top = Math.max(0, Math.min(sel.getBoundingClientRect().top, innerHeight - infoRect.height)) - rect.top
     let left = this.view.textDirection == Direction.RTL
     let spaceLeft = rect.left, spaceRight = innerWidth - rect.right
     if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
