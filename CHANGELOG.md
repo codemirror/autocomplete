@@ -1,3 +1,9 @@
+## 0.19.9 (2021-11-26)
+
+### Bug fixes
+
+Fix an issue where info tooltips would be visible in an inappropriate position when there was no room to place them properly.
+
 ## 0.19.8 (2021-11-17)
 
 ### Bug fixes
