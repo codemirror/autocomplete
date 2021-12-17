@@ -169,11 +169,14 @@ class CompletionTooltip {
   measureInfo() {
     let sel = this.dom.querySelector("[aria-selected]") as HTMLElement | null
     if (!sel || !this.info) return null
-    let rect = this.dom.getBoundingClientRect(), infoRect = this.info!.getBoundingClientRect()
-    if (rect.top > innerHeight - 10 || rect.bottom < 10) return null
-    let top = Math.max(0, Math.min(sel.getBoundingClientRect().top, innerHeight - infoRect.height)) - rect.top
+    let listRect = this.dom.getBoundingClientRect()
+    let infoRect = this.info!.getBoundingClientRect()
+    let selRect = sel.getBoundingClientRect()
+    if (selRect.top > Math.min(innerHeight, listRect.bottom) - 10 || selRect.bottom < Math.max(0, listRect.top) + 10)
+      return null
+    let top = Math.max(0, Math.min(selRect.top, innerHeight - infoRect.height)) - listRect.top
     let left = this.view.textDirection == Direction.RTL
-    let spaceLeft = rect.left, spaceRight = innerWidth - rect.right
+    let spaceLeft = listRect.left, spaceRight = innerWidth - listRect.right
     if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
     else if (!left && spaceRight < Math.min(infoRect.width, spaceLeft)) left = true
     return {top, left}
