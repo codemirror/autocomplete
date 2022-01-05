@@ -1,3 +1,13 @@
+## 0.19.10 (2022-01-05)
+
+### Bug fixes
+
+Make sure the info tooltip is hidden when the selected option is scrolled out of view.
+
+Fix a bug in the completion ranking that would sometimes give options that match the input by word start chars higher scores than appropriate.
+
+Options are now sorted (ascending) by length when their match score is otherwise identical.
+
 ## 0.19.9 (2021-11-26)
 
 ### Bug fixes
