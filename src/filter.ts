@@ -77,7 +77,7 @@ export class FuzzyMatcher {
     let byWordTo = 0, byWordFolded = false
     // If we've found a partial adjacent match, these track its state
     let adjacentTo = 0, adjacentStart = -1, adjacentEnd = -1
-    let hasLower = /[a-z]/.test(word)
+    let hasLower = /[a-z]/.test(word), wordAdjacent = true
     // Go over the option's text, scanning for the various kinds of matches
     for (let i = 0, e = Math.min(word.length, 200), prevType = Tp.NonWord; i < e && byWordTo < len;) {
       let next = codePointAt(word, i)
@@ -97,14 +97,15 @@ export class FuzzyMatcher {
       let ch, type = next < 0xff
         ? (next >= 48 && next <= 57 || next >= 97 && next <= 122 ? Tp.Lower : next >= 65 && next <= 90 ? Tp.Upper : Tp.NonWord)
         : ((ch = fromCodePoint(next)) != ch.toLowerCase() ? Tp.Upper : ch != ch.toUpperCase() ? Tp.Lower : Tp.NonWord)
-      if ((type == Tp.Upper && hasLower || prevType == Tp.NonWord && type != Tp.NonWord) &&
-          (chars[byWordTo] == next || (folded[byWordTo] == next && (byWordFolded = true))))
-        byWord[byWordTo++] = i
+      if (!i || type == Tp.Upper && hasLower || prevType == Tp.NonWord && type != Tp.NonWord) {
+        if (chars[byWordTo] == next || (folded[byWordTo] == next && (byWordFolded = true))) byWord[byWordTo++] = i
+        else if (byWord.length) wordAdjacent = false
+      }
       prevType = type
       i += codePointSize(next)
     }
 
-    if (byWordTo == len && byWord[0] == 0)
+    if (byWordTo == len && byWord[0] == 0 && wordAdjacent)
       return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0), byWord, word)
     if (adjacentTo == len && adjacentStart == 0)
       return [Penalty.CaseFold, 0, adjacentEnd]
@@ -113,7 +114,8 @@ export class FuzzyMatcher {
     if (adjacentTo == len)
       return [Penalty.CaseFold + Penalty.NotStart, adjacentStart, adjacentEnd]
     if (byWordTo == len)
-      return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0) + Penalty.NotStart, byWord, word)
+      return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0) + Penalty.NotStart +
+        (wordAdjacent ? 0 : Penalty.Gap), byWord, word)
     return chars.length == 2 ? null : this.result((any[0] ? Penalty.NotStart : 0) + Penalty.CaseFold + Penalty.Gap, any, word)
   }
 
