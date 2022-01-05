@@ -101,7 +101,9 @@ function once(c: CompletionSource): CompletionSource {
   }
 }
 
-function options(s: EditorState) { return currentCompletions(s).map(c => c.label).join(" ") }
+function options(s: EditorState) {
+  return currentCompletions(s).map(c => / /.test(c.label) ? JSON.stringify(c.label) : c.label).join(" ")
+}
 
 function type(view: EditorView, text: string) {
   let cur = view.state.selection.main.head
@@ -145,6 +147,10 @@ describe("autocomplete", () => {
     run.options("handles all-uppercase words", "sel", [from("SCOPE_CATALOG SELECT SELECTIVE")], "SELECT SELECTIVE SCOPE_CATALOG")
 
     run.options("penalizes by-word matches with gaps", "abc", [from("xabc aVeryBigCar")], "xabc aVeryBigCar")
+
+    run.options("prefers shorter options", "hair", [
+      completeFromList(["aVerySmallChair", "Hairstyle", "chair", "BigChair"])
+    ], "Hairstyle chair BigChair aVerySmallChair")
 
     run.test("will eagerly populate the result list when a source is slow", {
       doc: "on",

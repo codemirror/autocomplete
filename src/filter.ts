@@ -108,11 +108,11 @@ export class FuzzyMatcher {
     if (byWordTo == len && byWord[0] == 0 && wordAdjacent)
       return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0), byWord, word)
     if (adjacentTo == len && adjacentStart == 0)
-      return [Penalty.CaseFold, 0, adjacentEnd]
+      return [Penalty.CaseFold - word.length, 0, adjacentEnd]
     if (direct > -1)
-      return [Penalty.NotStart, direct, direct + this.pattern.length]
+      return [Penalty.NotStart - word.length, direct, direct + this.pattern.length]
     if (adjacentTo == len)
-      return [Penalty.CaseFold + Penalty.NotStart, adjacentStart, adjacentEnd]
+      return [Penalty.CaseFold + Penalty.NotStart - word.length, adjacentStart, adjacentEnd]
     if (byWordTo == len)
       return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0) + Penalty.NotStart +
         (wordAdjacent ? 0 : Penalty.Gap), byWord, word)
@@ -120,7 +120,7 @@ export class FuzzyMatcher {
   }
 
   result(score: number, positions: number[], word: string) {
-    let result = [score], i = 1
+    let result = [score - word.length], i = 1
     for (let pos of positions) {
       let to = pos + (this.astral ? codePointSize(codePointAt(word, pos)) : 1)
       if (i > 1 && result[i - 1] == pos) result[i - 1] = to
