@@ -15,7 +15,7 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
     if (!cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin) return false
     let step = 1, tooltip: HTMLElement
     if (by == "page" && (tooltip = view.dom.querySelector(".cm-tooltip-autocomplete") as HTMLElement))
-      step = Math.max(2, Math.floor(tooltip.offsetHeight / (tooltip.firstChild as HTMLElement).offsetHeight))
+      step = Math.max(2, Math.floor(tooltip.offsetHeight / (tooltip.querySelector("li") as HTMLElement).offsetHeight) - 1)
     let selected = cState.open.selected + step * (forward ? 1 : -1), {length} = cState.open.options
     if (selected < 0) selected = by == "page" ? 0 : length - 1
     else if (selected >= length) selected = by == "page" ? length - 1 : 0
