@@ -25,7 +25,7 @@ export const baseTheme = EditorView.baseTheme({
   },
 
   "&light .cm-tooltip-autocomplete ul li[aria-selected]": {
-    background: "#39e",
+    background: "#17c",
     color: "white",
   },
 
