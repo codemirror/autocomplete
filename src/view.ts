@@ -2,6 +2,7 @@ import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException} 
 import {Transaction} from "@codemirror/state"
 import {completionState, setSelectedEffect, startCompletionEffect, closeCompletionEffect, setActiveEffect, State,
         ActiveSource, ActiveResult, getUserEvent} from "./state"
+import {getTooltip, TooltipView} from "@codemirror/tooltip"
 import {completionConfig} from "./config"
 import {cur, CompletionResult, CompletionContext, applyCompletion, ensureAnchor} from "./completion"
 
@@ -13,9 +14,10 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
   return (view: EditorView) => {
     let cState = view.state.field(completionState, false)
     if (!cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin) return false
-    let step = 1, tooltip: HTMLElement
-    if (by == "page" && (tooltip = view.dom.querySelector(".cm-tooltip-autocomplete") as HTMLElement))
-      step = Math.max(2, Math.floor(tooltip.offsetHeight / (tooltip.querySelector("li") as HTMLElement).offsetHeight) - 1)
+    let step = 1, tooltip: TooltipView | null
+    if (by == "page" && (tooltip = getTooltip(view, cState.open.tooltip)))
+      step = Math.max(2, Math.floor(tooltip.dom.offsetHeight /
+        (tooltip.dom.querySelector("li") as HTMLElement).offsetHeight) - 1)
     let selected = cState.open.selected + step * (forward ? 1 : -1), {length} = cState.open.options
     if (selected < 0) selected = by == "page" ? 0 : length - 1
     else if (selected >= length) selected = by == "page" ? length - 1 : 0
