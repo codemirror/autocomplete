@@ -1,3 +1,9 @@
+## 0.19.12 (2022-01-11)
+
+### Bug fixes
+
+Fix completion navigation with PageUp/Down when the completion tooltip isn't part of the view DOM.
+
 ## 0.19.11 (2022-01-11)
 
 ### Bug fixes
