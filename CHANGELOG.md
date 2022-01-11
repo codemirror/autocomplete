@@ -1,3 +1,9 @@
+## 0.19.11 (2022-01-11)
+
+### Bug fixes
+
+Fix a bug that caused page up/down to only move the selection by two options in the completion tooltip.
+
 ## 0.19.10 (2022-01-05)
 
 ### Bug fixes
