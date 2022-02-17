@@ -76,8 +76,10 @@ function config(state: EditorState, pos: number) {
   return state.languageDataAt<CloseBracketConfig>("closeBrackets", pos)[0] || defaults
 }
 
+const android = typeof navigator == "object" && /Android\b/.test(navigator.userAgent)
+
 const inputHandler = EditorView.inputHandler.of((view, from, to, insert) => {
-  if (view.composing || view.state.readOnly) return false
+  if ((android ? view.composing : view.compositionStarted) || view.state.readOnly) return false
   let sel = view.state.selection.main
   if (insert.length > 2 || insert.length == 2 && codePointSize(codePointAt(insert, 0)) == 1 ||
       from != sel.from || to != sel.to) return false
