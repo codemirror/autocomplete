@@ -1,3 +1,11 @@
+## 0.19.13 (2022-02-18)
+
+### Bug fixes
+
+Fix an issue where the completion tooltip stayed open if it was explicitly opened and the user backspaced past its start.
+
+Stop snippet filling when a change happens across one of the snippet fields' boundaries.
+
 ## 0.19.12 (2022-01-11)
 
 ### Bug fixes
