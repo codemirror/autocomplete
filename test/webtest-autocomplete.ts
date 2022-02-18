@@ -206,6 +206,18 @@ describe("autocomplete", () => {
       await sync(options, "")
     })
 
+    run.test("stops explicit completion when backspacing past start", {
+      doc: "foo.o",
+      sources: [from("one two")]
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "one")
+      del(view)
+      await sync(options, "one two")
+      del(view)
+      await sync(options, "")
+    })
+
     run.test("stops explicit completions for non-matching input", {sources: [from("one")]}, async (view, sync) => {
       startCompletion(view)
       await sync(options, "one")

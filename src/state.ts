@@ -210,7 +210,9 @@ export class ActiveResult extends ActiveSource {
   handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
     let from = tr.changes.mapPos(this.from), to = tr.changes.mapPos(this.to, 1)
     let pos = cur(tr.state)
-    if ((this.explicitPos > -1 ? pos < from : pos <= from) || pos > to)
+    if ((this.explicitPos < 0 ? pos <= from : pos < this.from) ||
+        pos > to ||
+        type == "delete" && cur(tr.startState) == this.from)
       return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive)
     let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos)
     if (this.span && (from == to || this.span.test(tr.state.sliceDoc(from, to))))
