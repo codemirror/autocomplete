@@ -1,6 +1,6 @@
 import {Decoration, DecorationSet, WidgetType, EditorView, keymap, KeyBinding} from "@codemirror/view"
 import {StateField, StateEffect, ChangeDesc, EditorState, EditorSelection,
-        Transaction, TransactionSpec, Text, StateCommand, Prec, Facet} from "@codemirror/state"
+        Transaction, TransactionSpec, Text, StateCommand, Prec, Facet, MapMode} from "@codemirror/state"
 import {indentUnit} from "@codemirror/language"
 import {baseTheme} from "./theme"
 import {Completion} from "./completion"
@@ -16,7 +16,9 @@ class FieldRange {
   constructor(readonly field: number, readonly from: number, readonly to: number) {}
 
   map(changes: ChangeDesc) {
-    return new FieldRange(this.field, changes.mapPos(this.from, -1), changes.mapPos(this.to, 1))
+    let from = changes.mapPos(this.from, -1, MapMode.TrackDel)
+    let to = changes.mapPos(this.to, 1, MapMode.TrackDel)
+    return from == null || to == null ? null : new FieldRange(this.field, from, to)
   }
 }
 
@@ -86,7 +88,13 @@ class ActiveSnippet {
   }
 
   map(changes: ChangeDesc) {
-    return new ActiveSnippet(this.ranges.map(r => r.map(changes)), this.active)
+    let ranges = []
+    for (let r of this.ranges) {
+      let mapped = r.map(changes)
+      if (!mapped) return null
+      ranges.push(mapped)
+    }
+    return new ActiveSnippet(ranges, this.active)
   }
 
   selectionInsideField(sel: EditorSelection) {
