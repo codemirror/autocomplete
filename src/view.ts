@@ -87,7 +87,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     for (let i = 0; i < this.running.length; i++) {
       let query = this.running[i]
       if (doesReset ||
-          query.updates.length + update.transactions.length > MaxUpdateCount && query.time - Date.now() > MinAbortTime) {
+          query.updates.length + update.transactions.length > MaxUpdateCount && Date.now() - query.time > MinAbortTime) {
         for (let handler of query.context.abortListeners!) {
           try { handler() }
           catch(e) { logException(this.view.state, e) }

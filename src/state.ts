@@ -28,7 +28,6 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
       }
     }
   }
-  options.sort(cmpOption)
   let result = [], prev = null
   for (let opt of options.sort(cmpOption)) {
     if (result.length == MaxOptions) break
@@ -64,8 +63,9 @@ class CompletionDialog {
     let selected = 0
     if (prev && prev.selected) {
       let selectedValue = prev.options[prev.selected].completion
-      for (let i = 0; i < options.length && !selected; i++) {
-        if (options[i].completion == selectedValue) selected = i
+      for (let i = 0; i < options.length; i++) if (options[i].completion == selectedValue) {
+        selected = i
+        break
       }
     }
     return new CompletionDialog(options, makeAttrs(id, selected), {
