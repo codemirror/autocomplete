@@ -128,14 +128,13 @@ function sameResults(a: readonly ActiveSource[], b: readonly ActiveSource[]) {
 }
 
 const baseAttrs = {
-  "aria-autocomplete": "list",
-  "aria-expanded": "false"
+  "aria-autocomplete": "list"
 }
 
 function makeAttrs(id: string, selected: number): {[name: string]: string} {
   return {
     "aria-autocomplete": "list",
-    "aria-expanded": "true",
+    "aria-haspopup":"listbox",
     "aria-activedescendant": id + "-" + selected,
     "aria-controls": id
   }
