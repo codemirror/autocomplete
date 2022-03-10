@@ -196,6 +196,7 @@ class CompletionTooltip {
     const ul = document.createElement("ul")
     ul.id = id
     ul.setAttribute("role", "listbox")
+    ul.setAttribute("aria-expanded", "true")
     for (let i = range.from; i < range.to; i++) {
       let {completion, match} = options[i]
       const li = ul.appendChild(document.createElement("li"))
