@@ -1,3 +1,9 @@
+## 0.19.14 (2022-03-10)
+
+### Bug fixes
+
+Make the ARIA attributes added to the editor during autocompletion spec-compliant.
+
 ## 0.19.13 (2022-02-18)
 
 ### Bug fixes
