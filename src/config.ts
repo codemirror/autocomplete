@@ -39,6 +39,9 @@ export interface CompletionConfig {
   /// 70.
   addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
                   position: number}[]
+  /// When enabled (defaults to false), the mouse will be used to select 
+  /// an autocomplete result when hovering
+  allowMouseSelection?:boolean
 }
 
 export const completionConfig = Facet.define<CompletionConfig, Required<CompletionConfig>>({
@@ -51,7 +54,8 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       optionClass: () => "",
       aboveCursor: false,
       icons: true,
-      addToOptions: []
+      addToOptions: [],
+      allowMouseSelection: false
     }, {
       defaultKeymap: (a, b) => a && b,
       icons: (a, b) => a && b,

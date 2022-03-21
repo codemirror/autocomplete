@@ -1,7 +1,7 @@
 import {EditorView, ViewUpdate, Direction, logException} from "@codemirror/view"
 import {StateField, EditorState} from "@codemirror/state"
 import {TooltipView} from "@codemirror/tooltip"
-import {CompletionState} from "./state"
+import {CompletionState, setSelectedEffect} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, applyCompletion, Completion} from "./completion"
 
@@ -102,14 +102,22 @@ class CompletionTooltip {
     this.dom = document.createElement("div")
     this.dom.className = "cm-tooltip-autocomplete"
     this.dom.addEventListener("mousedown", (e: MouseEvent) => {
-      for (let dom = e.target as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
-        if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < options.length) {
-          applyCompletion(view, options[+match[1]])
-          e.preventDefault()
-          return
-        }
+      const index = this.getOptionIndex(e.target as HTMLElement, options.length)
+      if(index !== undefined){
+        applyCompletion(view, options[index])
+        e.preventDefault()
       }
     })
+
+    if(config.allowMouseSelection){
+      this.dom.addEventListener("mousemove", (e: MouseEvent) => {
+        const index = this.getOptionIndex(e.target as HTMLElement, options.length)
+        if(index !== undefined){
+          this.view.dispatch({effects: setSelectedEffect.of(index)})
+        } 
+      });
+    }
+    
     this.list = this.dom.appendChild(this.createListBox(options, cState.id, this.range))
     this.list.addEventListener("scroll", () => {
       if (this.info) this.view.requestMeasure(this.placeInfo)
@@ -117,6 +125,14 @@ class CompletionTooltip {
   }
 
   mount() { this.updateSel() }
+
+  getOptionIndex(element:HTMLElement, optionsLength:number){
+    for (let dom = element as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
+      if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < optionsLength) {
+        return +match[1]
+      }
+    }
+  }
 
   update(update: ViewUpdate) {
     if (update.state.field(this.stateField) != update.startState.field(this.stateField))
