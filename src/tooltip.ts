@@ -57,11 +57,11 @@ function createInfoDialog(option: Option, view: EditorView) {
   if (typeof info == "string") {
     dom.textContent = info
   } else {
-    let content = info!(option.completion)
-    if ((content as any).then)
-      (content as Promise<Node>).then(node => dom.appendChild(node), e => logException(view.state, e, "completion info"))
+    let content = info(option.completion)
+    if ('then' in content)
+      content.then(node => dom.appendChild(node), e => logException(view.state, e, "completion info"))
     else
-      dom.appendChild(content as Node)
+      dom.appendChild(content)
   }
   return dom
 }
