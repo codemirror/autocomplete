@@ -50,19 +50,15 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
   return content.sort((a, b) => a.position - b.position).map(a => a.render)
 }
 
-function createInfoDialog(option: Option, view: EditorView) {
+function createInfoDomNode(content: string | Node) {
   let dom = document.createElement("div")
   dom.className = "cm-tooltip cm-completionInfo"
-  let {info} = option.completion
-  if (typeof info == "string") {
-    dom.textContent = info
-  } else {
-    let content = info!(option.completion)
-    if ((content as any).then)
-      (content as Promise<Node>).then(node => dom.appendChild(node), e => logException(view.state, e, "completion info"))
-    else
-      dom.appendChild(content as Node)
-  }
+
+  if (typeof content === 'string')
+    dom.textContent = content
+  else
+    dom.appendChild(content)
+
   return dom
 }
 
@@ -138,14 +134,29 @@ class CompletionTooltip {
         if (this.info) this.view.requestMeasure(this.placeInfo)
       })
     }
-
     if (this.updateSelectedOption(open.selected)) {
       if (this.info) {this.info.remove(); this.info = null}
-      let option = open.options[open.selected]
-      if (option.completion.info) {
-        this.info = this.dom.appendChild(createInfoDialog(option, this.view)) as HTMLElement
+      let {completion} = open.options[open.selected]
+      let {info} = completion
+      if (!info) return
+      if (typeof info === 'string') {
+        this.info = this.dom.appendChild(createInfoDomNode(info))
         this.view.requestMeasure(this.placeInfo)
+        return;
       }
+      let infoResult = info(completion)
+      if ('then' in infoResult) {
+        infoResult.then(maybeNode => {
+          if (!maybeNode) return
+          let newState = this.view.state.field(this.stateField)
+          if (newState != cState) return
+          this.info = this.dom.appendChild(createInfoDomNode(maybeNode))
+          this.view.requestMeasure(this.placeInfo)
+        }).catch(e => logException(this.view.state, e, "completion info"))
+        return
+      }
+      this.info = this.dom.appendChild(createInfoDomNode(infoResult))
+      this.view.requestMeasure(this.placeInfo)
     }
   }
 
