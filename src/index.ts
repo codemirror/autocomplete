@@ -1,7 +1,7 @@
-import {Prec, Extension, EditorState} from "@codemirror/state"
+import {Prec, Extension, EditorState, StateEffect} from "@codemirror/state"
 import {keymap, KeyBinding} from "@codemirror/view"
-import {Completion} from "./completion"
-import {completionState, State} from "./state"
+import {Completion, Option} from "./completion"
+import {completionState, State, setSelectedEffect} from "./state"
 import {CompletionConfig, completionConfig} from "./config"
 import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
 import {baseTheme} from "./theme"
@@ -55,14 +55,33 @@ export function completionStatus(state: EditorState): null | "active" | "pending
     : cState && cState.active.some(a => a.state != State.Inactive) ? "active" : null
 }
 
+const completionArrayCache: WeakMap<readonly Option[], readonly Completion[]> = new WeakMap
+
 /// Returns the available completions as an array.
 export function currentCompletions(state: EditorState): readonly Completion[] {
   let open = state.field(completionState, false)?.open
-  return open ? open.options.map(o => o.completion) : []
+  if (!open) return []
+  let completions = completionArrayCache.get(open.options)
+  if (!completions)
+    completionArrayCache.set(open.options, completions = open.options.map(o => o.completion))
+  return completions
 }
 
 /// Return the currently selected completion, if any.
 export function selectedCompletion(state: EditorState): Completion | null {
   let open = state.field(completionState, false)?.open
   return open ? open.options[open.selected].completion : null
+}
+
+/// Returns the currently selected position in the active completion
+/// list, or null if no completions are active.
+export function selectedCompletionIndex(state: EditorState): number | null {
+  let open = state.field(completionState, false)?.open
+  return open ? open.selected : null
+}
+
+/// Create an effect that can be attached to a transaction to change
+/// the currently selected completion.
+export function setSelectedCompletion(index: number): StateEffect<unknown> {
+  return setSelectedEffect.of(index)
 }

@@ -8,6 +8,10 @@
 
 @selectedCompletion
 
+@selectedCompletionIndex
+
+@setSelectedCompletion
+
 @pickedCompletion
 
 ### Sources
