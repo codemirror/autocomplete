@@ -152,7 +152,7 @@ class CompletionTooltip {
           if (newState != cState) return
           this.info = this.dom.appendChild(createInfoDomNode(maybeNode))
           this.view.requestMeasure(this.placeInfo)
-        })
+        }).catch(e => logException(this.view.state, e, "completion info"))
         return
       }
       this.info = this.dom.appendChild(createInfoDomNode(infoResult))
