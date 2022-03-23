@@ -1,3 +1,13 @@
+## 0.19.15 (2022-03-23)
+
+### New features
+
+The `selectedCompletionIndex` function tells you the position of the currently selected completion.
+
+The new `setSelectionCompletion` function creates a state effect that moves the selected completion to a given index.
+
+A completion's `info` method may now return null to indicate that no further info is available.
+
 ## 0.19.14 (2022-03-10)
 
 ### Bug fixes
