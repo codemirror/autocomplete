@@ -50,18 +50,6 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
   return content.sort((a, b) => a.position - b.position).map(a => a.render)
 }
 
-function createInfoDomNode(content: string | Node) {
-  let dom = document.createElement("div")
-  dom.className = "cm-tooltip cm-completionInfo"
-
-  if (typeof content === 'string')
-    dom.textContent = content
-  else
-    dom.appendChild(content)
-
-  return dom
-}
-
 function rangeAroundSelected(total: number, selected: number, max: number) {
   if (total <= max) return {from: 0, to: total}
   if (selected <= (total >> 1)) {
@@ -139,25 +127,25 @@ class CompletionTooltip {
       let {completion} = open.options[open.selected]
       let {info} = completion
       if (!info) return
-      if (typeof info === 'string') {
-        this.info = this.dom.appendChild(createInfoDomNode(info))
-        this.view.requestMeasure(this.placeInfo)
-        return;
-      }
-      let infoResult = info(completion)
+      let infoResult = typeof info === 'string' ? document.createTextNode(info) : info(completion)
+      if (!infoResult) return
       if ('then' in infoResult) {
-        infoResult.then(maybeNode => {
-          if (!maybeNode) return
-          let newState = this.view.state.field(this.stateField)
-          if (newState != cState) return
-          this.info = this.dom.appendChild(createInfoDomNode(maybeNode))
-          this.view.requestMeasure(this.placeInfo)
+        infoResult.then(node => {
+          if (node && this.view.state.field(this.stateField, false) == cState)
+            this.addInfoPane(node)
         }).catch(e => logException(this.view.state, e, "completion info"))
-        return
+      } else {
+        this.addInfoPane(infoResult)
       }
-      this.info = this.dom.appendChild(createInfoDomNode(infoResult))
-      this.view.requestMeasure(this.placeInfo)
     }
+  }
+
+  addInfoPane(content: Node) {
+    let dom = this.info = document.createElement("div")
+    dom.className = "cm-tooltip cm-completionInfo"
+    dom.appendChild(content)
+    this.dom.appendChild(dom)
+    this.view.requestMeasure(this.placeInfo)
   }
 
   updateSelectedOption(selected: number) {
