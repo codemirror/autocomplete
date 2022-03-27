@@ -40,10 +40,19 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
   }, {
     render(completion: Completion) {
       if (!completion.detail) return null
-      let detailElt = document.createElement("span")
-      detailElt.className = "cm-completionDetail"
-      detailElt.textContent = completion.detail
-      return detailElt
+      if (typeof completion.detail == 'function') {
+        let detail = completion.detail(completion)
+        if (!detail) return null
+        let detailElt = document.createElement("span")
+        detailElt.className = "cm-completionDetail"
+        detailElt.appendChild(detail)
+        return detailElt
+      } else {
+        let detailElt = document.createElement("span")
+        detailElt.className = "cm-completionDetail"
+        detailElt.textContent =  completion.detail
+        return detailElt
+      }
     },
     position: 80
   })

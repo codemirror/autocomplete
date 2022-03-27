@@ -12,7 +12,7 @@ export interface Completion {
   label: string,
   /// An optional short piece of information to show (with a different
   /// style) after the label.
-  detail?: string,
+  detail?: string | ((completion: Completion) => (Node | null)),
   /// Additional info to show when the completion is selected. Can be
   /// a plain string or a function that'll render the DOM structure to
   /// show when invoked.
