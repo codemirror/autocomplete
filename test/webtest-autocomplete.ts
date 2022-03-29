@@ -1,7 +1,7 @@
 import {EditorView} from "@codemirror/view"
 import {EditorState, EditorSelection} from "@codemirror/state"
 import {CompletionSource, autocompletion, CompletionContext, startCompletion,
-        currentCompletions, completionStatus, completeFromList} from "@codemirror/autocomplete"
+        currentCompletions, completionStatus, completeFromList, acceptCompletion} from "@codemirror/autocomplete"
 import ist from "ist"
 
 const Timeout = 1000, Chunk = 15
@@ -10,7 +10,7 @@ type Sync = <T>(get: (state: EditorState) => T, value: T) => Promise<void>
 
 type TestSpec = {
   doc?: string,
-  selection?: number,
+  selection?: number | EditorSelection,
   sources: readonly CompletionSource[]
 }
 
@@ -30,11 +30,14 @@ class Runner {
 
   runTest(name: string, spec: TestSpec, f: (view: EditorView, sync: Sync) => Promise<void>) {
     let syncing: {get: (state: EditorState) => any, value: any, resolve: () => void} | null = null
+    let selection = spec.selection == null ? EditorSelection.single((spec.doc || "").length)
+      : typeof spec.selection == "number" ? EditorSelection.single(spec.selection)
+      : spec.selection
     let view = new EditorView({
       state: EditorState.create({
         doc: spec.doc,
-        selection: EditorSelection.single(spec.selection ?? (spec.doc ? spec.doc.length : 0)),
-        extensions: autocompletion({override: spec.sources})
+        selection,
+        extensions: [autocompletion({override: spec.sources}), EditorState.allowMultipleSelections.of(true)]
       }),
       parent: document.querySelector("#workspace")! as HTMLElement,
       dispatch: tr => {
@@ -331,6 +334,30 @@ describe("autocomplete", () => {
     }, async (view, sync) => {
       startCompletion(view)
       await sync(options, "ok hah one")
+    })
+
+    run.test("will complete for multiple cursors", {
+      sources: [from("okay")],
+      doc: "o\no",
+      selection: new EditorSelection([EditorSelection.cursor(1), EditorSelection.cursor(3)])
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "okay")
+      await sleep(80)
+      acceptCompletion(view)
+      ist(view.state.doc.toString(), "okay\nokay")
+    })
+
+    run.test("will not complete for multiple cursors if prefix doesn't match", {
+      sources: [from("okay allo")],
+      doc: "o\na",
+      selection: new EditorSelection([EditorSelection.cursor(1), EditorSelection.cursor(3)])
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "okay")
+      await sleep(80)
+      acceptCompletion(view)
+      ist(view.state.doc.toString(), "okay\na")
     })
 
     return run.finish()

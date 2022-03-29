@@ -1,5 +1,5 @@
 import {EditorView} from "@codemirror/view"
-import {EditorState, Annotation} from "@codemirror/state"
+import {EditorState, Annotation, EditorSelection} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {ActiveResult} from "./state"
@@ -200,12 +200,23 @@ export function ensureAnchor(expr: RegExp, start: boolean) {
 export const pickedCompletion = Annotation.define<Completion>()
 
 export function applyCompletion(view: EditorView, option: Option) {
-  let apply = option.completion.apply || option.completion.label
+  const apply = option.completion.apply || option.completion.label
   let result = option.source
   if (typeof apply == "string") {
-    view.dispatch({
-      changes: {from: result.from, to: result.to, insert: apply},
-      selection: {anchor: result.from + apply.length},
+    view.dispatch(view.state.changeByRange(range => {
+      if (range == view.state.selection.main) return {
+        changes: {from: result.from, to: result.to, insert: apply },
+        range: EditorSelection.cursor(result.from + apply.length)
+      }
+      let len = result.to - result.from
+      if (!range.empty ||
+          len && view.state.sliceDoc(range.from - len, range.from) != view.state.sliceDoc(result.from, result.to))
+        return {range}
+      return {
+        changes: {from: range.from - len, to: range.from, insert: apply},
+        range: EditorSelection.cursor(range.from - len + apply.length)
+      }
+    }), {
       userEvent: "input.complete",
       annotations: pickedCompletion.of(option.completion)
     })
