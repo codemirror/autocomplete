@@ -15,13 +15,13 @@ export interface CloseBracketConfig {
   brackets?: string[],
   /// Characters in front of which newly opened brackets are
   /// automatically closed. Closing always happens in front of
-  /// whitespace. Defaults to `")]}'\":;>"`.
+  /// whitespace. Defaults to `")]}:;>"`.
   before?: string
 }
 
 const defaults: Required<CloseBracketConfig> = {
   brackets: ["(", "[", "{", "'", '"'],
-  before: ")]}'\":;>"
+  before: ")]}:;>"
 }
 
 const closeBracketEffect = StateEffect.define<number>({
