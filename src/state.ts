@@ -1,7 +1,7 @@
 import {EditorView} from "@codemirror/view"
 import {Transaction, StateField, StateEffect, EditorState, ChangeDesc} from "@codemirror/state"
 import {Tooltip, showTooltip} from "@codemirror/tooltip"
-import {Option, CompletionSource, CompletionResult, cur, asSource, Completion} from "./completion"
+import {Option, CompletionSource, CompletionResult, cur, asSource, Completion, ensureAnchor} from "./completion"
 import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
@@ -197,8 +197,7 @@ export class ActiveResult extends ActiveSource {
               explicitPos: number,
               readonly result: CompletionResult,
               readonly from: number,
-              readonly to: number,
-              readonly span: RegExp | null) {
+              readonly to: number) {
     super(source, State.Result, explicitPos)
   }
 
@@ -211,9 +210,11 @@ export class ActiveResult extends ActiveSource {
         pos > to ||
         type == "delete" && cur(tr.startState) == this.from)
       return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive)
-    let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos)
-    if (this.span && (from == to || this.span.test(tr.state.sliceDoc(from, to))))
-      return new ActiveResult(this.source, explicitPos, this.result, from, to, this.span)
+    let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos), updated
+    if (checkValid(this.result.validFor, tr.state, from, to))
+      return new ActiveResult(this.source, explicitPos, this.result, from, to)
+    if (this.result.update && (updated = this.result.update(this.result, from, to, tr.state)))
+      return new ActiveResult(this.source, explicitPos, updated, updated.from, updated.to ?? cur(tr.state))
     return new ActiveSource(this.source, State.Pending, explicitPos)
   }
 
@@ -224,8 +225,15 @@ export class ActiveResult extends ActiveSource {
   map(mapping: ChangeDesc) {
     return mapping.empty ? this :
       new ActiveResult(this.source, this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos), this.result,
-                       mapping.mapPos(this.from), mapping.mapPos(this.to, 1), this.span)
+                       mapping.mapPos(this.from), mapping.mapPos(this.to, 1))
   }
+}
+
+function checkValid(validFor: undefined | RegExp | ((text: string, from: number, to: number, state: EditorState) => boolean),
+                    state: EditorState, from: number, to: number) {
+  if (!validFor) return false
+  let text = state.sliceDoc(from, to)
+  return typeof validFor == "function" ? validFor(text, from, to, state) : ensureAnchor(validFor, true).test(text)
 }
 
 export const startCompletionEffect = StateEffect.define<boolean>()

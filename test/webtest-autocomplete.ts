@@ -76,14 +76,14 @@ function from(list: string): CompletionSource {
   return cx => {
     let word = cx.matchBefore(/\w+$/)
     if (!word && !cx.explicit) return null
-    return {from: word ? word.from : cx.pos, options: list.split(" ").map(w => ({label: w})), span: /\w*/}
+    return {from: word ? word.from : cx.pos, options: list.split(" ").map(w => ({label: w})), validFor: /^\w*/}
   }
 }
 
-function tagged(span: boolean): CompletionSource {
+function tagged(validFor: boolean): CompletionSource {
   return cx => {
     let word = cx.matchBefore(/\w+$/)
-    return {from: word ? word.from : cx.pos, options: [{label: "tag" + cx.pos}], span: span ? /\w*/ : undefined}
+    return {from: word ? word.from : cx.pos, options: [{label: "tag" + cx.pos}], validFor: validFor ? /^\w*/ : undefined}
   }
 }
 
@@ -358,6 +358,17 @@ describe("autocomplete", () => {
       await sleep(80)
       acceptCompletion(view)
       ist(view.state.doc.toString(), "okay\na")
+    })
+
+    run.test("can synchronously update results", {sources: [cx => ({
+      options: [{label: "a"}, {label: "aha"}],
+      from: 0,
+      update: (r, from, to) => ({options: r.options.filter(o => o.label.length > 1), from: r.from})
+    })]}, async (view, sync) => {
+      type(view, "a")
+      await sync(options, "a aha")
+      type(view, "h")
+      ist(options(view.state), "aha")
     })
 
     return run.finish()

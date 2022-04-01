@@ -115,10 +115,10 @@ function prefixMatch(options: readonly Completion[]) {
 /// completes them.
 export function completeFromList(list: readonly (string | Completion)[]): CompletionSource {
   let options = list.map(o => typeof o == "string" ? {label: o} : o) as Completion[]
-  let [span, match] = options.every(o => /^\w+$/.test(o.label)) ? [/\w*$/, /\w+$/] : prefixMatch(options)
+  let [validFor, match] = options.every(o => /^\w+$/.test(o.label)) ? [/\w*$/, /\w+$/] : prefixMatch(options)
   return (context: CompletionContext) => {
     let token = context.matchBefore(match)
-    return token || context.explicit ? {from: token ? token.from : context.pos, options, span} : null
+    return token || context.explicit ? {from: token ? token.from : context.pos, options, validFor} : null
   }
 }
 
@@ -161,20 +161,27 @@ export interface CompletionResult {
   /// own matching (against the text between `from` and `to`) and
   /// sorting.
   options: readonly Completion[],
-  /// When given, further input that causes the part of the document
-  /// between ([mapped](#state.ChangeDesc.mapPos)) `from` and `to` to
-  /// match this regular expression will not query the completion
-  /// source again, but continue with this list of options. This can
-  /// help a lot with responsiveness, since it allows the completion
-  /// list to be updated synchronously.
-  span?: RegExp
+  /// When given, further typing or deletion that causes the part of
+  /// the document between ([mapped](#state.ChangeDesc.mapPos)) `from`
+  /// and `to` to match this regular expression or predicate function
+  /// will not query the completion source again, but continue with
+  /// this list of options. This can help a lot with responsiveness,
+  /// since it allows the completion list to be updated synchronously.
+  validFor?: RegExp | ((text: string, from: number, to: number, state: EditorState) => boolean),
   /// By default, the library filters and scores completions. Set
   /// `filter` to `false` to disable this, and cause your completions
   /// to all be included, in the order they were given. When there are
   /// other sources, unfiltered completions appear at the top of the
-  /// list of completions. `span` must not be given when `filter` is
-  /// `false`, because it only works when filtering.
-  filter?: boolean
+  /// list of completions. `validFor` must not be given when `filter`
+  /// is `false`, because it only works when filtering.
+  filter?: boolean,
+  /// Synchronously update the completion result after typing or
+  /// deletion. If given, this should not do any expensive work, since
+  /// it will be called during editor state updates. The function
+  /// should make sure (similar to
+  /// [`validFor`](#autocomplete.CompletionResult.validFor)) that the
+  /// completion still applies in the new state.
+  update?: (current: CompletionResult, from: number, to: number, state: EditorState) => CompletionResult | null
 }
 
 export class Option {

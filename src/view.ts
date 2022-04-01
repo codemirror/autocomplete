@@ -4,7 +4,7 @@ import {completionState, setSelectedEffect, startCompletionEffect, closeCompleti
         ActiveSource, ActiveResult, getUserEvent} from "./state"
 import {getTooltip, TooltipView} from "@codemirror/tooltip"
 import {completionConfig} from "./config"
-import {cur, CompletionResult, CompletionContext, applyCompletion, ensureAnchor} from "./completion"
+import {cur, CompletionResult, CompletionContext, applyCompletion} from "./completion"
 
 const CompletionInteractMargin = 75
 
@@ -157,8 +157,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       if (query.done) {
         let active: ActiveSource = new ActiveResult(
           query.active.source, query.active.explicitPos, query.done, query.done.from,
-          query.done.to ?? cur(query.updates.length ? query.updates[0].startState : this.view.state),
-          query.done.span && query.done.filter !== false ? ensureAnchor(query.done.span, true) : null)
+          query.done.to ?? cur(query.updates.length ? query.updates[0].startState : this.view.state))
         // Replay the transactions that happened since the start of
         // the request and see if that preserves the result
         for (let tr of query.updates) active = active.update(tr, conf)

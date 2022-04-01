@@ -75,5 +75,5 @@ export const completeAnyWord: CompletionSource = context => {
   if (!token && !context.explicit) return null
   let from = token ? token.from : context.pos
   let options = collectWords(context.state.doc, wordCache(wordChars), re, C.Range, from)
-  return {from, options, span: mapRE(re, s => "^" + s)}
+  return {from, options, validFor: mapRE(re, s => "^" + s)}
 }
