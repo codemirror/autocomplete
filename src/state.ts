@@ -6,8 +6,6 @@ import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
 
-const MaxOptions = 300
-
 // Used to pick a preferred option when two options with the same
 // label occur in the result.
 function score(option: Completion) {
@@ -30,7 +28,6 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
   }
   let result = [], prev = null
   for (let opt of options.sort(cmpOption)) {
-    if (result.length == MaxOptions) break
     if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail ||
         (prev.type != null && opt.completion.type != null && prev.type != opt.completion.type) || 
         prev.apply != opt.completion.apply) result.push(opt)
