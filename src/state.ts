@@ -1,7 +1,8 @@
 import {EditorView} from "@codemirror/view"
 import {Transaction, StateField, StateEffect, EditorState, ChangeDesc} from "@codemirror/state"
 import {Tooltip, showTooltip} from "@codemirror/tooltip"
-import {Option, CompletionSource, CompletionResult, cur, asSource, Completion, ensureAnchor} from "./completion"
+import {Option, CompletionSource, CompletionResult, cur, asSource,
+        Completion, ensureAnchor, CompletionContext} from "./completion"
 import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
@@ -213,7 +214,8 @@ export class ActiveResult extends ActiveSource {
     let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos), updated
     if (checkValid(this.result.validFor, tr.state, from, to))
       return new ActiveResult(this.source, explicitPos, this.result, from, to)
-    if (this.result.update && (updated = this.result.update(this.result, from, to, tr.state)))
+    if (this.result.update &&
+        (updated = this.result.update(this.result, from, to, new CompletionContext(tr.state, pos, explicitPos >= 0))))
       return new ActiveResult(this.source, explicitPos, updated, updated.from, updated.to ?? cur(tr.state))
     return new ActiveSource(this.source, State.Pending, explicitPos)
   }

@@ -35,8 +35,7 @@ export interface CompletionConfig {
   /// completion, and should produce a DOM node to show. `position`
   /// determines where in the DOM the result appears, relative to
   /// other added widgets and the standard content. The default icons
-  /// have position 20, the label position 50, and the detail position
-  /// 70.
+  /// have position 20, the label position 50, and the detail position 70.
   addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
                   position: number}[]
 }

@@ -181,7 +181,7 @@ export interface CompletionResult {
   /// should make sure (similar to
   /// [`validFor`](#autocomplete.CompletionResult.validFor)) that the
   /// completion still applies in the new state.
-  update?: (current: CompletionResult, from: number, to: number, state: EditorState) => CompletionResult | null
+  update?: (current: CompletionResult, from: number, to: number, context: CompletionContext) => CompletionResult | null
 }
 
 export class Option {

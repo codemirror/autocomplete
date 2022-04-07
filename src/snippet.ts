@@ -129,8 +129,9 @@ function fieldSelection(ranges: readonly FieldRange[], field: number) {
   return EditorSelection.create(ranges.filter(r => r.field == field).map(r => EditorSelection.range(r.from, r.to)))
 }
 
-/// Convert a snippet template to a function that can apply it.
-/// Snippets are written using syntax like this:
+/// Convert a snippet template to a function that can
+/// [apply](#autocomplete.Completion.apply) it. Snippets are written
+/// using syntax like this:
 ///
 ///     "for (let ${index} = 0; ${index} < ${end}; ${index}++) {\n\t${}\n}"
 ///
