@@ -1,6 +1,5 @@
-import {EditorView, ViewUpdate, Direction, logException} from "@codemirror/view"
+import {EditorView, ViewUpdate, Direction, logException, TooltipView} from "@codemirror/view"
 import {StateField, EditorState} from "@codemirror/state"
-import {TooltipView} from "@codemirror/tooltip"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, applyCompletion, Completion} from "./completion"

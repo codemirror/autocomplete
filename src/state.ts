@@ -1,6 +1,5 @@
-import {EditorView} from "@codemirror/view"
+import {EditorView, Tooltip, showTooltip} from "@codemirror/view"
 import {Transaction, StateField, StateEffect, EditorState, ChangeDesc} from "@codemirror/state"
-import {Tooltip, showTooltip} from "@codemirror/tooltip"
 import {Option, CompletionSource, CompletionResult, cur, asSource,
         Completion, ensureAnchor, CompletionContext} from "./completion"
 import {FuzzyMatcher} from "./filter"
