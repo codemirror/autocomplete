@@ -1,4 +1,4 @@
-import {Text} from "@codemirror/text"
+import {Text} from "@codemirror/state"
 import {Completion, CompletionSource} from "./completion"
 
 const enum C { Range = 50000, MinCacheLen = 1000, MaxList = 2000 }
