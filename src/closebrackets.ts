@@ -1,7 +1,7 @@
 import {EditorView, KeyBinding} from "@codemirror/view"
 import {EditorState, EditorSelection, Transaction, Extension,
-        StateCommand, StateField, StateEffect, MapMode, CharCategory} from "@codemirror/state"
-import {RangeSet, RangeValue} from "@codemirror/rangeset"
+        StateCommand, StateField, StateEffect, MapMode, CharCategory,
+        RangeSet, RangeValue} from "@codemirror/state"
 import {Text, codePointAt, fromCodePoint, codePointSize} from "@codemirror/text"
 import {syntaxTree} from "@codemirror/language"
 
