@@ -55,3 +55,15 @@
 @clearSnippet
 
 @snippetKeymap
+
+### Automatic Bracket Closing
+
+@CloseBracketConfig
+
+@closeBrackets
+
+@closeBracketsKeymap
+
+@deleteBracketPair
+
+@insertBracket
