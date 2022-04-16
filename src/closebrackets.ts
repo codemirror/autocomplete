@@ -112,7 +112,7 @@ export const deleteBracketPair: StateCommand = ({state, dispatch}) => {
 }
 
 /// Close-brackets related key bindings. Binds Backspace to
-/// [`deleteBracketPair`](#closebrackets.deleteBracketPair).
+/// [`deleteBracketPair`](#autocomplete.deleteBracketPair).
 export const closeBracketsKeymap: readonly KeyBinding[] = [
   {key: "Backspace", run: deleteBracketPair}
 ]
@@ -124,7 +124,7 @@ export const closeBracketsKeymap: readonly KeyBinding[] = [
 /// previously-closed bracket), this function returns a transaction
 /// representing that custom behavior. (You only need this if you want
 /// to programmatically insert brackets—the
-/// [`closeBrackets`](#closebrackets.closeBrackets) extension will
+/// [`closeBrackets`](#autocomplete.closeBrackets) extension will
 /// take care of running this for user input.)
 export function insertBracket(state: EditorState, bracket: string): Transaction | null {
   let conf = config(state, state.selection.main.head)
