@@ -1,3 +1,21 @@
+## 0.20.0 (2022-04-20)
+
+### Breaking changes
+
+`CompletionResult.span` has been renamed to `validFor`, and may now hold a function as well as a regular expression.
+
+### Bug fixes
+
+Remove code that dropped any options beyond the 300th one when matching and sorting option lists.
+
+Completion will now apply to all cursors when there are multiple cursors.
+
+### New features
+
+`CompletionResult.update` can now be used to implement quick autocompletion updates in a synchronous way.
+
+The @codemirror/closebrackets package was merged into this one.
+
 ## 0.19.15 (2022-03-23)
 
 ### New features
