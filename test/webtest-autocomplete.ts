@@ -339,7 +339,7 @@ describe("autocomplete", () => {
     run.test("will complete for multiple cursors", {
       sources: [from("okay")],
       doc: "o\no",
-      selection: new EditorSelection([EditorSelection.cursor(1), EditorSelection.cursor(3)])
+      selection: EditorSelection.create([EditorSelection.cursor(1), EditorSelection.cursor(3)])
     }, async (view, sync) => {
       startCompletion(view)
       await sync(options, "okay")
@@ -351,7 +351,7 @@ describe("autocomplete", () => {
     run.test("will not complete for multiple cursors if prefix doesn't match", {
       sources: [from("okay allo")],
       doc: "o\na",
-      selection: new EditorSelection([EditorSelection.cursor(1), EditorSelection.cursor(3)])
+      selection: EditorSelection.create([EditorSelection.cursor(1), EditorSelection.cursor(3)])
     }, async (view, sync) => {
       startCompletion(view)
       await sync(options, "okay")
