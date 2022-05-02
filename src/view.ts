@@ -186,10 +186,15 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
   }
 }, {
   eventHandlers: {
-    compositionstart(this: {composing: CompositionState}) {
+    blur() {
+      let state = this.view.state.field(completionState, false)
+      if (state && state.tooltip && this.view.state.facet(completionConfig).closeOnBlur)
+        this.view.dispatch({effects: closeCompletionEffect.of(null)})
+    },
+    compositionstart() {
       this.composing = CompositionState.Started
     },
-    compositionend(this: {view: EditorView, composing: CompositionState}) {
+    compositionend() {
       if (this.composing == CompositionState.ChangedAndMoved) {
         // Safari fires compositionend events synchronously, possibly
         // from inside an update, so dispatch asynchronously to avoid reentrancy
