@@ -9,14 +9,14 @@ export interface Completion {
   /// The label to show in the completion picker. This is what input
   /// is matched agains to determine whether a completion matches (and
   /// how well it matches).
-  label: string,
+  label: string
   /// An optional short piece of information to show (with a different
   /// style) after the label.
-  detail?: string,
+  detail?: string
   /// Additional info to show when the completion is selected. Can be
   /// a plain string or a function that'll render the DOM structure to
   /// show when invoked.
-  info?: string | ((completion: Completion) => (Node | null | Promise<Node | null>)),
+  info?: string | ((completion: Completion) => (Node | null | Promise<Node | null>))
   /// How to apply the completion. The default is to replace it with
   /// its [label](#autocomplete.Completion.label). When this holds a
   /// string, the completion range is replaced by that string. When it
@@ -24,7 +24,7 @@ export interface Completion {
   /// completion. If it fires a transaction, it is responsible for
   /// adding the [`pickedCompletion`](#autocomplete.pickedCompletion)
   /// annotation to it.
-  apply?: string | ((view: EditorView, completion: Completion, from: number, to: number) => void),
+  apply?: string | ((view: EditorView, completion: Completion, from: number, to: number) => void)
   /// The type of the completion. This is used to pick an icon to show
   /// for the completion. Icons are styled with a CSS class created by
   /// appending the type name to `"cm-completionIcon-"`. You can
@@ -34,7 +34,7 @@ export interface Completion {
   /// `property`, `text`, `type`, and `variable`.
   ///
   /// Multiple types can be provided by separating them with spaces.
-  type?: string,
+  type?: string
   /// When given, should be a number from -99 to 99 that adjusts how
   /// this completion is ranked compared to other completions that
   /// match the input as well as this one. A negative number moves it
@@ -152,29 +152,35 @@ export type CompletionSource =
 /// Interface for objects returned by completion sources.
 export interface CompletionResult {
   /// The start of the range that is being completed.
-  from: number,
+  from: number
   /// The end of the range that is being completed. Defaults to the
   /// main cursor position.
-  to?: number,
+  to?: number
   /// The completions returned. These don't have to be compared with
   /// the input by the source—the autocompletion system will do its
   /// own matching (against the text between `from` and `to`) and
   /// sorting.
-  options: readonly Completion[],
+  options: readonly Completion[]
   /// When given, further typing or deletion that causes the part of
   /// the document between ([mapped](#state.ChangeDesc.mapPos)) `from`
   /// and `to` to match this regular expression or predicate function
   /// will not query the completion source again, but continue with
   /// this list of options. This can help a lot with responsiveness,
   /// since it allows the completion list to be updated synchronously.
-  validFor?: RegExp | ((text: string, from: number, to: number, state: EditorState) => boolean),
+  validFor?: RegExp | ((text: string, from: number, to: number, state: EditorState) => boolean)
   /// By default, the library filters and scores completions. Set
   /// `filter` to `false` to disable this, and cause your completions
   /// to all be included, in the order they were given. When there are
   /// other sources, unfiltered completions appear at the top of the
   /// list of completions. `validFor` must not be given when `filter`
   /// is `false`, because it only works when filtering.
-  filter?: boolean,
+  filter?: boolean
+  /// When [`filter`](#autocomplete.CompletionResult.filter) is set to
+  /// `false`, this may be provided to compute the ranges on the label
+  /// that match the input. Should return an array of numbers where
+  /// each pair of adjacent numbers provide the start and end of a
+  /// range.
+  getMatch?: (completion: Completion) => readonly number[]
   /// Synchronously update the completion result after typing or
   /// deletion. If given, this should not do any expensive work, since
   /// it will be called during editor state updates. The function
