@@ -1,3 +1,11 @@
+## 0.20.1 (2022-05-16)
+
+### New features
+
+The new `closeOnBlur` option determines whether the completion tooltip is closed when the editor loses focus.
+
+`CompletionResult` objects with `filter: false` may now have a `getMatch` property that determines the matched range in the options.
+
 ## 0.20.0 (2022-04-20)
 
 ### Breaking changes
