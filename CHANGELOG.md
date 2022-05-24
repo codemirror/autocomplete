@@ -1,3 +1,9 @@
+## 0.20.2 (2022-05-24)
+
+### New features
+
+The package now exports an `insertCompletionText` helper that implements the default behavior for applying a completion.
+
 ## 0.20.1 (2022-05-16)
 
 ### New features
