@@ -8,7 +8,7 @@ import {baseTheme} from "./theme"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
 export {Completion, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
-        completeFromList, ifIn, ifNotIn} from "./completion"
+        completeFromList, ifIn, ifNotIn, insertCompletionText} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"
 export {completeAnyWord} from "./word"
 export {CloseBracketConfig, closeBrackets, closeBracketsKeymap, deleteBracketPair, insertBracket} from "./closebrackets"

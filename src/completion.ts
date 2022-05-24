@@ -1,5 +1,5 @@
 import {EditorView} from "@codemirror/view"
-import {EditorState, Annotation, EditorSelection} from "@codemirror/state"
+import {EditorState, Annotation, EditorSelection, TransactionSpec} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {ActiveResult} from "./state"
@@ -212,30 +212,33 @@ export function ensureAnchor(expr: RegExp, start: boolean) {
 /// picking a completion.
 export const pickedCompletion = Annotation.define<Completion>()
 
+/// Helper function that returns a transaction spec which inserts a
+/// completion's text in the main selection range, and any other
+/// selection range that has the same text in front of it.
+export function insertCompletionText(state: EditorState, text: string, from: number, to: number): TransactionSpec {
+  return state.changeByRange(range => {
+    if (range == state.selection.main) return {
+      changes: {from: from, to: to, insert: text},
+      range: EditorSelection.cursor(from + text.length)
+    }
+    let len = to - from
+    if (!range.empty ||
+      len && state.sliceDoc(range.from - len, range.from) != state.sliceDoc(from, to))
+      return {range}
+    return {
+      changes: {from: range.from - len, to: range.from, insert: text},
+      range: EditorSelection.cursor(range.from - len + text.length)
+    }
+  })
+}
+
 export function applyCompletion(view: EditorView, option: Option) {
   const apply = option.completion.apply || option.completion.label
   let result = option.source
-  if (typeof apply == "string") {
-    view.dispatch(view.state.changeByRange(range => {
-      if (range == view.state.selection.main) return {
-        changes: {from: result.from, to: result.to, insert: apply },
-        range: EditorSelection.cursor(result.from + apply.length)
-      }
-      let len = result.to - result.from
-      if (!range.empty ||
-          len && view.state.sliceDoc(range.from - len, range.from) != view.state.sliceDoc(result.from, result.to))
-        return {range}
-      return {
-        changes: {from: range.from - len, to: range.from, insert: apply},
-        range: EditorSelection.cursor(range.from - len + apply.length)
-      }
-    }), {
-      userEvent: "input.complete",
-      annotations: pickedCompletion.of(option.completion)
-    })
-  } else {
+  if (typeof apply == "string")
+    view.dispatch(insertCompletionText(view.state, apply, result.from, result.to))
+  else
     apply(view, option.completion, result.from, result.to)
-  }
 }
 
 const SourceCache = new WeakMap<readonly (string | Completion)[], CompletionSource>()

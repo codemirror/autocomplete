@@ -30,6 +30,8 @@
 
 @completeAnyWord
 
+@insertCompletionText
+
 ### Commands
 
 @startCompletion

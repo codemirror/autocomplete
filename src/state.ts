@@ -137,7 +137,7 @@ const baseAttrs = {
 function makeAttrs(id: string, selected: number): {[name: string]: string} {
   return {
     "aria-autocomplete": "list",
-    "aria-haspopup":"listbox",
+    "aria-haspopup": "listbox",
     "aria-activedescendant": id + "-" + selected,
     "aria-controls": id
   }
