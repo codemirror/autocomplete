@@ -1,3 +1,11 @@
+## 0.20.3 (2022-05-30)
+
+### Bug fixes
+
+Add an aria-label to the completion listbox.
+
+Fix a regression that caused transactions generated for completion to not have a `userEvent` annotation.
+
 ## 0.20.2 (2022-05-24)
 
 ### New features
