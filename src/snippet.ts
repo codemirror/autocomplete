@@ -157,7 +157,10 @@ export function snippet(template: string) {
   let snippet = Snippet.parse(template)
   return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, _completion: Completion, from: number, to: number) => {
     let {text, ranges} = snippet.instantiate(editor.state, from)
-    let spec: TransactionSpec = {changes: {from, to, insert: Text.of(text)}}
+    let spec: TransactionSpec = {
+      changes: {from, to, insert: Text.of(text)},
+      scrollIntoView: true
+    }
     if (ranges.length) spec.selection = fieldSelection(ranges, 0)
     if (ranges.length > 1) {
       let active = new ActiveSnippet(ranges, 0)
