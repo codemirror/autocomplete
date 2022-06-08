@@ -1,3 +1,9 @@
+## 6.0.0 (2022-06-08)
+
+### Bug fixes
+
+Scroll the cursor into view when inserting a snippet.
+
 ## 0.20.3 (2022-05-30)
 
 ### Bug fixes
