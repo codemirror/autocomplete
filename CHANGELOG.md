@@ -1,3 +1,9 @@
+## 6.0.1 (2022-06-09)
+
+### Bug fixes
+
+Support escaping `${` or `#{` in snippets.
+
 ## 6.0.0 (2022-06-08)
 
 ### Bug fixes
