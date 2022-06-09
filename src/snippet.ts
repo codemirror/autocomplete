@@ -8,8 +8,8 @@ import {Completion} from "./completion"
 class FieldPos {
   constructor(public field: number,
               readonly line: number,
-              readonly from: number,
-              readonly to: number) {}
+              public from: number,
+              public to: number) {}
 }
 
 class FieldRange {
@@ -62,6 +62,13 @@ class Snippet {
         }
         positions.push(new FieldPos(found, lines.length, m.index, m.index + name.length))
         line = line.slice(0, m.index) + name + line.slice(m.index + m[0].length)
+      }
+      for (let esc; esc = /([$#])\\{/.exec(line);) {
+        line = line.slice(0, esc.index) + esc[1] + "{" + line.slice(esc.index + esc[0].length)
+        for (let pos of positions) if (pos.line == lines.length && pos.from > esc.index) {
+          pos.from--
+          pos.to--
+        }
       }
       lines.push(line)
     }
@@ -153,6 +160,11 @@ function fieldSelection(ranges: readonly FieldRange[], field: number) {
 /// The order of fields defaults to textual order, but you can add
 /// numbers to placeholders (`${1}` or `${1:defaultText}`) to provide
 /// a custom order.
+///
+/// To include a literal `${` or `#{` in your template, put a
+/// backslash after the dollar or hash and before the brace (`$\\{`).
+/// This will be removed and the sequence will not be interpreted as a
+/// placeholder.
 export function snippet(template: string) {
   let snippet = Snippet.parse(template)
   return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, _completion: Completion, from: number, to: number) => {
