@@ -1,3 +1,9 @@
+## 6.0.2 (2022-06-15)
+
+### Bug fixes
+
+Declare package dependencies as peer dependencies as an attempt to avoid duplicated package issues.
+
 ## 6.0.1 (2022-06-09)
 
 ### Bug fixes
