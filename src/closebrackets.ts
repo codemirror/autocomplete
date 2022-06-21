@@ -239,6 +239,11 @@ function probablyInString(state: EditorState, pos: number, quoteToken: string) {
     if (state.sliceDoc(node.from, node.from + quoteToken.length) == quoteToken) return true
     let parent = node.to == pos && node.parent
     if (!parent) break
+    let first = parent.firstChild
+    while (first && first.from == parent.from && first.to - first.from > quoteToken.length) {
+      if (state.sliceDoc(first.to - quoteToken.length, first.to) == quoteToken) return false
+      first = first.firstChild
+    }
     node = parent
   }
   return false
