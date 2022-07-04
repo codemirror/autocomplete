@@ -1,3 +1,9 @@
+## 6.0.3 (2022-07-04)
+
+### Bug fixes
+
+Fix a bug that caused `closeBrackets` to not close quotes when at the end of a syntactic construct that starts with a similar quote.
+
 ## 6.0.2 (2022-06-15)
 
 ### Bug fixes
