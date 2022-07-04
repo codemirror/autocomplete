@@ -234,16 +234,19 @@ function nodeStart(state: EditorState, pos: number) {
 }
 
 function probablyInString(state: EditorState, pos: number, quoteToken: string) {
+  console.log('check pos', pos)
   let node = syntaxTree(state).resolveInner(pos, -1)
   for (let i = 0; i < 5; i++) {
-    if (state.sliceDoc(node.from, node.from + quoteToken.length) == quoteToken) return true
+    if (state.sliceDoc(node.from, node.from + quoteToken.length) == quoteToken) {
+      let first = node.firstChild
+      while (first && first.from == node.from && first.to - first.from > quoteToken.length) {
+        if (state.sliceDoc(first.to - quoteToken.length, first.to) == quoteToken) return false
+        first = first.firstChild
+      }
+      return true
+    }
     let parent = node.to == pos && node.parent
     if (!parent) break
-    let first = parent.firstChild
-    while (first && first.from == parent.from && first.to - first.from > quoteToken.length) {
-      if (state.sliceDoc(first.to - quoteToken.length, first.to) == quoteToken) return false
-      first = first.firstChild
-    }
     node = parent
   }
   return false
