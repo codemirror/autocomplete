@@ -234,7 +234,6 @@ function nodeStart(state: EditorState, pos: number) {
 }
 
 function probablyInString(state: EditorState, pos: number, quoteToken: string) {
-  console.log('check pos', pos)
   let node = syntaxTree(state).resolveInner(pos, -1)
   for (let i = 0; i < 5; i++) {
     if (state.sliceDoc(node.from, node.from + quoteToken.length) == quoteToken) {
