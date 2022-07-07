@@ -1,3 +1,9 @@
+## 6.0.4 (2022-07-07)
+
+### Bug fixes
+
+Remove a leftover `console.log` in bracket closing code.
+
 ## 6.0.3 (2022-07-04)
 
 ### Bug fixes
