@@ -1,3 +1,11 @@
+## 6.1.0 (2022-07-19)
+
+### New features
+
+You can now provide a `compareCompletions` option to autocompletion to influence the way completions with the same match score are sorted.
+
+The `selectOnOpen` option to autocompletion can be used to require explicitly selecting a completion option before `acceptCompletion` does anything.
+
 ## 6.0.4 (2022-07-07)
 
 ### Bug fixes
