@@ -64,8 +64,8 @@ class CompletionDialog {
   ): CompletionDialog | null {
     let options = sortOptions(active, state)
     if (!options.length) return null
-    let selected = 0
-    if (prev && prev.selected) {
+    let selected = state.facet(completionConfig).selectOnOpen ? 0 : -1
+    if (prev && prev.selected != selected && prev.selected != -1) {
       let selectedValue = prev.options[prev.selected].completion
       for (let i = 0; i < options.length; i++) if (options[i].completion == selectedValue) {
         selected = i
@@ -135,13 +135,14 @@ const baseAttrs = {
   "aria-autocomplete": "list"
 }
 
-function makeAttrs(id: string, selected: number): {[name: string]: string} {
-  return {
+function makeAttrs(id: string, selected: number) {
+  let result: {[name: string]: string} = {
     "aria-autocomplete": "list",
     "aria-haspopup": "listbox",
-    "aria-activedescendant": id + "-" + selected,
     "aria-controls": id
   }
+  if (selected > -1) result["aria-activedescendant"] = id + "-" + selected
+  return result
 }
 
 const none: readonly any[] = []

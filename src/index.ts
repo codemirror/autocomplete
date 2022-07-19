@@ -71,14 +71,14 @@ export function currentCompletions(state: EditorState): readonly Completion[] {
 /// Return the currently selected completion, if any.
 export function selectedCompletion(state: EditorState): Completion | null {
   let open = state.field(completionState, false)?.open
-  return open ? open.options[open.selected].completion : null
+  return open && open.selected >= 0 ? open.options[open.selected].completion : null
 }
 
 /// Returns the currently selected position in the active completion
 /// list, or null if no completions are active.
 export function selectedCompletionIndex(state: EditorState): number | null {
   let open = state.field(completionState, false)?.open
-  return open ? open.selected : null
+  return open && open.selected >= 0 ? open.selected : null
 }
 
 /// Create an effect that can be attached to a transaction to change

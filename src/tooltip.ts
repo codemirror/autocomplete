@@ -51,6 +51,7 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
 
 function rangeAroundSelected(total: number, selected: number, max: number) {
   if (total <= max) return {from: 0, to: total}
+  if (selected < 0) selected = 0
   if (selected <= (total >> 1)) {
     let off = Math.floor(selected / max)
     return {from: off * max, to: (off + 1) * max}

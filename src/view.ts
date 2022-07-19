@@ -18,7 +18,8 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
     if (by == "page" && (tooltip = getTooltip(view, cState.open.tooltip)))
       step = Math.max(2, Math.floor(tooltip.dom.offsetHeight /
         (tooltip.dom.querySelector("li") as HTMLElement).offsetHeight) - 1)
-    let selected = cState.open.selected + step * (forward ? 1 : -1), {length} = cState.open.options
+    let {length} = cState.open.options
+    let selected = cState.open.selected > -1 ? cState.open.selected + step * (forward ? 1 : -1) : forward ? 0 : length - 1
     if (selected < 0) selected = by == "page" ? 0 : length - 1
     else if (selected >= length) selected = by == "page" ? length - 1 : 0
     view.dispatch({effects: setSelectedEffect.of(selected)})
@@ -29,7 +30,8 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
 /// Accept the current completion.
 export const acceptCompletion: Command = (view: EditorView) => {
   let cState = view.state.field(completionState, false)
-  if (view.state.readOnly || !cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin)
+  if (view.state.readOnly || !cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin ||
+      cState.open.selected < 0)
     return false
   applyCompletion(view, cState.open.options[cState.open.selected])
   return true

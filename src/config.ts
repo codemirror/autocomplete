@@ -5,6 +5,13 @@ export interface CompletionConfig {
   /// When enabled (defaults to true), autocompletion will start
   /// whenever the user types something that can be completed.
   activateOnTyping?: boolean
+  /// By default, when completion opens, the first option is selected
+  /// and can be confirmed with
+  /// [`acceptCompletion`](#autocomplete.acceptCompletion). When this
+  /// is set to false, the completion widget starts with no completion
+  /// selected, and the user has to explicitly move to a completion
+  /// before you can confirm one.
+  selectOnOpen?: boolean
   /// Override the completion sources used. By default, they will be
   /// taken from the `"autocomplete"` [language
   /// data](#state.EditorState.languageDataAt) (which should hold
@@ -51,6 +58,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
   combine(configs) {
     return combineConfig(configs, {
       activateOnTyping: true,
+      selectOnOpen: true,
       override: null,
       closeOnBlur: true,
       maxRenderedOptions: 100,
