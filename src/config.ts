@@ -41,6 +41,10 @@ export interface CompletionConfig {
   /// have position 20, the label position 50, and the detail position 70.
   addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
                   position: number}[]
+  /// The comparison function to use when sorting completions with the same
+  /// match score. Defaults to using
+  /// [`localeCompare`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare).
+  compareCompletions?: (a: Completion, b: Completion) => number
 }
 
 export const completionConfig = Facet.define<CompletionConfig, Required<CompletionConfig>>({
@@ -54,7 +58,8 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       optionClass: () => "",
       aboveCursor: false,
       icons: true,
-      addToOptions: []
+      addToOptions: [],
+      compareCompletions: (a, b) => a.label.localeCompare(b.label)
     }, {
       defaultKeymap: (a, b) => a && b,
       closeOnBlur: (a, b) => a && b,

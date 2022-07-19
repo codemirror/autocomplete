@@ -32,7 +32,8 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
     }
   }
   let result = [], prev = null
-  for (let opt of options.sort(cmpOption)) {
+  let compare = state.facet(completionConfig).compareCompletions
+  for (let opt of options.sort((a, b) => (b.match[0] - a.match[0]) || compare(a.completion, b.completion))) {
     if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail ||
         (prev.type != null && opt.completion.type != null && prev.type != opt.completion.type) || 
         prev.apply != opt.completion.apply) result.push(opt)
@@ -144,12 +145,6 @@ function makeAttrs(id: string, selected: number): {[name: string]: string} {
 }
 
 const none: readonly any[] = []
-
-function cmpOption(a: Option, b: Option) {
-  let dScore = b.match[0] - a.match[0]
-  if (dScore) return dScore
-  return a.completion.label.localeCompare(b.completion.label)
-}
 
 export const enum State { Inactive = 0, Pending = 1, Result = 2 }
 
