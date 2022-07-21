@@ -113,7 +113,7 @@ class CompletionTooltip {
 
   updateSel() {
     let cState = this.view.state.field(this.stateField), open = cState.open!
-    if (open.selected < this.range.from || open.selected >= this.range.to) {
+    if (open.selected > -1 && open.selected < this.range.from || open.selected >= this.range.to) {
       this.range = rangeAroundSelected(open.options.length, open.selected,
                                        this.view.state.facet(completionConfig).maxRenderedOptions)
       this.list.remove()
