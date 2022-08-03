@@ -101,13 +101,12 @@ export const deleteBracketPair: StateCommand = ({state, dispatch}) => {
       for (let token of tokens) {
         if (token == before && nextChar(state.doc, range.head) == closing(codePointAt(token, 0)))
           return {changes: {from: range.head - token.length, to: range.head + token.length},
-                  range: EditorSelection.cursor(range.head - token.length),
-                  userEvent: "delete.backward"}
+                  range: EditorSelection.cursor(range.head - token.length)}
       }
     }
     return {range: dont = range}
   })
-  if (!dont) dispatch(state.update(changes, {scrollIntoView: true}))
+  if (!dont) dispatch(state.update(changes, {scrollIntoView: true, userEvent: "delete.backward"}))
   return !dont
 }
 
