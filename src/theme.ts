@@ -1,5 +1,7 @@
 import {EditorView} from "@codemirror/view"
 
+export const enum Info { Margin = 30, Width = 400 }
+
 export const baseTheme = EditorView.baseTheme({
   ".cm-tooltip.cm-tooltip-autocomplete": {
     "& > ul": {
@@ -45,11 +47,14 @@ export const baseTheme = EditorView.baseTheme({
     position: "absolute",
     padding: "3px 9px",
     width: "max-content",
-    maxWidth: "300px",
+    maxWidth: `${Info.Width}px`,
+    boxSizing: "border-box"
   },
 
   ".cm-completionInfo.cm-completionInfo-left": { right: "100%" },
   ".cm-completionInfo.cm-completionInfo-right": { left: "100%" },
+  ".cm-completionInfo.cm-completionInfo-left-narrow": { right: `${Info.Margin}px` },
+  ".cm-completionInfo.cm-completionInfo-right-narrow": { left: `${Info.Margin}px` },
 
   "&light .cm-snippetField": {backgroundColor: "#00000022"},
   "&dark .cm-snippetField": {backgroundColor: "#ffffff22"},

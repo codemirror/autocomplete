@@ -3,6 +3,7 @@ import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, applyCompletion, Completion} from "./completion"
+import {Info} from "./theme"
 
 type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
 
@@ -66,7 +67,7 @@ class CompletionTooltip {
   list: HTMLElement
   placeInfo = {
     read: () => this.measureInfo(),
-    write: (pos: {left: boolean, top: number} | null) => this.positionInfo(pos),
+    write: (pos: {top: string, bottom: string, class: string, maxWidth: string} | null) => this.positionInfo(pos),
     key: this
   }
   range: {from: number, to: number}
@@ -168,25 +169,44 @@ class CompletionTooltip {
   measureInfo() {
     let sel = this.dom.querySelector("[aria-selected]") as HTMLElement | null
     if (!sel || !this.info) return null
+    let win = this.dom.ownerDocument.defaultView!
     let listRect = this.dom.getBoundingClientRect()
     let infoRect = this.info!.getBoundingClientRect()
     let selRect = sel.getBoundingClientRect()
-    if (selRect.top > Math.min(innerHeight, listRect.bottom) - 10 || selRect.bottom < Math.max(0, listRect.top) + 10)
+    if (selRect.top > Math.min(win.innerHeight, listRect.bottom) - 10 || selRect.bottom < Math.max(0, listRect.top) + 10)
       return null
-    let top = Math.max(0, Math.min(selRect.top, innerHeight - infoRect.height)) - listRect.top
-    let left = this.view.textDirection == Direction.RTL
-    let spaceLeft = listRect.left, spaceRight = innerWidth - listRect.right
+    let rtl = this.view.textDirection == Direction.RTL, left = rtl, narrow = false, maxWidth
+    let top = "", bottom = ""
+    let spaceLeft = listRect.left, spaceRight = win.innerWidth - listRect.right
     if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
     else if (!left && spaceRight < Math.min(infoRect.width, spaceLeft)) left = true
-    return {top, left}
+    if (infoRect.width <= (left ? spaceLeft : spaceRight)) {
+      top = (Math.max(0, Math.min(selRect.top, win.innerHeight - infoRect.height)) - listRect.top) + "px"
+      maxWidth = Math.min(Info.Width, left ? spaceLeft : spaceRight) + "px"
+    } else {
+      narrow = true
+      maxWidth = Math.min(Info.Width, (rtl ? listRect.right : win.innerWidth - listRect.left) - Info.Margin) + "px"
+      let spaceBelow = win.innerHeight - listRect.bottom
+      if (spaceBelow >= infoRect.height || spaceBelow > listRect.top) // Below the completion
+        top = (selRect.bottom - listRect.top) + "px"
+      else // Above it
+        bottom = (listRect.bottom - selRect.top) + "px"
+    }
+    return {
+      top, bottom, maxWidth,
+      class: narrow ? (rtl ? "left-narrow" : "right-narrow") : left ? "left" : "right",
+    }
   }
 
-  positionInfo(pos: {top: number, left: boolean} | null) {
+  positionInfo(pos: {top: string, bottom: string, class: string, maxWidth: string} | null) {
     if (this.info) {
-      this.info.style.top = (pos ? pos.top : -1e6) + "px"
       if (pos) {
-        this.info.classList.toggle("cm-completionInfo-left", pos.left)
-        this.info.classList.toggle("cm-completionInfo-right", !pos.left)
+        this.info.style.top = pos.top
+        this.info.style.bottom = pos.bottom
+        this.info.style.maxWidth = pos.maxWidth
+        this.info.className = "cm-tooltip cm-completionInfo cm-completionInfo-" + pos.class
+      } else {
+        this.info.style.top = "-1e6px"
       }
     }
   }
