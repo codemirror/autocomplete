@@ -1,3 +1,11 @@
+## 6.1.1 (2022-09-08)
+
+### Bug fixes
+
+Fix a bug that prevented transactions produced by `deleteBracketPair` from being marked as deletion user events.
+
+Improve positioning of completion info tooltips so they are less likely to stick out of the screen on small displays.
+
 ## 6.1.0 (2022-07-19)
 
 ### New features
