@@ -41,8 +41,12 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
     render(completion: Completion) {
       if (!completion.detail) return null
       let detailElt = document.createElement("span")
-      detailElt.className = "cm-completionDetail"
-      detailElt.textContent = completion.detail
+      detailElt.className = "cm-completionDetail"     
+      if (typeof completion.detail === "string") {
+        detailElt.textContent = completion.detail
+      } else {
+        detailElt.appendChild(completion.detail);
+      }
       return detailElt
     },
     position: 80
