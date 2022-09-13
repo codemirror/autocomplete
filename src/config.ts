@@ -52,6 +52,11 @@ export interface CompletionConfig {
   /// match score. Defaults to using
   /// [`localeCompare`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare).
   compareCompletions?: (a: Completion, b: Completion) => number
+  /// By default, commands relating to an open completion only take
+  /// effect 75 milliseconds after the completion opened, so that key
+  /// presses made before the user is aware of the tooltip don't go to
+  /// the tooltip. This option can be used to configure that delay.
+  interactionDelay?: number
 }
 
 export const completionConfig = Facet.define<CompletionConfig, Required<CompletionConfig>>({
@@ -67,7 +72,8 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       aboveCursor: false,
       icons: true,
       addToOptions: [],
-      compareCompletions: (a, b) => a.label.localeCompare(b.label)
+      compareCompletions: (a, b) => a.label.localeCompare(b.label),
+      interactionDelay: 75
     }, {
       defaultKeymap: (a, b) => a && b,
       closeOnBlur: (a, b) => a && b,

@@ -6,14 +6,14 @@ import {completionState, setSelectedEffect, startCompletionEffect, closeCompleti
 import {completionConfig} from "./config"
 import {cur, CompletionResult, CompletionContext, applyCompletion} from "./completion"
 
-const CompletionInteractMargin = 75
-
 /// Returns a command that moves the completion selection forward or
 /// backward by the given amount.
 export function moveCompletionSelection(forward: boolean, by: "option" | "page" = "option"): Command {
   return (view: EditorView) => {
     let cState = view.state.field(completionState, false)
-    if (!cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin) return false
+    if (!cState || !cState.open ||
+        Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
+      return false
     let step = 1, tooltip: TooltipView | null
     if (by == "page" && (tooltip = getTooltip(view, cState.open.tooltip)))
       step = Math.max(2, Math.floor(tooltip.dom.offsetHeight /
@@ -30,8 +30,8 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
 /// Accept the current completion.
 export const acceptCompletion: Command = (view: EditorView) => {
   let cState = view.state.field(completionState, false)
-  if (view.state.readOnly || !cState || !cState.open || Date.now() - cState.open.timestamp < CompletionInteractMargin ||
-      cState.open.selected < 0)
+  if (view.state.readOnly || !cState || !cState.open || cState.open.selected < 0 ||
+      Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
     return false
   applyCompletion(view, cState.open.options[cState.open.selected])
   return true
