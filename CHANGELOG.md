@@ -1,3 +1,9 @@
+## 6.2.0 (2022-09-13)
+
+### New features
+
+Autocompletion now takes an `interactionDelay` option that can be used to control the delay between the time where completion opens and the time where commands like `acceptCompletion` affect it.
+
 ## 6.1.1 (2022-09-08)
 
 ### Bug fixes
