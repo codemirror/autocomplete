@@ -62,6 +62,7 @@ export const baseTheme = EditorView.baseTheme({
     verticalAlign: "text-top",
     width: 0,
     height: "1.15em",
+    display: "inline-block",
     margin: "0 -0.7px -.7em",
     borderLeft: "1.4px dotted #888"
   },
