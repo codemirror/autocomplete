@@ -169,7 +169,7 @@ class CompletionTooltip {
   measureInfo() {
     let sel = this.dom.querySelector("[aria-selected]") as HTMLElement | null
     if (!sel || !this.info) return null
-    let win = this.dom.ownerDocument.defaultView!
+    let win = this.dom.ownerDocument.defaultView || window
     let listRect = this.dom.getBoundingClientRect()
     let infoRect = this.info!.getBoundingClientRect()
     let selRect = sel.getBoundingClientRect()
