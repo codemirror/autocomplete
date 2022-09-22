@@ -12,16 +12,20 @@ export interface CloseBracketConfig {
   /// The opening brackets to close. Defaults to `["(", "[", "{", "'",
   /// '"']`. Brackets may be single characters or a triple of quotes
   /// (as in `"''''"`).
-  brackets?: string[],
+  brackets?: string[]
   /// Characters in front of which newly opened brackets are
   /// automatically closed. Closing always happens in front of
   /// whitespace. Defaults to `")]}:;>"`.
   before?: string
+  /// When determining whether a given node may be a string, recognize
+  /// these prefixes before the opening quote.
+  stringPrefixes?: string[]
 }
 
 const defaults: Required<CloseBracketConfig> = {
   brackets: ["(", "[", "{", "'", '"'],
-  before: ")]}:;>"
+  before: ")]}:;>",
+  stringPrefixes: []
 }
 
 const closeBracketEffect = StateEffect.define<number>({
@@ -131,7 +135,7 @@ export function insertBracket(state: EditorState, bracket: string): Transaction 
   for (let tok of tokens) {
     let closed = closing(codePointAt(tok, 0))
     if (bracket == tok)
-      return closed == tok ? handleSame(state, tok, tokens.indexOf(tok + tok + tok) > -1) 
+      return closed == tok ? handleSame(state, tok, tokens.indexOf(tok + tok + tok) > -1, conf) 
         : handleOpen(state, tok, closed, conf.before || defaults.before)
     if (bracket == closed && closedBracketAt(state, state.selection.main.from))
       return handleClose(state, tok, closed)
@@ -190,13 +194,14 @@ function handleClose(state: EditorState, _open: string, close: string) {
 
 // Handles cases where the open and close token are the same, and
 // possibly triple quotes (as in `"""abc"""`-style quoting).
-function handleSame(state: EditorState, token: string, allowTriple: boolean) {
+function handleSame(state: EditorState, token: string, allowTriple: boolean, config: CloseBracketConfig) {
+  let stringPrefixes = config.stringPrefixes || defaults.stringPrefixes
   let dont = null, changes = state.changeByRange(range => {
     if (!range.empty)
       return {changes: [{insert: token, from: range.from}, {insert: token, from: range.to}],
               effects: closeBracketEffect.of(range.to + token.length),
               range: EditorSelection.range(range.anchor + token.length, range.head + token.length)}
-    let pos = range.head, next = nextChar(state.doc, pos)
+    let pos = range.head, next = nextChar(state.doc, pos), start
     if (next == token) {
       if (nodeStart(state, pos)) {
         return {changes: {insert: token + token, from: pos},
@@ -208,13 +213,13 @@ function handleSame(state: EditorState, token: string, allowTriple: boolean) {
                 effects: skipBracketEffect.of(pos)}
       }
     } else if (allowTriple && state.sliceDoc(pos - 2 * token.length, pos) == token + token &&
-               nodeStart(state, pos - 2 * token.length)) {
+               (start = canStartStringAt(state, pos - 2 * token.length, stringPrefixes)) > -1 &&
+               nodeStart(state, start)) {
       return {changes: {insert: token + token + token + token, from: pos},
               effects: closeBracketEffect.of(pos + token.length),
               range: EditorSelection.cursor(pos + token.length)}
     } else if (state.charCategorizer(pos)(next) != CharCategory.Word) {
-      let prev = state.sliceDoc(pos - 1, pos)
-      if (prev != token && state.charCategorizer(pos)(prev) != CharCategory.Word && !probablyInString(state, pos, token))
+      if (canStartStringAt(state, pos, stringPrefixes) > -1 && !probablyInString(state, pos, token, stringPrefixes))
         return {changes: {insert: token + token, from: pos},
                 effects: closeBracketEffect.of(pos + token.length),
                 range: EditorSelection.cursor(pos + token.length)}
@@ -232,12 +237,15 @@ function nodeStart(state: EditorState, pos: number) {
   return tree.parent && tree.from == pos
 }
 
-function probablyInString(state: EditorState, pos: number, quoteToken: string) {
+function probablyInString(state: EditorState, pos: number, quoteToken: string, prefixes: readonly string[]) {
   let node = syntaxTree(state).resolveInner(pos, -1)
+  let maxPrefix = prefixes.reduce((m, p) => Math.max(m, p.length), 0)
   for (let i = 0; i < 5; i++) {
-    if (state.sliceDoc(node.from, node.from + quoteToken.length) == quoteToken) {
+    let start = state.sliceDoc(node.from, Math.min(node.to, node.from + quoteToken.length + maxPrefix))
+    let quotePos = start.indexOf(quoteToken)
+    if (!quotePos || quotePos > -1 && prefixes.indexOf(start.slice(0, quotePos)) > -1) {
       let first = node.firstChild
-      while (first && first.from == node.from && first.to - first.from > quoteToken.length) {
+      while (first && first.from == node.from && first.to - first.from > quoteToken.length + quotePos) {
         if (state.sliceDoc(first.to - quoteToken.length, first.to) == quoteToken) return false
         first = first.firstChild
       }
@@ -248,4 +256,15 @@ function probablyInString(state: EditorState, pos: number, quoteToken: string) {
     node = parent
   }
   return false
+}
+
+function canStartStringAt(state: EditorState, pos: number, prefixes: readonly string[]) {
+  let charCat = state.charCategorizer(pos)
+  if (charCat(state.sliceDoc(pos - 1, pos)) != CharCategory.Word) return pos
+  for (let prefix of prefixes) {
+    let start = pos - prefix.length
+    if (state.sliceDoc(start, pos) == prefix && charCat(state.sliceDoc(start - 1, start)) != CharCategory.Word)
+      return start
+  }
+  return -1
 }
