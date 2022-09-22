@@ -1,3 +1,9 @@
+## 6.3.0 (2022-09-22)
+
+### New features
+
+Close bracket configuration now supports a `stringPrefixes` property that can be used to allow autoclosing of prefixed strings.
+
 ## 6.2.0 (2022-09-13)
 
 ### New features
