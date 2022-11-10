@@ -31,9 +31,17 @@ export const baseTheme = EditorView.baseTheme({
     color: "white",
   },
 
+  "&light .cm-tooltip-autocomplete-disabled ul li[aria-selected]": {
+    background: "#777",
+  },
+
   "&dark .cm-tooltip-autocomplete ul li[aria-selected]": {
     background: "#347",
     color: "white",
+  },
+
+  "&dark .cm-tooltip-autocomplete-disabled ul li[aria-selected]": {
+    background: "#444",
   },
 
   ".cm-completionListIncompleteTop:before, .cm-completionListIncompleteBottom:after": {

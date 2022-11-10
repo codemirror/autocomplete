@@ -11,7 +11,7 @@ import {cur, CompletionResult, CompletionContext, applyCompletion} from "./compl
 export function moveCompletionSelection(forward: boolean, by: "option" | "page" = "option"): Command {
   return (view: EditorView) => {
     let cState = view.state.field(completionState, false)
-    if (!cState || !cState.open ||
+    if (!cState || !cState.open || cState.open.disabled ||
         Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
       return false
     let step = 1, tooltip: TooltipView | null
@@ -33,7 +33,8 @@ export const acceptCompletion: Command = (view: EditorView) => {
   if (view.state.readOnly || !cState || !cState.open || cState.open.selected < 0 ||
       Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
     return false
-  applyCompletion(view, cState.open.options[cState.open.selected])
+  if (!cState.open.disabled)
+    applyCompletion(view, cState.open.options[cState.open.selected])
   return true
 }
 

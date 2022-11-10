@@ -104,8 +104,13 @@ class CompletionTooltip {
   mount() { this.updateSel() }
 
   update(update: ViewUpdate) {
-    if (update.state.field(this.stateField) != update.startState.field(this.stateField))
+    let cState = update.state.field(this.stateField)
+    let prevState = update.startState.field(this.stateField)
+    if (cState != prevState) {
       this.updateSel()
+      if (cState.open?.disabled != prevState.open?.disabled)
+        this.dom.classList.toggle("cm-tooltip-autocomplete-disabled", !!cState.open?.disabled)
+    }
   }
 
   positioned() {

@@ -48,11 +48,12 @@ class CompletionDialog {
               readonly attrs: {[name: string]: string},
               readonly tooltip: Tooltip,
               readonly timestamp: number,
-              readonly selected: number) {}
+              readonly selected: number,
+              readonly disabled: boolean) {}
 
   setSelected(selected: number, id: string) {
     return selected == this.selected || selected >= this.options.length ? this
-      : new CompletionDialog(this.options, makeAttrs(id, selected), this.tooltip, this.timestamp, selected)
+      : new CompletionDialog(this.options, makeAttrs(id, selected), this.tooltip, this.timestamp, selected, this.disabled)
   }
 
   static build(
@@ -63,7 +64,10 @@ class CompletionDialog {
     conf: Required<CompletionConfig>
   ): CompletionDialog | null {
     let options = sortOptions(active, state)
-    if (!options.length) return null
+    if (!options.length) {
+      return prev && active.some(a => a.state == State.Pending) ?
+        new CompletionDialog(prev.options, prev.attrs, prev.tooltip, prev.timestamp, prev.selected, true) : null
+    }
     let selected = state.facet(completionConfig).selectOnOpen ? 0 : -1
     if (prev && prev.selected != selected && prev.selected != -1) {
       let selectedValue = prev.options[prev.selected].completion
@@ -76,12 +80,12 @@ class CompletionDialog {
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
       create: completionTooltip(completionState),
       above: conf.aboveCursor,
-    }, prev ? prev.timestamp : Date.now(), selected)
+    }, prev ? prev.timestamp : Date.now(), selected, false)
   }
 
   map(changes: ChangeDesc) {
     return new CompletionDialog(this.options, this.attrs, {...this.tooltip, pos: changes.mapPos(this.tooltip.pos)},
-                                this.timestamp, this.selected)
+                                this.timestamp, this.selected, this.disabled)
   }
 }
 
@@ -105,9 +109,13 @@ export class CompletionState {
     })
     if (active.length == this.active.length && active.every((a, i) => a == this.active[i])) active = this.active
 
-    let open = tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
-      !sameResults(active, this.active) ? CompletionDialog.build(active, state, this.id, this.open, conf)
-      : this.open && tr.docChanged ? this.open.map(tr.changes) : this.open
+    let open = this.open
+    if (tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
+        !sameResults(active, this.active))
+      open = CompletionDialog.build(active, state, this.id, this.open, conf)
+    else if (open && tr.docChanged)
+      open = open.map(tr.changes)
+
     if (!open && active.every(a => a.state != State.Pending) && active.some(a => a.hasResult()))
       active = active.map(a => a.hasResult() ? new ActiveSource(a.source, State.Inactive) : a)
     for (let effect of tr.effects) if (effect.is(setSelectedEffect)) open = open && open.setSelected(effect.value, this.id)
