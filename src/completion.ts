@@ -231,8 +231,7 @@ export function insertCompletionText(state: EditorState, text: string, from: num
         range: EditorSelection.cursor(range.from - len + text.length)
       }
     }),
-    userEvent: "input.complete",
-    annotations: pickedCompletion.of(option.completion)
+    userEvent: "input.complete"
   }
 }
 
@@ -240,7 +239,10 @@ export function applyCompletion(view: EditorView, option: Option) {
   const apply = option.completion.apply || option.completion.label
   let result = option.source
   if (typeof apply == "string")
-    view.dispatch(insertCompletionText(view.state, apply, result.from, result.to))
+    view.dispatch({
+      ...insertCompletionText(view.state, apply, result.from, result.to),
+      annotations: pickedCompletion.of(option.completion)
+    })
   else
     apply(view, option.completion, result.from, result.to)
 }
