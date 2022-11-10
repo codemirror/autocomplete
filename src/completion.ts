@@ -239,7 +239,10 @@ export function applyCompletion(view: EditorView, option: Option) {
   const apply = option.completion.apply || option.completion.label
   let result = option.source
   if (typeof apply == "string")
-    view.dispatch(insertCompletionText(view.state, apply, result.from, result.to))
+    view.dispatch({
+      ...insertCompletionText(view.state, apply, result.from, result.to),
+      annotations: pickedCompletion.of(option.completion)
+    })
   else
     apply(view, option.completion, result.from, result.to)
 }
