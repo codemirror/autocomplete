@@ -231,7 +231,8 @@ export function insertCompletionText(state: EditorState, text: string, from: num
         range: EditorSelection.cursor(range.from - len + text.length)
       }
     }),
-    userEvent: "input.complete"
+    userEvent: "input.complete",
+    annotations: pickedCompletion.of(option.completion)
   }
 }
 
