@@ -1,4 +1,4 @@
-import {EditorView, ViewUpdate, Direction, logException, TooltipView} from "@codemirror/view"
+import {EditorView, ViewUpdate, Direction, logException, TooltipView, Rect} from "@codemirror/view"
 import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
@@ -71,6 +71,7 @@ class CompletionTooltip {
     key: this
   }
   range: {from: number, to: number}
+  space: Rect | null = null
   optionContent: OptionContentSource[]
   optionClass: (option: Completion) => string
 
@@ -113,7 +114,8 @@ class CompletionTooltip {
     }
   }
 
-  positioned() {
+  positioned(space: Rect) {
+    this.space = space
     if (this.info) this.view.requestMeasure(this.placeInfo)
   }
 
@@ -174,24 +176,29 @@ class CompletionTooltip {
   measureInfo() {
     let sel = this.dom.querySelector("[aria-selected]") as HTMLElement | null
     if (!sel || !this.info) return null
-    let win = this.dom.ownerDocument.defaultView || window
     let listRect = this.dom.getBoundingClientRect()
     let infoRect = this.info!.getBoundingClientRect()
     let selRect = sel.getBoundingClientRect()
-    if (selRect.top > Math.min(win.innerHeight, listRect.bottom) - 10 || selRect.bottom < Math.max(0, listRect.top) + 10)
+    let space = this.space
+    if (!space) {
+      let win = this.dom.ownerDocument.defaultView || window
+      space = {left: 0, top: 0, right: win.innerWidth, bottom: win.innerHeight}
+    }
+    if (selRect.top > Math.min(space.bottom, listRect.bottom) - 10 ||
+        selRect.bottom < Math.max(space.top, listRect.top) + 10)
       return null
     let rtl = this.view.textDirection == Direction.RTL, left = rtl, narrow = false, maxWidth
     let top = "", bottom = ""
-    let spaceLeft = listRect.left, spaceRight = win.innerWidth - listRect.right
+    let spaceLeft = listRect.left - space.left, spaceRight = space.right - listRect.right
     if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
     else if (!left && spaceRight < Math.min(infoRect.width, spaceLeft)) left = true
     if (infoRect.width <= (left ? spaceLeft : spaceRight)) {
-      top = (Math.max(0, Math.min(selRect.top, win.innerHeight - infoRect.height)) - listRect.top) + "px"
+      top = (Math.max(space.top, Math.min(selRect.top, space.bottom - infoRect.height)) - listRect.top) + "px"
       maxWidth = Math.min(Info.Width, left ? spaceLeft : spaceRight) + "px"
     } else {
       narrow = true
-      maxWidth = Math.min(Info.Width, (rtl ? listRect.right : win.innerWidth - listRect.left) - Info.Margin) + "px"
-      let spaceBelow = win.innerHeight - listRect.bottom
+      maxWidth = Math.min(Info.Width, (rtl ? listRect.right : space.right - listRect.left) - Info.Margin) + "px"
+      let spaceBelow = space.bottom - listRect.bottom
       if (spaceBelow >= infoRect.height || spaceBelow > listRect.top) // Below the completion
         top = (selRect.bottom - listRect.top) + "px"
       else // Above it
