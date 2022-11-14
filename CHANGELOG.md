@@ -1,3 +1,13 @@
+## 6.3.1 (2022-11-14)
+
+### Bug fixes
+
+Fix a regression where transactions for picking a completion (without custom `apply` method) no longer had the `pickedCompletion` annotation.
+
+Reduce flickering for completion sources without `validFor` info by temporarily showing a disabled tooltip while the completion updates.
+
+Make sure completion info tooltips are kept within the space provided by the `tooltipSpace` option.
+
 ## 6.3.0 (2022-09-22)
 
 ### New features
