@@ -1,3 +1,9 @@
+## 6.3.2 (2022-11-15)
+
+### Bug fixes
+
+Fix a regression that could cause the completion dialog to stick around when it should be hidden.
+
 ## 6.3.1 (2022-11-14)
 
 ### Bug fixes
