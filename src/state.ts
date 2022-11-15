@@ -113,6 +113,8 @@ export class CompletionState {
     if (tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
         !sameResults(active, this.active))
       open = CompletionDialog.build(active, state, this.id, this.open, conf)
+    else if (open && open.disabled && !active.some(a => a.state == State.Pending))
+      open = null
     else if (open && tr.docChanged)
       open = open.map(tr.changes)
 
