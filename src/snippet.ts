@@ -63,8 +63,8 @@ class Snippet {
         positions.push(new FieldPos(found, lines.length, m.index, m.index + name.length))
         line = line.slice(0, m.index) + name + line.slice(m.index + m[0].length)
       }
-      for (let esc; esc = /([$#])\\{/.exec(line);) {
-        line = line.slice(0, esc.index) + esc[1] + "{" + line.slice(esc.index + esc[0].length)
+      for (let esc; esc = /\\([{}])/.exec(line);) {
+        line = line.slice(0, esc.index) + esc[1] + line.slice(esc.index + esc[0].length)
         for (let pos of positions) if (pos.line == lines.length && pos.from > esc.index) {
           pos.from--
           pos.to--
@@ -161,10 +161,9 @@ function fieldSelection(ranges: readonly FieldRange[], field: number) {
 /// numbers to placeholders (`${1}` or `${1:defaultText}`) to provide
 /// a custom order.
 ///
-/// To include a literal `${` or `#{` in your template, put a
-/// backslash after the dollar or hash and before the brace (`$\\{`).
-/// This will be removed and the sequence will not be interpreted as a
-/// placeholder.
+/// To include a literal `{` or `}` in your template, put a backslash
+/// in front of it. This will be removed and the brace will not be
+/// interpreted as indicating a placeholder.
 export function snippet(template: string) {
   let snippet = Snippet.parse(template)
   return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, _completion: Completion, from: number, to: number) => {
