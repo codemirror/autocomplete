@@ -90,7 +90,8 @@ export const baseTheme = EditorView.baseTheme({
     display: "inline-block",
     textAlign: "center",
     paddingRight: ".6em",
-    opacity: "0.6"
+    opacity: "0.6",
+    boxSizing: "content-box"
   },
 
   ".cm-completionIcon-function, .cm-completionIcon-method": {
