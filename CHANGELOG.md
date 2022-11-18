@@ -1,3 +1,11 @@
+## 6.3.3 (2022-11-18)
+
+### Bug fixes
+
+Set an explicit `box-sizing` style on completion icons so CSS resets don't mess them up.
+
+Allow closing braces in templates to be escaped with a backslash.
+
 ## 6.3.2 (2022-11-15)
 
 ### Bug fixes
