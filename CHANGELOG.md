@@ -1,3 +1,9 @@
+## 6.3.4 (2022-11-24)
+
+### Bug fixes
+
+Fix an issue where completion lists could end up being higher than the tooltip they were in.
+
 ## 6.3.3 (2022-11-18)
 
 ### Bug fixes
