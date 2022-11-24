@@ -12,6 +12,7 @@ export const baseTheme = EditorView.baseTheme({
       maxWidth: "min(700px, 95vw)",
       minWidth: "250px",
       maxHeight: "10em",
+      height: "100%",
       listStyle: "none",
       margin: 0,
       padding: 0,
