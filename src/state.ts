@@ -110,13 +110,12 @@ export class CompletionState {
     if (active.length == this.active.length && active.every((a, i) => a == this.active[i])) active = this.active
 
     let open = this.open
+    if (open && tr.docChanged) open = open.map(tr.changes)
     if (tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
         !sameResults(active, this.active))
-      open = CompletionDialog.build(active, state, this.id, this.open, conf)
+      open = CompletionDialog.build(active, state, this.id, open, conf)
     else if (open && open.disabled && !active.some(a => a.state == State.Pending))
       open = null
-    else if (open && tr.docChanged)
-      open = open.map(tr.changes)
 
     if (!open && active.every(a => a.state != State.Pending) && active.some(a => a.hasResult()))
       active = active.map(a => a.hasResult() ? new ActiveSource(a.source, State.Inactive) : a)
