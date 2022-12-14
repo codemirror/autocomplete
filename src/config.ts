@@ -33,6 +33,9 @@ export interface CompletionConfig {
   /// space. Setting this to true will make the extension put the
   /// completions above the cursor when possible.
   aboveCursor?: boolean,
+  /// When given, this may return an additional CSS class to add to
+  /// the completion dialog element.
+  tooltipClass?: (state: EditorState) => string,
   /// This can be used to add additional CSS classes to completion
   /// options.
   optionClass?: (completion: Completion) => string,
@@ -62,13 +65,14 @@ export interface CompletionConfig {
 
 export const completionConfig = Facet.define<CompletionConfig, Required<CompletionConfig>>({
   combine(configs) {
-    return combineConfig(configs, {
+    return combineConfig<Required<CompletionConfig>>(configs, {
       activateOnTyping: true,
       selectOnOpen: true,
       override: null,
       closeOnBlur: true,
       maxRenderedOptions: 100,
       defaultKeymap: true,
+      tooltipClass: () => "",
       optionClass: () => "",
       aboveCursor: false,
       icons: true,
@@ -79,6 +83,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       defaultKeymap: (a, b) => a && b,
       closeOnBlur: (a, b) => a && b,
       icons: (a, b) => a && b,
+      tooltipClass: (a, b) => c => joinClass(a(c), b(c)),
       optionClass: (a, b) => c => joinClass(a(c), b(c)),
       addToOptions: (a, b) => a.concat(b)
     })
