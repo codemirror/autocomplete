@@ -1,3 +1,13 @@
+## 6.4.0 (2022-12-14)
+
+### Bug fixes
+
+Fix an issue where the extension would sometimes try to draw a disabled dialog at an outdated position, leading to plugin crashes.
+
+### New features
+
+A `tooltipClass` option to autocompletion can now be used to add additional CSS classes to the completion tooltip.
+
 ## 6.3.4 (2022-11-24)
 
 ### Bug fixes
