@@ -73,6 +73,8 @@ class CompletionTooltip {
   range: {from: number, to: number}
   space: Rect | null = null
   optionContent: OptionContentSource[]
+  tooltipClass: (state: EditorState) => string
+  currentClass = ""
   optionClass: (option: Completion) => string
 
   constructor(readonly view: EditorView,
@@ -82,12 +84,13 @@ class CompletionTooltip {
     let config = view.state.facet(completionConfig)
     this.optionContent = optionContent(config)
     this.optionClass = config.optionClass
+    this.tooltipClass = config.tooltipClass
 
     this.range = rangeAroundSelected(options.length, selected, config.maxRenderedOptions)
 
     this.dom = document.createElement("div")
-    let addClass = config.tooltipClass(view.state)
-    this.dom.className = "cm-tooltip-autocomplete" + (addClass ? " " + addClass : "")
+    this.dom.className = "cm-tooltip-autocomplete"
+    this.updateTooltipClass(view.state)
     this.dom.addEventListener("mousedown", (e: MouseEvent) => {
       for (let dom = e.target as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
         if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < options.length) {
@@ -108,10 +111,20 @@ class CompletionTooltip {
   update(update: ViewUpdate) {
     let cState = update.state.field(this.stateField)
     let prevState = update.startState.field(this.stateField)
+    this.updateTooltipClass(update.state)
     if (cState != prevState) {
       this.updateSel()
       if (cState.open?.disabled != prevState.open?.disabled)
         this.dom.classList.toggle("cm-tooltip-autocomplete-disabled", !!cState.open?.disabled)
+    }
+  }
+
+  updateTooltipClass(state: EditorState) {
+    let cls = this.tooltipClass(state)
+    if (cls != this.currentClass) {
+      for (let c of this.currentClass.split(" ")) if (c) this.dom.classList.remove(c)
+      for (let c of cls.split(" ")) if (c) this.dom.classList.add(c)
+      this.currentClass = cls
     }
   }
 
