@@ -126,8 +126,10 @@ export function completeFromList(list: readonly (string | Completion)[]): Comple
 /// cursor is in a syntax node with one of the given names.
 export function ifIn(nodes: readonly string[], source: CompletionSource): CompletionSource {
   return (context: CompletionContext) => {
-    for (let pos: SyntaxNode | null = syntaxTree(context.state).resolveInner(context.pos, -1); pos; pos = pos.parent)
+    for (let pos: SyntaxNode | null = syntaxTree(context.state).resolveInner(context.pos, -1); pos; pos = pos.parent) {
       if (nodes.indexOf(pos.name) > -1) return source(context)
+      if (pos.type.isTop) break
+    }
     return null
   }
 }
@@ -136,8 +138,10 @@ export function ifIn(nodes: readonly string[], source: CompletionSource): Comple
 /// cursor is in a syntax node with one of the given names.
 export function ifNotIn(nodes: readonly string[], source: CompletionSource): CompletionSource {
   return (context: CompletionContext) => {
-    for (let pos: SyntaxNode | null = syntaxTree(context.state).resolveInner(context.pos, -1); pos; pos = pos.parent)
+    for (let pos: SyntaxNode | null = syntaxTree(context.state).resolveInner(context.pos, -1); pos; pos = pos.parent) {
       if (nodes.indexOf(pos.name) > -1) return null
+      if (pos.type.isTop) break
+    }
     return source(context)
   }
 }
