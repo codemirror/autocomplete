@@ -6,7 +6,8 @@ const enum Penalty {
   Gap = -1100,      // Added for each gap in the match (not counted for by-word matches)
   NotStart = -700,  // The match doesn't start at the start of the word
   CaseFold = -200,  // At least one character needed to be case-folded to match
-  ByWord = -100     // The match is by-word, meaning each char in the pattern matches the start of a word in the string
+  ByWord = -100,    // The match is by-word, meaning each char in the pattern matches the start of a word in the string
+  NotFull = -100,   // Used to push down matches that don't match the pattern fully relative to those that do
 }
 
 const enum Tp { NonWord, Upper, Lower }
@@ -50,12 +51,15 @@ export class FuzzyMatcher {
     // For single-character queries, only match when they occur right
     // at the start
     if (chars.length == 1) {
-      let first = codePointAt(word, 0)
-      return first == chars[0] ? [0, 0, codePointSize(first)]
-        : first == folded[0] ? [Penalty.CaseFold, 0, codePointSize(first)] : null
+      let first = codePointAt(word, 0), firstSize = codePointSize(first)
+      let score = firstSize == word.length ? 0 : Penalty.NotFull
+      if (first == chars[0]) {}
+      else if (first == folded[0]) score += Penalty.CaseFold
+      else return null
+      return [score, 0, firstSize]
     }
     let direct = word.indexOf(this.pattern)
-    if (direct == 0) return [0, 0, this.pattern.length]
+    if (direct == 0) return [word.length == this.pattern.length ? 0 : Penalty.NotFull, 0, this.pattern.length]
 
     let len = chars.length, anyTo = 0
     if (direct < 0) {
@@ -108,7 +112,7 @@ export class FuzzyMatcher {
     if (byWordTo == len && byWord[0] == 0 && wordAdjacent)
       return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0), byWord, word)
     if (adjacentTo == len && adjacentStart == 0)
-      return [Penalty.CaseFold - word.length, 0, adjacentEnd]
+      return [Penalty.CaseFold - word.length + (adjacentEnd == word.length ? 0 : Penalty.NotFull), 0, adjacentEnd]
     if (direct > -1)
       return [Penalty.NotStart - word.length, direct, direct + this.pattern.length]
     if (adjacentTo == len)
