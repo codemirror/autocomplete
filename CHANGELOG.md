@@ -1,3 +1,11 @@
+## 6.4.1 (2023-02-14)
+
+### Bug fixes
+
+Don't consider node names in trees that aren't the same language as the one at the completion position in `ifIn` and `ifNotIn`.
+
+Make sure completions that exactly match the input get a higher score than those that don't (so that even if the latter has a score boost, it ends up lower in the list).
+
 ## 6.4.0 (2022-12-14)
 
 ### Bug fixes
