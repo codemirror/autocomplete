@@ -1,3 +1,9 @@
+## 6.4.2 (2023-02-17)
+
+### Bug fixes
+
+Fix a bug where the apply method created by `snippet` didn't add a `pickedCompletion` annotation to the transactions it created.
+
 ## 6.4.1 (2023-02-14)
 
 ### Bug fixes
