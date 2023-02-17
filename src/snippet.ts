@@ -3,7 +3,7 @@ import {StateField, StateEffect, ChangeDesc, EditorState, EditorSelection,
         Transaction, TransactionSpec, Text, StateCommand, Prec, Facet, MapMode} from "@codemirror/state"
 import {indentUnit} from "@codemirror/language"
 import {baseTheme} from "./theme"
-import {Completion} from "./completion"
+import {Completion, pickedCompletion} from "./completion"
 
 class FieldPos {
   constructor(public field: number,
@@ -166,11 +166,12 @@ function fieldSelection(ranges: readonly FieldRange[], field: number) {
 /// interpreted as indicating a placeholder.
 export function snippet(template: string) {
   let snippet = Snippet.parse(template)
-  return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, _completion: Completion, from: number, to: number) => {
+  return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, completion: Completion, from: number, to: number) => {
     let {text, ranges} = snippet.instantiate(editor.state, from)
     let spec: TransactionSpec = {
       changes: {from, to, insert: Text.of(text)},
-      scrollIntoView: true
+      scrollIntoView: true,
+      annotations: pickedCompletion.of(completion)
     }
     if (ranges.length) spec.selection = fieldSelection(ranges, 0)
     if (ranges.length > 1) {
