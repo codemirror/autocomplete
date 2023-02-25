@@ -34,9 +34,6 @@ const closeBracketEffect = StateEffect.define<number>({
     return mapped == null ? undefined : mapped
   }
 })
-const skipBracketEffect = StateEffect.define<number>({
-  map(value, mapping) { return mapping.mapPos(value) }
-})
 
 const closedBracket = new class extends RangeValue {}
 closedBracket.startSide = 1; closedBracket.endSide = -1
@@ -51,10 +48,8 @@ const bracketState = StateField.define<RangeSet<typeof closedBracket>>({
         value = RangeSet.empty
     }
     value = value.map(tr.changes)
-    for (let effect of tr.effects) {
-      if (effect.is(closeBracketEffect)) value = value.update({add: [closedBracket.range(effect.value, effect.value + 1)]})
-      else if (effect.is(skipBracketEffect)) value = value.update({filter: from => from != effect.value})
-    }
+    for (let effect of tr.effects) if (effect.is(closeBracketEffect))
+      value = value.update({add: [closedBracket.range(effect.value, effect.value + 1)]})
     return value
   }
 })
@@ -181,14 +176,15 @@ function handleOpen(state: EditorState, open: string, close: string, closeBefore
 }
 
 function handleClose(state: EditorState, _open: string, close: string) {
-  let dont = null, moved = state.selection.ranges.map(range => {
-    if (range.empty && nextChar(state.doc, range.head) == close) return EditorSelection.cursor(range.head + close.length)
-    return dont = range
+  let dont = null, changes = state.changeByRange(range => {
+    if (range.empty && nextChar(state.doc, range.head) == close)
+      return {changes: {from: range.head, to: range.head + close.length, insert: close},
+              range: EditorSelection.cursor(range.head + close.length)}
+    return dont = {range}
   })
-  return dont ? null : state.update({
-    selection: EditorSelection.create(moved, state.selection.mainIndex),
+  return dont ? null : state.update(changes, {
     scrollIntoView: true,
-    effects: state.selection.ranges.map(({from}) => skipBracketEffect.of(from))
+    userEvent: "input.type"
   })
 }
 
@@ -209,8 +205,9 @@ function handleSame(state: EditorState, token: string, allowTriple: boolean, con
                 range: EditorSelection.cursor(pos + token.length)}
       } else if (closedBracketAt(state, pos)) {
         let isTriple = allowTriple && state.sliceDoc(pos, pos + token.length * 3) == token + token + token
-        return {range: EditorSelection.cursor(pos + token.length * (isTriple ? 3 : 1)),
-                effects: skipBracketEffect.of(pos)}
+        let content = isTriple ? token + token + token : token
+        return {changes: {from: pos, to: pos + content.length, insert: content},
+                range: EditorSelection.cursor(pos + content.length)}
       }
     } else if (allowTriple && state.sliceDoc(pos - 2 * token.length, pos) == token + token &&
                (start = canStartStringAt(state, pos - 2 * token.length, stringPrefixes)) > -1 &&
