@@ -174,7 +174,9 @@ class CompletionTooltip {
     let set: null | HTMLElement = null
     for (let opt = this.list.firstChild as (HTMLElement | null), i = this.range.from; opt;
          opt = opt.nextSibling as (HTMLElement | null), i++) {
-      if (i == selected) {
+      if (opt.nodeName != "LI" || !opt.id) {
+        i-- // A section header
+      } else if (i == selected) {
         if (!opt.hasAttribute("aria-selected")) {
           opt.setAttribute("aria-selected", "true")
           set = opt
@@ -243,8 +245,21 @@ class CompletionTooltip {
     ul.setAttribute("role", "listbox")
     ul.setAttribute("aria-expanded", "true")
     ul.setAttribute("aria-label", this.view.state.phrase("Completions"))
+    let curSection: string | null = null
     for (let i = range.from; i < range.to; i++) {
-      let {completion, match} = options[i]
+      let {completion, match} = options[i], {section} = completion
+      if (section) {
+        let name = typeof section == "string" ? section : section.name
+        if (name != curSection && (i > range.from || range.from == 0)) {
+          curSection = name
+          if (typeof section != "string" && section.header) {
+            ul.appendChild(section.header(section))
+          } else {
+            let header = ul.appendChild(document.createElement("completion-section"))
+            header.textContent = name
+          }
+        }
+      }
       const li = ul.appendChild(document.createElement("li"))
       li.id = id + "-" + i
       li.setAttribute("role", "option")

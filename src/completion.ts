@@ -40,6 +40,30 @@ export interface Completion {
   /// match the input as well as this one. A negative number moves it
   /// down the list, a positive number moves it up.
   boost?: number
+  /// Can be used to divide the completion list into sections.
+  /// Completions in a given section (matched by name) will be grouped
+  /// together, with a heading above them. Options without section
+  /// will appear above all sections. A string value is equivalent to
+  /// a `{name}` object.
+  section?: string | CompletionSection
+}
+
+/// Object used to describe a completion
+/// [section](#autocomplete.Completion.section). It is recommended to
+/// create a shared object used by all the completions in a given
+/// section.
+export interface CompletionSection {
+  /// The name of the section. If no `render` method is present, this
+  /// will be displayed above the options.
+  name: string
+  /// An optional function that renders the section header. Since the
+  /// headers are shown inside a list, you should make sure the
+  /// resulting element has a `display: list-item` style.
+  header?: (section: CompletionSection) => HTMLElement
+  /// By default, sections are ordered alphabetically by name. To
+  /// specify an explicit order, `rank` can be used. Sections with a
+  /// lower rank will be shown above sections with a higher rank.
+  rank?: number
 }
 
 /// An instance of this is passed to completion source functions.
@@ -197,7 +221,8 @@ export interface CompletionResult {
 export class Option {
   constructor(readonly completion: Completion,
               readonly source: ActiveResult,
-              readonly match: readonly number[]) {}
+              readonly match: readonly number[],
+              public score: number) {}
 }
 
 export function cur(state: EditorState) { return state.selection.main.head }

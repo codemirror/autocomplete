@@ -1,7 +1,7 @@
 import {EditorView, Tooltip, showTooltip} from "@codemirror/view"
 import {Transaction, StateField, StateEffect, EditorState, ChangeDesc} from "@codemirror/state"
 import {Option, CompletionSource, CompletionResult, cur, asSource,
-        Completion, ensureAnchor, CompletionContext} from "./completion"
+        Completion, ensureAnchor, CompletionContext, CompletionSection} from "./completion"
 import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
@@ -14,26 +14,50 @@ function score(option: Completion) {
 }
 
 function sortOptions(active: readonly ActiveSource[], state: EditorState) {
-  let options = [], i = 0
+  let options: Option[] = []
+  let sections: null | CompletionSection[] = null
+  let addOption = (option: Option) => {
+    options.push(option)
+    let {section} = option.completion
+    if (section) {
+      if (!sections) sections = []
+      let name = typeof section == "string" ? section : section.name
+      if (!sections.some(s => s.name == name)) sections.push(typeof section == "string" ? {name} : section)
+    }
+  }
+
   for (let a of active) if (a.hasResult()) {
     if (a.result.filter === false) {
       let getMatch = a.result.getMatch
       for (let option of a.result.options) {
-        let match = [1e9 - i++]
+        let match = [1e9 - options.length]
         if (getMatch) for (let n of getMatch(option)) match.push(n)
-        options.push(new Option(option, a, match))
+        addOption(new Option(option, a, match, match[0]))
       }
     } else {
       let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
       for (let option of a.result.options) if (match = matcher.match(option.label)) {
-        if (option.boost != null) match[0] += option.boost
-        options.push(new Option(option, a, match))
+        addOption(new Option(option, a, match, match[0] + (option.boost || 0)))
       }
     }
   }
+
+  if (sections) {
+    let sectionOrder: {[name: string]: number} = Object.create(null), pos = 0
+    let cmp = (a: CompletionSection, b: CompletionSection) => (a.rank ?? 1e9) - (b.rank ?? 1e9) || (a.name < b.name ? -1 : 1)
+    for (let s of (sections as CompletionSection[]).sort(cmp)) {
+      pos -= 1e5
+      sectionOrder[s.name] = pos
+    }
+    for (let option of options) {
+      let {section} = option.completion
+      if (section) option.score += sectionOrder[typeof section == "string" ? section : section.name]
+    }
+  }
+
   let result = [], prev = null
   let compare = state.facet(completionConfig).compareCompletions
-  for (let opt of options.sort((a, b) => (b.match[0] - a.match[0]) || compare(a.completion, b.completion))) {
+  for (let opt of options.sort((a, b) => (b.score - a.score) || compare(a.completion, b.completion))) {
     if (!prev || prev.label != opt.completion.label || prev.detail != opt.completion.detail ||
         (prev.type != null && opt.completion.type != null && prev.type != opt.completion.type) || 
         prev.apply != opt.completion.apply) result.push(opt)

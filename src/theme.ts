@@ -17,13 +17,21 @@ export const baseTheme = EditorView.baseTheme({
       margin: 0,
       padding: 0,
 
-      "& > li": {
-        overflowX: "hidden",
-        textOverflow: "ellipsis",
-        cursor: "pointer",
+      "& > li, & > completion-section": {
         padding: "1px 3px",
         lineHeight: 1.2
       },
+      "& > li": {
+        overflowX: "hidden",
+        textOverflow: "ellipsis",
+        cursor: "pointer"
+      },
+      "& > completion-section": {
+        display: "list-item",
+        borderBottom: "1px solid silver",
+        paddingLeft: "0.5em",
+        opacity: 0.7
+      }
     }
   },
 
