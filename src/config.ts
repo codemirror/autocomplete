@@ -1,5 +1,7 @@
 import {Completion, CompletionSource} from "./completion"
+import {Info} from "./theme"
 import {Facet, combineConfig, EditorState} from "@codemirror/state"
+import {EditorView, Rect, Direction} from "@codemirror/view"
 
 export interface CompletionConfig {
   /// When enabled (defaults to true), autocompletion will start
@@ -52,6 +54,14 @@ export interface CompletionConfig {
   /// 80.
   addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
                   position: number}[]
+  /// By default, [info](#autocomplet.Completion.info) tooltips are
+  /// placed to the side of the selected. This option can be used to
+  /// override that. It will be given rectangles for the list of
+  /// completions, the selected option, the info element, and the
+  /// availble [tooltip space](#view.tooltips^config.tooltipSpace),
+  /// and should return style and/or class strings for the info
+  /// element.
+  positionInfo?: (view: EditorView, list: Rect, option: Rect, info: Rect, space: Rect) => {style?: string, class?: string}
   /// The comparison function to use when sorting completions with the same
   /// match score. Defaults to using
   /// [`localeCompare`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare).
@@ -77,6 +87,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       aboveCursor: false,
       icons: true,
       addToOptions: [],
+      positionInfo: defaultPositionInfo,
       compareCompletions: (a, b) => a.label.localeCompare(b.label),
       interactionDelay: 75
     }, {
@@ -92,4 +103,31 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
 
 function joinClass(a: string, b: string) {
   return a ? b ? a + " " + b : a : b
+}
+
+function defaultPositionInfo(view: EditorView, list: Rect, option: Rect, info: Rect, space: Rect) {
+  let rtl = view.textDirection == Direction.RTL, left = rtl, narrow = false
+  let side = "top", offset, maxWidth
+  let spaceLeft = list.left - space.left, spaceRight = space.right - list.right
+  let infoWidth = info.right - info.left, infoHeight = info.bottom - info.top
+  if (left && spaceLeft < Math.min(infoWidth, spaceRight)) left = false
+  else if (!left && spaceRight < Math.min(infoWidth, spaceLeft)) left = true
+  if (infoWidth <= (left ? spaceLeft : spaceRight)) {
+    offset = Math.max(space.top, Math.min(option.top, space.bottom - infoHeight)) - list.top
+    maxWidth = Math.min(Info.Width, left ? spaceLeft : spaceRight)
+  } else {
+    narrow = true
+    maxWidth = Math.min(Info.Width, (rtl ? list.right : space.right - list.left) - Info.Margin)
+    let spaceBelow = space.bottom - list.bottom
+    if (spaceBelow >= infoHeight || spaceBelow > list.top) { // Below the completion
+      offset = option.bottom - list.top
+    } else { // Above it
+      side = "bottom"
+      offset = list.bottom - option.top
+    }
+  }
+  return {
+    style: `${side}: ${offset}px; max-width: ${maxWidth}px`,
+    class: "cm-completionInfo-" + (narrow ? (rtl ? "left-narrow" : "right-narrow") : left ? "left" : "right")
+  }
 }

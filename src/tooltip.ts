@@ -1,9 +1,8 @@
-import {EditorView, ViewUpdate, Direction, logException, TooltipView, Rect} from "@codemirror/view"
+import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirror/view"
 import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, applyCompletion, Completion} from "./completion"
-import {Info} from "./theme"
 
 type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
 
@@ -65,9 +64,9 @@ class CompletionTooltip {
   dom: HTMLElement
   info: HTMLElement | null = null
   list: HTMLElement
-  placeInfo = {
+  placeInfoReq = {
     read: () => this.measureInfo(),
-    write: (pos: {top: string, bottom: string, class: string, maxWidth: string} | null) => this.positionInfo(pos),
+    write: (pos: {style?: string, class?: string} | null) => this.placeInfo(pos),
     key: this
   }
   range: {from: number, to: number}
@@ -102,7 +101,7 @@ class CompletionTooltip {
     })
     this.list = this.dom.appendChild(this.createListBox(options, cState.id, this.range))
     this.list.addEventListener("scroll", () => {
-      if (this.info) this.view.requestMeasure(this.placeInfo)
+      if (this.info) this.view.requestMeasure(this.placeInfoReq)
     })
   }
 
@@ -130,7 +129,7 @@ class CompletionTooltip {
 
   positioned(space: Rect) {
     this.space = space
-    if (this.info) this.view.requestMeasure(this.placeInfo)
+    if (this.info) this.view.requestMeasure(this.placeInfoReq)
   }
 
   updateSel() {
@@ -141,7 +140,7 @@ class CompletionTooltip {
       this.list.remove()
       this.list = this.dom.appendChild(this.createListBox(open.options, cState.id, this.range))
       this.list.addEventListener("scroll", () => {
-        if (this.info) this.view.requestMeasure(this.placeInfo)
+        if (this.info) this.view.requestMeasure(this.placeInfoReq)
       })
     }
     if (this.updateSelectedOption(open.selected)) {
@@ -167,7 +166,7 @@ class CompletionTooltip {
     dom.className = "cm-tooltip cm-completionInfo"
     dom.appendChild(content)
     this.dom.appendChild(dom)
-    this.view.requestMeasure(this.placeInfo)
+    this.view.requestMeasure(this.placeInfoReq)
   }
 
   updateSelectedOption(selected: number) {
@@ -203,38 +202,16 @@ class CompletionTooltip {
     if (selRect.top > Math.min(space.bottom, listRect.bottom) - 10 ||
         selRect.bottom < Math.max(space.top, listRect.top) + 10)
       return null
-    let rtl = this.view.textDirection == Direction.RTL, left = rtl, narrow = false, maxWidth
-    let top = "", bottom = ""
-    let spaceLeft = listRect.left - space.left, spaceRight = space.right - listRect.right
-    if (left && spaceLeft < Math.min(infoRect.width, spaceRight)) left = false
-    else if (!left && spaceRight < Math.min(infoRect.width, spaceLeft)) left = true
-    if (infoRect.width <= (left ? spaceLeft : spaceRight)) {
-      top = (Math.max(space.top, Math.min(selRect.top, space.bottom - infoRect.height)) - listRect.top) + "px"
-      maxWidth = Math.min(Info.Width, left ? spaceLeft : spaceRight) + "px"
-    } else {
-      narrow = true
-      maxWidth = Math.min(Info.Width, (rtl ? listRect.right : space.right - listRect.left) - Info.Margin) + "px"
-      let spaceBelow = space.bottom - listRect.bottom
-      if (spaceBelow >= infoRect.height || spaceBelow > listRect.top) // Below the completion
-        top = (selRect.bottom - listRect.top) + "px"
-      else // Above it
-        bottom = (listRect.bottom - selRect.top) + "px"
-    }
-    return {
-      top, bottom, maxWidth,
-      class: narrow ? (rtl ? "left-narrow" : "right-narrow") : left ? "left" : "right",
-    }
+    return this.view.state.facet(completionConfig).positionInfo(this.view, listRect, selRect, infoRect, space)
   }
 
-  positionInfo(pos: {top: string, bottom: string, class: string, maxWidth: string} | null) {
+  placeInfo(pos: {style?: string, class?: string} | null) {
     if (this.info) {
       if (pos) {
-        this.info.style.top = pos.top
-        this.info.style.bottom = pos.bottom
-        this.info.style.maxWidth = pos.maxWidth
-        this.info.className = "cm-tooltip cm-completionInfo cm-completionInfo-" + pos.class
+        if (pos.style) this.info.style.cssText = pos.style
+        this.info.className = "cm-tooltip cm-completionInfo " + (pos.class || "")
       } else {
-        this.info.style.top = "-1e6px"
+        this.info.style.cssText = "top: -1e6px"
       }
     }
   }
