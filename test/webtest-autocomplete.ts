@@ -37,7 +37,7 @@ class Runner {
       state: EditorState.create({
         doc: spec.doc,
         selection,
-        extensions: [autocompletion({override: spec.sources}), EditorState.allowMultipleSelections.of(true)]
+        extensions: [autocompletion({override: spec.sources, interactionDelay: 0}), EditorState.allowMultipleSelections.of(true)]
       }),
       parent: document.querySelector("#workspace")! as HTMLElement,
       dispatch: tr => {
@@ -288,6 +288,28 @@ describe("autocomplete", () => {
       ist(view.dom.querySelector(".cm-tooltip"), dialog)
     })
 
+    run.test("replaces entire selected ranges", {
+      sources: [from("one hey")],
+      doc: "hello world",
+      selection: EditorSelection.single(1, 5)
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "hey")
+      acceptCompletion(view)
+      ist(view.state.doc.toString(), "hey world")
+    })
+
+    run.test("replaces inverted ranges", {
+      sources: [from("one hey")],
+      doc: "hello world",
+      selection: EditorSelection.single(5, 1)
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "hey")
+      acceptCompletion(view)
+      ist(view.state.doc.toString(), "hey world")
+    })
+
     run.test("complete from list", {sources: [once(completeFromList(["one", "two", "three"]))], doc: "t"}, async (view, sync) => {
       startCompletion(view)
       await sync(options, "three two")
@@ -355,7 +377,6 @@ describe("autocomplete", () => {
     }, async (view, sync) => {
       startCompletion(view)
       await sync(options, "okay")
-      await sleep(80)
       acceptCompletion(view)
       ist(view.state.doc.toString(), "okay\na")
     })

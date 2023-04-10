@@ -225,7 +225,7 @@ export class Option {
               public score: number) {}
 }
 
-export function cur(state: EditorState) { return state.selection.main.head }
+export function cur(state: EditorState) { return state.selection.main.from }
 
 // Make sure the given regexp has a $ at its end and, if `start` is
 // true, a ^ at its start.
@@ -245,18 +245,14 @@ export const pickedCompletion = Annotation.define<Completion>()
 /// completion's text in the main selection range, and any other
 /// selection range that has the same text in front of it.
 export function insertCompletionText(state: EditorState, text: string, from: number, to: number): TransactionSpec {
+  let {main} = state.selection, len = to - from
   return {
     ...state.changeByRange(range => {
-      if (range == state.selection.main) return {
-        changes: {from: from, to: to, insert: text},
-        range: EditorSelection.cursor(from + text.length)
-      }
-      let len = to - from
-      if (!range.empty ||
-        len && state.sliceDoc(range.from - len, range.from) != state.sliceDoc(from, to))
+      if (range != main && len &&
+          state.sliceDoc(range.from - len, range.from + to - main.from) != state.sliceDoc(from, to))
         return {range}
       return {
-        changes: {from: range.from - len, to: range.from, insert: text},
+        changes: {from: range.from - len, to: to == main.from ? range.to : range.from + to - main.from, insert: text},
         range: EditorSelection.cursor(range.from - len + text.length)
       }
     }),
