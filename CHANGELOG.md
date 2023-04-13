@@ -1,3 +1,17 @@
+## 6.5.0 (2023-04-13)
+
+### Bug fixes
+
+When `closeBrackets` skips a bracket, it now generates a change that overwrites the bracket.
+
+Replace the entire selected range when picking a completion with a non-cursor selection active.
+
+### New features
+
+Completions can now provide a `section` field that is used to group them into sections.
+
+The new `positionInfo` option can be used to provide custom logic for positioning the info tooltips.
+
 ## 6.4.2 (2023-02-17)
 
 ### Bug fixes
