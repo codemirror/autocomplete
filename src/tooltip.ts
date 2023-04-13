@@ -2,7 +2,7 @@ import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirr
 import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
-import {Option, applyCompletion, Completion} from "./completion"
+import {Option, applyCompletion, Completion, closeCompletionEffect} from "./completion"
 
 type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
 
@@ -98,6 +98,12 @@ class CompletionTooltip {
           return
         }
       }
+    })
+    this.dom.addEventListener("focusout", (e: FocusEvent) => {
+      let state = view.state.field(this.stateField, false)
+      if (state && state.tooltip && view.state.facet(completionConfig).closeOnBlur &&
+          e.relatedTarget != view.contentDOM)
+        view.dispatch({effects: closeCompletionEffect.of(null)})
     })
     this.list = this.dom.appendChild(this.createListBox(options, cState.id, this.range))
     this.list.addEventListener("scroll", () => {

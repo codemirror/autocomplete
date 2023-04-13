@@ -1,7 +1,8 @@
 import {EditorView, Tooltip, showTooltip} from "@codemirror/view"
 import {Transaction, StateField, StateEffect, EditorState, ChangeDesc} from "@codemirror/state"
 import {Option, CompletionSource, CompletionResult, cur, asSource,
-        Completion, ensureAnchor, CompletionContext, CompletionSection} from "./completion"
+        Completion, ensureAnchor, CompletionContext, CompletionSection,
+        startCompletionEffect, closeCompletionEffect} from "./completion"
 import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
@@ -271,8 +272,6 @@ function checkValid(validFor: undefined | RegExp | ((text: string, from: number,
   return typeof validFor == "function" ? validFor(text, from, to, state) : ensureAnchor(validFor, true).test(text)
 }
 
-export const startCompletionEffect = StateEffect.define<boolean>()
-export const closeCompletionEffect = StateEffect.define<null>()
 export const setActiveEffect = StateEffect.define<readonly ActiveSource[]>({
   map(sources, mapping) { return sources.map(s => s.map(mapping)) }
 })

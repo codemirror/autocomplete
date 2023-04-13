@@ -1,5 +1,5 @@
 import {EditorView} from "@codemirror/view"
-import {EditorState, Annotation, EditorSelection, TransactionSpec} from "@codemirror/state"
+import {EditorState, StateEffect, Annotation, EditorSelection, TransactionSpec} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {ActiveResult} from "./state"
@@ -280,3 +280,6 @@ export function asSource(source: CompletionSource | readonly (string | Completio
   if (!known) SourceCache.set(source, known = completeFromList(source))
   return known
 }
+
+export const startCompletionEffect = StateEffect.define<boolean>()
+export const closeCompletionEffect = StateEffect.define<null>()

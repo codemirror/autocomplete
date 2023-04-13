@@ -1,10 +1,11 @@
 import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException,
         getTooltip, TooltipView} from "@codemirror/view"
 import {Transaction} from "@codemirror/state"
-import {completionState, setSelectedEffect, startCompletionEffect, closeCompletionEffect, setActiveEffect, State,
+import {completionState, setSelectedEffect, setActiveEffect, State,
         ActiveSource, ActiveResult, getUserEvent} from "./state"
 import {completionConfig} from "./config"
-import {cur, CompletionResult, CompletionContext, applyCompletion} from "./completion"
+import {cur, CompletionResult, CompletionContext, applyCompletion,
+        startCompletionEffect, closeCompletionEffect} from "./completion"
 
 /// Returns a command that moves the completion selection forward or
 /// backward by the given amount.
@@ -189,10 +190,13 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
   }
 }, {
   eventHandlers: {
-    blur() {
+    blur(event) {
       let state = this.view.state.field(completionState, false)
-      if (state && state.tooltip && this.view.state.facet(completionConfig).closeOnBlur)
-        this.view.dispatch({effects: closeCompletionEffect.of(null)})
+      if (state && state.tooltip && this.view.state.facet(completionConfig).closeOnBlur) {
+        let dialog = state.open && getTooltip(this.view, state.open.tooltip)
+        if (!dialog || !dialog.dom.contains(event.relatedTarget as HTMLElement))
+          this.view.dispatch({effects: closeCompletionEffect.of(null)})
+      }
     },
     compositionstart() {
       this.composing = CompositionState.Started
