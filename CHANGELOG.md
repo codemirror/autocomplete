@@ -1,3 +1,9 @@
+## 6.5.1 (2023-04-13)
+
+### Bug fixes
+
+Keep completions open when interaction with an info tooltip moves focus out of the editor.
+
 ## 6.5.0 (2023-04-13)
 
 ### Bug fixes
