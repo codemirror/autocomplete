@@ -166,12 +166,12 @@ function fieldSelection(ranges: readonly FieldRange[], field: number) {
 /// interpreted as indicating a placeholder.
 export function snippet(template: string) {
   let snippet = Snippet.parse(template)
-  return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, completion: Completion, from: number, to: number) => {
+  return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, completion: Completion | null, from: number, to: number) => {
     let {text, ranges} = snippet.instantiate(editor.state, from)
     let spec: TransactionSpec = {
       changes: {from, to, insert: Text.of(text)},
       scrollIntoView: true,
-      annotations: pickedCompletion.of(completion)
+      annotations: completion ? pickedCompletion.of(completion) : undefined
     }
     if (ranges.length) spec.selection = fieldSelection(ranges, 0)
     if (ranges.length > 1) {
