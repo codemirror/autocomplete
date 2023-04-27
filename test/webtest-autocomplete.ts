@@ -310,6 +310,16 @@ describe("autocomplete", () => {
       ist(view.state.doc.toString(), "hey world")
     })
 
+    run.test("can cover range beyond cursor", {
+      sources: [cx => ({from: 0, to: 4, options: [{label: "brrrr"}]})],
+      doc: "brrr"
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "brrrr")
+      acceptCompletion(view)
+      ist(view.state.doc.toString(), "brrrr")
+    })
+
     run.test("complete from list", {sources: [once(completeFromList(["one", "two", "three"]))], doc: "t"}, async (view, sync) => {
       startCompletion(view)
       await sync(options, "three two")

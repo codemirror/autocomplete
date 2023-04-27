@@ -245,15 +245,15 @@ export const pickedCompletion = Annotation.define<Completion>()
 /// completion's text in the main selection range, and any other
 /// selection range that has the same text in front of it.
 export function insertCompletionText(state: EditorState, text: string, from: number, to: number): TransactionSpec {
-  let {main} = state.selection, len = to - from
+  let {main} = state.selection, fromOff = from - main.from, toOff = to - main.from
   return {
     ...state.changeByRange(range => {
-      if (range != main && len &&
-          state.sliceDoc(range.from - len, range.from + to - main.from) != state.sliceDoc(from, to))
+      if (range != main && from != to &&
+          state.sliceDoc(range.from + fromOff, range.from + toOff) != state.sliceDoc(from, to))
         return {range}
       return {
-        changes: {from: range.from - len, to: to == main.from ? range.to : range.from + to - main.from, insert: text},
-        range: EditorSelection.cursor(range.from - len + text.length)
+        changes: {from: range.from + fromOff, to: to == main.from ? range.to : range.from + toOff, insert: text},
+        range: EditorSelection.cursor(range.from + fromOff + text.length)
       }
     }),
     userEvent: "input.complete"
