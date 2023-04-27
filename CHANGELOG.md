@@ -1,3 +1,13 @@
+## 6.6.0 (2023-04-27)
+
+### Bug fixes
+
+Fix a bug in `insertCompletionText` that caused it to replace the wrong range when a result set's `to` fell after the cursor.
+
+### New features
+
+Functions returned by `snippet` can now be called without a completion object.
+
 ## 6.5.1 (2023-04-13)
 
 ### Bug fixes
