@@ -1,8 +1,9 @@
 import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirror/view"
 import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
+import {applyCompletion} from "./view"
 import {completionConfig, CompletionConfig} from "./config"
-import {Option, applyCompletion, Completion, closeCompletionEffect} from "./completion"
+import {Option, Completion, closeCompletionEffect} from "./completion"
 
 type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
 

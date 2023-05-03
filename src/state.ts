@@ -33,12 +33,12 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
       for (let option of a.result.options) {
         let match = [1e9 - options.length]
         if (getMatch) for (let n of getMatch(option)) match.push(n)
-        addOption(new Option(option, a, match, match[0]))
+        addOption(new Option(option, a.source, match, match[0]))
       }
     } else {
       let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
       for (let option of a.result.options) if (match = matcher.match(option.label)) {
-        addOption(new Option(option, a, match, match[0] + (option.boost || 0)))
+        addOption(new Option(option, a.source, match, match[0] + (option.boost || 0)))
       }
     }
   }

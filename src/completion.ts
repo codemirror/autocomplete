@@ -2,7 +2,6 @@ import {EditorView} from "@codemirror/view"
 import {EditorState, StateEffect, Annotation, EditorSelection, TransactionSpec} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
-import {ActiveResult} from "./state"
 
 /// Objects type used to represent individual completions.
 export interface Completion {
@@ -220,7 +219,7 @@ export interface CompletionResult {
 
 export class Option {
   constructor(readonly completion: Completion,
-              readonly source: ActiveResult,
+              readonly source: CompletionSource,
               readonly match: readonly number[],
               public score: number) {}
 }
@@ -258,18 +257,6 @@ export function insertCompletionText(state: EditorState, text: string, from: num
     }),
     userEvent: "input.complete"
   }
-}
-
-export function applyCompletion(view: EditorView, option: Option) {
-  const apply = option.completion.apply || option.completion.label
-  let result = option.source
-  if (typeof apply == "string")
-    view.dispatch({
-      ...insertCompletionText(view.state, apply, result.from, result.to),
-      annotations: pickedCompletion.of(option.completion)
-    })
-  else
-    apply(view, option.completion, result.from, result.to)
 }
 
 const SourceCache = new WeakMap<readonly (string | Completion)[], CompletionSource>()

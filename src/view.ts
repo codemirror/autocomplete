@@ -4,7 +4,7 @@ import {Transaction} from "@codemirror/state"
 import {completionState, setSelectedEffect, setActiveEffect, State,
         ActiveSource, ActiveResult, getUserEvent} from "./state"
 import {completionConfig} from "./config"
-import {cur, CompletionResult, CompletionContext, applyCompletion,
+import {cur, CompletionResult, CompletionContext, Option, insertCompletionText, pickedCompletion,
         startCompletionEffect, closeCompletionEffect} from "./completion"
 
 /// Returns a command that moves the completion selection forward or
@@ -35,7 +35,7 @@ export const acceptCompletion: Command = (view: EditorView) => {
       Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
     return false
   if (!cState.open.disabled)
-    applyCompletion(view, cState.open.options[cState.open.selected])
+    return applyCompletion(view, cState.open.options[cState.open.selected])
   return true
 }
 
@@ -211,3 +211,18 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     }
   }
 })
+
+export function applyCompletion(view: EditorView, option: Option) {
+  const apply = option.completion.apply || option.completion.label
+  let result = view.state.field(completionState).active.find(a => a.source == option.source)
+  if (!(result instanceof ActiveResult)) return false
+
+  if (typeof apply == "string")
+    view.dispatch({
+      ...insertCompletionText(view.state, apply, result.from, result.to),
+      annotations: pickedCompletion.of(option.completion)
+    })
+  else
+    apply(view, option.completion, result.from, result.to)
+  return true
+}

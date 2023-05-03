@@ -402,6 +402,17 @@ describe("autocomplete", () => {
       ist(options(view.state), "aha")
     })
 
+    run.test("preserves completion position when changes happen", {
+      sources: [from("pow")],
+      doc: "\n\n",
+      selection: 2
+    }, async (view, sync) => {
+      startCompletion(view)
+      await sync(options, "pow")
+      view.dispatch({changes: {from: 0, insert: "woooooo"}})
+      acceptCompletion(view)
+      ist(view.state.doc.toString(), "woooooo\n\npow")
+    })
     return run.finish()
   })
 })
