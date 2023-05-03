@@ -1,3 +1,9 @@
+## 6.6.1 (2023-05-03)
+
+### Bug fixes
+
+Fix a bug that made the editor use the completion's original position, rather than its current position, when changes happened in the document while a result was active.
+
 ## 6.6.0 (2023-04-27)
 
 ### Bug fixes
