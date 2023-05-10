@@ -211,6 +211,20 @@ export const nextSnippetField = moveField(1)
 /// Move to the previous snippet field, if available.
 export const prevSnippetField = moveField(-1)
 
+/// Check if there is an active snippet with a next field for
+/// `nextSnippetField` to move to.
+export function hasNextSnippetField(state: EditorState) {
+  let active = state.field(snippetState, false)
+  return !!(active && active.ranges.some(r => r.field == active!.active + 1))
+}
+
+/// Returns true if there is an active snippet and a previous field
+/// for `prevSnippetField` to move to.
+export function hasPrevSnippetField(state: EditorState) {
+  let active = state.field(snippetState, false)
+  return !!(active && active.active > 0)
+}
+
 const defaultSnippetKeymap = [
   {key: "Tab", run: nextSnippetField, shift: prevSnippetField},
   {key: "Escape", run: clearSnippet}

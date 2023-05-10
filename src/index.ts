@@ -6,7 +6,8 @@ import {CompletionConfig, completionConfig} from "./config"
 import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
 import {baseTheme} from "./theme"
 
-export {snippet, snippetCompletion, nextSnippetField, prevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
+export {snippet, snippetCompletion, nextSnippetField, prevSnippetField,
+        hasNextSnippetField, hasPrevSnippetField, clearSnippet, snippetKeymap} from "./snippet"
 export {Completion, CompletionSection, CompletionContext, CompletionSource, CompletionResult, pickedCompletion,
         completeFromList, ifIn, ifNotIn, insertCompletionText} from "./completion"
 export {startCompletion, closeCompletion, acceptCompletion, moveCompletionSelection} from "./view"

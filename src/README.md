@@ -54,7 +54,11 @@
 
 @nextSnippetField
 
+@hasNextSnippetField
+
 @prevSnippetField
+
+@hasPrevSnippetField
 
 @clearSnippet
 
