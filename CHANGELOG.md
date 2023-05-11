@@ -1,3 +1,9 @@
+## 6.7.0 (2023-05-11)
+
+### New features
+
+The new `hasNextSnippetField` and `hasPrevSnippetField` functions can be used to figure out if the snippet-field-motion commands apply to a given state.
+
 ## 6.6.1 (2023-05-03)
 
 ### Bug fixes
