@@ -45,7 +45,7 @@ export class FuzzyMatcher {
   // The score is a number that is more negative the worse the match
   // is. See `Penalty` above.
   match(word: string): number[] | null {
-    if (this.pattern.length == 0) return [0]
+    if (this.pattern.length == 0) return [Penalty.NotFull]
     if (word.length < this.pattern.length) return null
     let {chars, folded, any, precise, byWord} = this
     // For single-character queries, only match when they occur right
