@@ -1,3 +1,9 @@
+## 6.7.1 (2023-05-13)
+
+### Bug fixes
+
+Fix a bug that cause incorrect ordering of completions when some results covered input text and others didn't.
+
 ## 6.7.0 (2023-05-11)
 
 ### New features
