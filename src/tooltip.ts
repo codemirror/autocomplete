@@ -1,7 +1,6 @@
 import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirror/view"
 import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
-import {applyCompletion} from "./view"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, Completion, closeCompletionEffect} from "./completion"
 
@@ -78,7 +77,8 @@ class CompletionTooltip {
   optionClass: (option: Completion) => string
 
   constructor(readonly view: EditorView,
-              readonly stateField: StateField<CompletionState>) {
+              readonly stateField: StateField<CompletionState>,
+              readonly applyCompletion: (view: EditorView, option: Option) => void) {
     let cState = view.state.field(stateField)
     let {options, selected} = cState.open!
     let config = view.state.facet(completionConfig)
@@ -94,7 +94,7 @@ class CompletionTooltip {
     this.dom.addEventListener("mousedown", (e: MouseEvent) => {
       for (let dom = e.target as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
         if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < options.length) {
-          applyCompletion(view, options[+match[1]])
+          this.applyCompletion(view, options[+match[1]])
           e.preventDefault()
           return
         }
@@ -262,8 +262,9 @@ class CompletionTooltip {
 
 // We allocate a new function instance every time the completion
 // changes to force redrawing/repositioning of the tooltip
-export function completionTooltip(stateField: StateField<CompletionState>) {
-  return (view: EditorView): TooltipView => new CompletionTooltip(view, stateField)
+export function completionTooltip(stateField: StateField<CompletionState>,
+                                  applyCompletion: (view: EditorView, option: Option) => void) {
+  return (view: EditorView): TooltipView => new CompletionTooltip(view, stateField, applyCompletion)
 }
 
 function scrollIntoView(container: HTMLElement, element: HTMLElement) {

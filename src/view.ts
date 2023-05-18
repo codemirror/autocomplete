@@ -2,10 +2,9 @@ import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException,
         getTooltip, TooltipView} from "@codemirror/view"
 import {Transaction} from "@codemirror/state"
 import {completionState, setSelectedEffect, setActiveEffect, State,
-        ActiveSource, ActiveResult, getUserEvent} from "./state"
+        ActiveSource, ActiveResult, getUserEvent, applyCompletion} from "./state"
 import {completionConfig} from "./config"
-import {cur, CompletionResult, CompletionContext, Option, insertCompletionText, pickedCompletion,
-        startCompletionEffect, closeCompletionEffect} from "./completion"
+import {cur, CompletionResult, CompletionContext, startCompletionEffect, closeCompletionEffect} from "./completion"
 
 /// Returns a command that moves the completion selection forward or
 /// backward by the given amount.
@@ -211,18 +210,3 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     }
   }
 })
-
-export function applyCompletion(view: EditorView, option: Option) {
-  const apply = option.completion.apply || option.completion.label
-  let result = view.state.field(completionState).active.find(a => a.source == option.source)
-  if (!(result instanceof ActiveResult)) return false
-
-  if (typeof apply == "string")
-    view.dispatch({
-      ...insertCompletionText(view.state, apply, result.from, result.to),
-      annotations: pickedCompletion.of(option.completion)
-    })
-  else
-    apply(view, option.completion, result.from, result.to)
-  return true
-}

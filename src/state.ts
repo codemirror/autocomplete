@@ -2,7 +2,8 @@ import {EditorView, Tooltip, showTooltip} from "@codemirror/view"
 import {Transaction, StateField, StateEffect, EditorState, ChangeDesc} from "@codemirror/state"
 import {Option, CompletionSource, CompletionResult, cur, asSource,
         Completion, ensureAnchor, CompletionContext, CompletionSection,
-        startCompletionEffect, closeCompletionEffect} from "./completion"
+        startCompletionEffect, closeCompletionEffect,
+        insertCompletionText, pickedCompletion} from "./completion"
 import {FuzzyMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
@@ -103,7 +104,7 @@ class CompletionDialog {
     }
     return new CompletionDialog(options, makeAttrs(id, selected), {
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
-      create: completionTooltip(completionState),
+      create: completionTooltip(completionState, applyCompletion),
       above: conf.aboveCursor,
     }, prev ? prev.timestamp : Date.now(), selected, false)
   }
@@ -287,3 +288,18 @@ export const completionState = StateField.define<CompletionState>({
     EditorView.contentAttributes.from(f, state => state.attrs)
   ]
 })
+
+export function applyCompletion(view: EditorView, option: Option) {
+  const apply = option.completion.apply || option.completion.label
+  let result = view.state.field(completionState).active.find(a => a.source == option.source)
+  if (!(result instanceof ActiveResult)) return false
+
+  if (typeof apply == "string")
+    view.dispatch({
+      ...insertCompletionText(view.state, apply, result.from, result.to),
+      annotations: pickedCompletion.of(option.completion)
+    })
+  else
+    apply(view, option.completion, result.from, result.to)
+  return true
+}
