@@ -1,5 +1,7 @@
 @Completion
 
+@CompletionInfo
+
 @CompletionSection
 
 @autocompletion

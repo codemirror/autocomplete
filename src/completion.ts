@@ -15,7 +15,7 @@ export interface Completion {
   /// Additional info to show when the completion is selected. Can be
   /// a plain string or a function that'll render the DOM structure to
   /// show when invoked.
-  info?: string | ((completion: Completion) => (Node | null | Promise<Node | null>))
+  info?: string | ((completion: Completion) => CompletionInfo | Promise<CompletionInfo>)
   /// How to apply the completion. The default is to replace it with
   /// its [label](#autocomplete.Completion.label). When this holds a
   /// string, the completion range is replaced by that string. When it
@@ -46,6 +46,12 @@ export interface Completion {
   /// a `{name}` object.
   section?: string | CompletionSection
 }
+
+/// The type returned from
+/// [`Completion.info`](#autocomplete.Completion.info). May be a DOM
+/// node, null to indicate there is no info, or an object with an
+/// optional `destroy` method that cleans up the node.
+export type CompletionInfo = Node | null | {dom: Node, destroy?(): void}
 
 /// Object used to describe a completion
 /// [section](#autocomplete.Completion.section). It is recommended to

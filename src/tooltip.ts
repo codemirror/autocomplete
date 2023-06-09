@@ -2,7 +2,7 @@ import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirr
 import {StateField, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
-import {Option, Completion, closeCompletionEffect} from "./completion"
+import {Option, Completion, CompletionInfo, closeCompletionEffect} from "./completion"
 
 type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
 
@@ -63,6 +63,7 @@ function rangeAroundSelected(total: number, selected: number, max: number) {
 class CompletionTooltip {
   dom: HTMLElement
   info: HTMLElement | null = null
+  infoDestroy: (() => void) | null = null
   list: HTMLElement
   placeInfoReq = {
     read: () => this.measureInfo(),
@@ -151,28 +152,36 @@ class CompletionTooltip {
       })
     }
     if (this.updateSelectedOption(open.selected)) {
-      if (this.info) {this.info.remove(); this.info = null}
+      this.destroyInfo()
       let {completion} = open.options[open.selected]
       let {info} = completion
       if (!info) return
-      let infoResult = typeof info === 'string' ? document.createTextNode(info) : info(completion)
+      let infoResult = typeof info === "string" ? document.createTextNode(info) : info(completion)
       if (!infoResult) return
-      if ('then' in infoResult) {
-        infoResult.then(node => {
-          if (node && this.view.state.field(this.stateField, false) == cState)
-            this.addInfoPane(node)
+      if ("then" in infoResult) {
+        infoResult.then(obj => {
+          if (obj && this.view.state.field(this.stateField, false) == cState)
+            this.addInfoPane(obj, completion)
         }).catch(e => logException(this.view.state, e, "completion info"))
       } else {
-        this.addInfoPane(infoResult)
+        this.addInfoPane(infoResult, completion)
       }
     }
   }
 
-  addInfoPane(content: Node) {
-    let dom = this.info = document.createElement("div")
-    dom.className = "cm-tooltip cm-completionInfo"
-    dom.appendChild(content)
-    this.dom.appendChild(dom)
+  addInfoPane(content: NonNullable<CompletionInfo>, completion: Completion) {
+    this.destroyInfo()
+    let wrap = this.info = document.createElement("div")
+    wrap.className = "cm-tooltip cm-completionInfo"
+    if ((content as Node).nodeType != null) {
+      wrap.appendChild(content as Node)
+      this.infoDestroy = null
+    } else {
+      let {dom, destroy} = content as {dom: Node, destroy?(): void}
+      wrap.appendChild(dom)
+      this.infoDestroy = destroy || null
+    }
+    this.dom.appendChild(wrap)
     this.view.requestMeasure(this.placeInfoReq)
   }
 
@@ -257,6 +266,18 @@ class CompletionTooltip {
     if (range.from) ul.classList.add("cm-completionListIncompleteTop")
     if (range.to < options.length) ul.classList.add("cm-completionListIncompleteBottom")
     return ul
+  }
+
+  destroyInfo() {
+    if (this.info) {
+      if (this.infoDestroy) this.infoDestroy()
+      this.info.remove()
+      this.info = null
+    }
+  }
+
+  destroy() {
+    this.destroyInfo()
   }
 }
 
