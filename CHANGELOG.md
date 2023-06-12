@@ -1,3 +1,9 @@
+## 6.8.0 (2023-06-12)
+
+### New features
+
+The result of `Completion.info` may now include a `destroy` method that will be called when the tooltip is removed.
+
 ## 6.7.1 (2023-05-13)
 
 ### Bug fixes
