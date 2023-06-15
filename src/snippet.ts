@@ -250,8 +250,8 @@ const addSnippetKeymap = Prec.highest(keymap.compute([snippetKeymap], state => s
 /// Create a completion from a snippet. Returns an object with the
 /// properties from `completion`, plus an `apply` function that
 /// applies the snippet.
-export function snippetCompletion(template: string, completion: Completion): Completion {
-  return {...completion, apply: snippet(template)}
+export function snippetCompletion(template: string, completion: Completion, placeholder?: string): Completion {
+  return {...completion, apply: snippet(template, placeholder)}
 }
 
 const snippetPointerHandler = EditorView.domEventHandlers({
