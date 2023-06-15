@@ -22,6 +22,12 @@ class FieldRange {
   }
 }
 
+function generateRegex (placeholder = '#$') {
+  const escapedPlaceholder = placeholder.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const regexString = '[' + escapedPlaceholder + ']' + '\\{(?:(\\d+)(?::([^}]*))?|([^}]*))\\}';
+  return new RegExp(regexString);
+}
+
 class Snippet {
   constructor(readonly lines: readonly string[],
               readonly fieldPositions: readonly FieldPos[]) {}
@@ -44,11 +50,11 @@ class Snippet {
     return {text, ranges}
   }
 
-  static parse(template: string) {
+  static parse(template: string, placeholder?: string) {
     let fields: {seq: number | null, name: string}[] = []
     let lines = [], positions = [], m
     for (let line of template.split(/\r\n?|\n/)) {
-      while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|([^}]*))\}/.exec(line)) {
+      while (m = generateRegex(placeholder).exec(line)) {
         let seq = m[1] ? +m[1] : null, name = m[2] || m[3] || "", found = -1
         for (let i = 0; i < fields.length; i++) {
           if (seq != null ? fields[i].seq == seq : name ? fields[i].name == name : false) found = i
@@ -164,8 +170,8 @@ function fieldSelection(ranges: readonly FieldRange[], field: number) {
 /// To include a literal `{` or `}` in your template, put a backslash
 /// in front of it. This will be removed and the brace will not be
 /// interpreted as indicating a placeholder.
-export function snippet(template: string) {
-  let snippet = Snippet.parse(template)
+export function snippet(template: string, placeholder?: string) {
+  let snippet = Snippet.parse(template, placeholder)
   return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, completion: Completion | null, from: number, to: number) => {
     let {text, ranges} = snippet.instantiate(editor.state, from)
     let spec: TransactionSpec = {
