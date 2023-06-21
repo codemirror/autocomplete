@@ -30,11 +30,10 @@ export function moveCompletionSelection(forward: boolean, by: "option" | "page" 
 /// Accept the current completion.
 export const acceptCompletion: Command = (view: EditorView) => {
   let cState = view.state.field(completionState, false)
-  if (view.state.readOnly || !cState || !cState.open || cState.open.selected < 0 ||
+  if (view.state.readOnly || !cState || !cState.open || cState.open.selected < 0 || cState.open.disabled ||
       Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
     return false
-  if (!cState.open.disabled)
-    return applyCompletion(view, cState.open.options[cState.open.selected])
+  return applyCompletion(view, cState.open.options[cState.open.selected])
   return true
 }
 
