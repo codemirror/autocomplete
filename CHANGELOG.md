@@ -1,3 +1,9 @@
+## 6.8.1 (2023-06-23)
+
+### Bug fixes
+
+`acceptCompletion` now returns false (allowing other handlers to take effect) when the completion popup is open but disabled.
+
 ## 6.8.0 (2023-06-12)
 
 ### New features
