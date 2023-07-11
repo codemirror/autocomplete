@@ -29,15 +29,16 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
   }
 
   for (let a of active) if (a.hasResult()) {
+    let getMatch = a.result.getMatch
     if (a.result.filter === false) {
-      let getMatch = a.result.getMatch
       for (let option of a.result.options) {
         addOption(new Option(option, a.source, getMatch ? getMatch(option) : [], 1e9 - options.length))
       }
     } else {
       let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to))
       for (let option of a.result.options) if (matcher.match(option.label)) {
-        addOption(new Option(option, a.source, matcher.matched, matcher.score + (option.boost || 0)))
+        let matched = !option.displayLabel ? matcher.matched : getMatch ? getMatch(option, matcher.matched) : []
+        addOption(new Option(option, a.source, matched, matcher.score + (option.boost || 0)))
       }
     }
   }

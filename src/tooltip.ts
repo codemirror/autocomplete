@@ -23,7 +23,7 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
     render(completion: Completion, _s: EditorState, match: readonly number[]) {
       let labelElt = document.createElement("span")
       labelElt.className = "cm-completionLabel"
-      let {label} = completion, off = 0
+      let label = completion.displayLabel || completion.label, off = 0
       for (let j = 0; j < match.length;) {
         let from = match[j++], to = match[j++]
         if (from > off) labelElt.appendChild(document.createTextNode(label.slice(off, from)))
