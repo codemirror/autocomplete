@@ -24,7 +24,7 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
       let labelElt = document.createElement("span")
       labelElt.className = "cm-completionLabel"
       let {label} = completion, off = 0
-      for (let j = 1; j < match.length;) {
+      for (let j = 0; j < match.length;) {
         let from = match[j++], to = match[j++]
         if (from > off) labelElt.appendChild(document.createTextNode(label.slice(off, from)))
         let span = labelElt.appendChild(document.createElement("span"))

@@ -32,14 +32,12 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
     if (a.result.filter === false) {
       let getMatch = a.result.getMatch
       for (let option of a.result.options) {
-        let match = [1e9 - options.length]
-        if (getMatch) for (let n of getMatch(option)) match.push(n)
-        addOption(new Option(option, a.source, match, match[0]))
+        addOption(new Option(option, a.source, getMatch ? getMatch(option) : [], 1e9 - options.length))
       }
     } else {
-      let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
-      for (let option of a.result.options) if (match = matcher.match(option.label)) {
-        addOption(new Option(option, a.source, match, match[0] + (option.boost || 0)))
+      let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to))
+      for (let option of a.result.options) if (matcher.match(option.label)) {
+        addOption(new Option(option, a.source, matcher.matched, matcher.score + (option.boost || 0)))
       }
     }
   }
