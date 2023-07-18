@@ -191,7 +191,8 @@ function moveField(dir: 1 | -1): StateCommand {
     let next = active.active + dir, last = dir > 0 && !active.ranges.some(r => r.field == next + dir)
     dispatch(state.update({
       selection: fieldSelection(active.ranges, next),
-      effects: setActive.of(last ? null : new ActiveSnippet(active.ranges, next))
+      effects: setActive.of(last ? null : new ActiveSnippet(active.ranges, next)),
+      scrollIntoView: true
     }))
     return true
   }
@@ -256,7 +257,9 @@ const snippetPointerHandler = EditorView.domEventHandlers({
     if (!match || match.field == active.active) return false
     view.dispatch({
       selection: fieldSelection(active.ranges, match.field),
-      effects: setActive.of(active.ranges.some(r => r.field > match!.field) ? new ActiveSnippet(active.ranges, match.field) : null)
+      effects: setActive.of(active.ranges.some(r => r.field > match!.field)
+        ? new ActiveSnippet(active.ranges, match.field) : null),
+      scrollIntoView: true
     })
     return true
   }

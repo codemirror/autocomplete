@@ -269,6 +269,7 @@ export function insertCompletionText(state: EditorState, text: string, from: num
         range: EditorSelection.cursor(range.from + fromOff + text.length)
       }
     }),
+    scrollIntoView: true,
     userEvent: "input.complete"
   }
 }
