@@ -6,7 +6,7 @@ import {SyntaxNode} from "@lezer/common"
 /// Objects type used to represent individual completions.
 export interface Completion {
   /// The label to show in the completion picker. This is what input
-  /// is matched agains to determine whether a completion matches (and
+  /// is matched against to determine whether a completion matches (and
   /// how well it matches).
   label: string
   /// An optional override for the completion's visible label. When
