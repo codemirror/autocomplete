@@ -1,3 +1,9 @@
+## 6.9.0 (2023-07-18)
+
+### New features
+
+Completions may now provide a `displayLabel` property that overrides the way they are displayed in the completion list.
+
 ## 6.8.1 (2023-06-23)
 
 ### Bug fixes
