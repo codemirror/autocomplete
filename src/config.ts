@@ -54,7 +54,7 @@ export interface CompletionConfig {
   /// 80.
   addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
                   position: number}[]
-  /// By default, [info](#autocomplet.Completion.info) tooltips are
+  /// By default, [info](#autocomplete.Completion.info) tooltips are
   /// placed to the side of the selected. This option can be used to
   /// override that. It will be given rectangles for the list of
   /// completions, the selected option, the info element, and the
