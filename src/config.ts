@@ -55,12 +55,12 @@ export interface CompletionConfig {
   addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
                   position: number}[]
   /// By default, [info](#autocomplete.Completion.info) tooltips are
-  /// placed to the side of the selected. This option can be used to
-  /// override that. It will be given rectangles for the list of
-  /// completions, the selected option, the info element, and the
-  /// availble [tooltip space](#view.tooltips^config.tooltipSpace),
-  /// and should return style and/or class strings for the info
-  /// element.
+  /// placed to the side of the selected completion. This option can
+  /// be used to override that. It will be given rectangles for the
+  /// list of completions, the selected option, the info element, and
+  /// the availble [tooltip
+  /// space](#view.tooltips^config.tooltipSpace), and should return
+  /// style and/or class strings for the info element.
   positionInfo?: (view: EditorView, list: Rect, option: Rect, info: Rect, space: Rect) => {style?: string, class?: string}
   /// The comparison function to use when sorting completions with the same
   /// match score. Defaults to using
