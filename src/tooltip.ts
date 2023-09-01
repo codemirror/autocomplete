@@ -218,7 +218,8 @@ class CompletionTooltip {
     if (selRect.top > Math.min(space.bottom, listRect.bottom) - 10 ||
         selRect.bottom < Math.max(space.top, listRect.top) + 10)
       return null
-    return this.view.state.facet(completionConfig).positionInfo(this.view, listRect, selRect, infoRect, space)
+    return (this.view.state.facet(completionConfig).positionInfo as any)(
+      this.view, listRect, selRect, infoRect, space, this.dom)
   }
 
   placeInfo(pos: {style?: string, class?: string} | null) {
@@ -291,6 +292,7 @@ export function completionTooltip(stateField: StateField<CompletionState>,
 function scrollIntoView(container: HTMLElement, element: HTMLElement) {
   let parent = container.getBoundingClientRect()
   let self = element.getBoundingClientRect()
-  if (self.top < parent.top) container.scrollTop -= parent.top - self.top
-  else if (self.bottom > parent.bottom) container.scrollTop += self.bottom - parent.bottom
+  let scaleY = parent.height / container.offsetHeight
+  if (self.top < parent.top) container.scrollTop -= (parent.top - self.top) / scaleY
+  else if (self.bottom > parent.bottom) container.scrollTop += (self.bottom - parent.bottom) / scaleY
 }

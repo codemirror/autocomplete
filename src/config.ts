@@ -87,7 +87,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       aboveCursor: false,
       icons: true,
       addToOptions: [],
-      positionInfo: defaultPositionInfo,
+      positionInfo: defaultPositionInfo as any,
       compareCompletions: (a, b) => a.label.localeCompare(b.label),
       interactionDelay: 75
     }, {
@@ -105,7 +105,7 @@ function joinClass(a: string, b: string) {
   return a ? b ? a + " " + b : a : b
 }
 
-function defaultPositionInfo(view: EditorView, list: Rect, option: Rect, info: Rect, space: Rect) {
+function defaultPositionInfo(view: EditorView, list: Rect, option: Rect, info: Rect, space: Rect, tooltip: HTMLElement) {
   let rtl = view.textDirection == Direction.RTL, left = rtl, narrow = false
   let side = "top", offset, maxWidth
   let spaceLeft = list.left - space.left, spaceRight = space.right - list.right
@@ -126,8 +126,10 @@ function defaultPositionInfo(view: EditorView, list: Rect, option: Rect, info: R
       offset = list.bottom - option.top
     }
   }
+  let scaleY = (list.bottom - list.top) / tooltip.offsetHeight
+  let scaleX = (list.right - list.left) / tooltip.offsetWidth
   return {
-    style: `${side}: ${offset}px; max-width: ${maxWidth}px`,
+    style: `${side}: ${offset / scaleY}px; max-width: ${maxWidth / scaleX}px`,
     class: "cm-completionInfo-" + (narrow ? (rtl ? "left-narrow" : "right-narrow") : left ? "left" : "right")
   }
 }
