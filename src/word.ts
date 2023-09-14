@@ -4,7 +4,7 @@ import {Completion, CompletionSource} from "./completion"
 const enum C { Range = 50000, MinCacheLen = 1000, MaxList = 2000 }
 
 function wordRE(wordChars: string) {
-  let escaped = wordChars.replace(/[\\[.+*?(){|^$]/g, "\\$&")
+  let escaped = wordChars.replace(/[\]\-\\]/g, "\\$&")
   try {
     return new RegExp(`[\\p{Alphabetic}\\p{Number}_${escaped}]+`, "ug")
   } catch {
