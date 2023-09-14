@@ -1,3 +1,11 @@
+## 6.9.1 (2023-09-14)
+
+### Bug fixes
+
+Make sure the cursor is scrolled into view after inserting completion text.
+
+Make sure scrolling completions into view doesn't get confused when the tooltip is scaled.
+
 ## 6.9.0 (2023-07-18)
 
 ### New features
