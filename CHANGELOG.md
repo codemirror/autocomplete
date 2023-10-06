@@ -1,3 +1,9 @@
+## 6.9.2 (2023-10-06)
+
+### Bug fixes
+
+Fix a bug in `completeAnyWord` that could cause it to generate invalid regular expressions and crash.
+
 ## 6.9.1 (2023-09-14)
 
 ### Bug fixes
