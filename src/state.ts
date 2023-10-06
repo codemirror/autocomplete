@@ -104,7 +104,7 @@ class CompletionDialog {
     }
     return new CompletionDialog(options, makeAttrs(id, selected), {
       pos: active.reduce((a, b) => b.hasResult() ? Math.min(a, b.from) : a, 1e8),
-      create: completionTooltip(completionState, applyCompletion),
+      create: createTooltip,
       above: conf.aboveCursor,
     }, prev ? prev.timestamp : Date.now(), selected, false)
   }
@@ -303,3 +303,5 @@ export function applyCompletion(view: EditorView, option: Option) {
     apply(view, option.completion, result.from, result.to)
   return true
 }
+
+const createTooltip = completionTooltip(completionState, applyCompletion)

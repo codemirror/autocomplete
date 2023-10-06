@@ -64,7 +64,7 @@ class CompletionTooltip {
   dom: HTMLElement
   info: HTMLElement | null = null
   infoDestroy: (() => void) | null = null
-  list: HTMLElement
+  list!: HTMLElement
   placeInfoReq = {
     read: () => this.measureInfo(),
     write: (pos: {style?: string, class?: string} | null) => this.placeInfo(pos),
@@ -107,22 +107,32 @@ class CompletionTooltip {
           e.relatedTarget != view.contentDOM)
         view.dispatch({effects: closeCompletionEffect.of(null)})
     })
-    this.list = this.dom.appendChild(this.createListBox(options, cState.id, this.range))
+    this.showOptions(options, cState.id)
+  }
+
+  mount() { this.updateSel() }
+
+  showOptions(options: readonly Option[], id: string) {
+    if (this.list) this.list.remove()
+    this.list = this.dom.appendChild(this.createListBox(options, id, this.range))
     this.list.addEventListener("scroll", () => {
       if (this.info) this.view.requestMeasure(this.placeInfoReq)
     })
   }
-
-  mount() { this.updateSel() }
 
   update(update: ViewUpdate) {
     let cState = update.state.field(this.stateField)
     let prevState = update.startState.field(this.stateField)
     this.updateTooltipClass(update.state)
     if (cState != prevState) {
+      let {options, selected, disabled} = cState.open!
+      if (!prevState.open || prevState.open.options != options) {
+         this.range = rangeAroundSelected(options.length, selected, update.state.facet(completionConfig).maxRenderedOptions)
+        this.showOptions(options, cState.id)
+      }
       this.updateSel()
-      if (cState.open?.disabled != prevState.open?.disabled)
-        this.dom.classList.toggle("cm-tooltip-autocomplete-disabled", !!cState.open?.disabled)
+      if (disabled != prevState.open?.disabled)
+        this.dom.classList.toggle("cm-tooltip-autocomplete-disabled", !!disabled)
     }
   }
 
@@ -145,11 +155,7 @@ class CompletionTooltip {
     if (open.selected > -1 && open.selected < this.range.from || open.selected >= this.range.to) {
       this.range = rangeAroundSelected(open.options.length, open.selected,
                                        this.view.state.facet(completionConfig).maxRenderedOptions)
-      this.list.remove()
-      this.list = this.dom.appendChild(this.createListBox(open.options, cState.id, this.range))
-      this.list.addEventListener("scroll", () => {
-        if (this.info) this.view.requestMeasure(this.placeInfoReq)
-      })
+      this.showOptions(open.options, cState.id)
     }
     if (this.updateSelectedOption(open.selected)) {
       this.destroyInfo()
@@ -282,8 +288,6 @@ class CompletionTooltip {
   }
 }
 
-// We allocate a new function instance every time the completion
-// changes to force redrawing/repositioning of the tooltip
 export function completionTooltip(stateField: StateField<CompletionState>,
                                   applyCompletion: (view: EditorView, option: Option) => void) {
   return (view: EditorView): TooltipView => new CompletionTooltip(view, stateField, applyCompletion)
