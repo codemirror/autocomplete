@@ -71,6 +71,11 @@ export interface CompletionConfig {
   /// presses made before the user is aware of the tooltip don't go to
   /// the tooltip. This option can be used to configure that delay.
   interactionDelay?: number
+  /// When there are multiple asynchronous completion sources, this
+  /// controls how long the extension waits for a slow source before
+  /// displaying results from faster sources. Defaults to 100
+  /// milliseconds.
+  updateSyncTime?: number
 }
 
 export const completionConfig = Facet.define<CompletionConfig, Required<CompletionConfig>>({
@@ -89,7 +94,8 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       addToOptions: [],
       positionInfo: defaultPositionInfo as any,
       compareCompletions: (a, b) => a.label.localeCompare(b.label),
-      interactionDelay: 75
+      interactionDelay: 75,
+      updateSyncTime: 100
     }, {
       defaultKeymap: (a, b) => a && b,
       closeOnBlur: (a, b) => a && b,

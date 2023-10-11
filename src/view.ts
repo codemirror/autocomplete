@@ -64,7 +64,7 @@ class RunningQuery {
               readonly context: CompletionContext) {}
 }
 
-const DebounceTime = 50, MaxUpdateCount = 50, MinAbortTime = 1000
+const MaxUpdateCount = 50, MinAbortTime = 1000
 
 const enum CompositionState { None, Started, Changed, ChangedAndMoved }
 
@@ -103,7 +103,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
     if (this.debounceUpdate > -1) clearTimeout(this.debounceUpdate)
     this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.active.source == a.source))
-      ? setTimeout(() => this.startUpdate(), DebounceTime) : -1
+      ? setTimeout(() => this.startUpdate(), update.state.facet(completionConfig).updateSyncTime) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
       if (getUserEvent(tr) == "input")
@@ -139,8 +139,11 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
   }
 
   scheduleAccept() {
-    if (this.running.every(q => q.done !== undefined)) this.accept()
-    else if (this.debounceAccept < 0) this.debounceAccept = setTimeout(() => this.accept(), DebounceTime)
+    if (this.running.every(q => q.done !== undefined))
+      this.accept()
+    else if (this.debounceAccept < 0)
+      this.debounceAccept = setTimeout(() => this.accept(),
+                                       this.view.state.facet(completionConfig).updateSyncTime)
   }
 
   // For each finished query in this.running, try to create a result
