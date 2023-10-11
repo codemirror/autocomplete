@@ -1,3 +1,9 @@
+## 6.10.0 (2023-10-11)
+
+### New features
+
+The new autocompletion configuration option `updateSyncTime` allows control over how long fast sources are held back waiting for slower completion sources.
+
 ## 6.9.2 (2023-10-06)
 
 ### Bug fixes
