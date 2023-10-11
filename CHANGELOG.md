@@ -1,3 +1,9 @@
+## 6.10.1 (2023-10-11)
+
+### Bug fixes
+
+Fix a bug where picking a selection with the mouse could use the wrong completion if the completion list was updated after being opened.
+
 ## 6.10.0 (2023-10-11)
 
 ### New features
