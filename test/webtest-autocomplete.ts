@@ -37,7 +37,7 @@ class Runner {
       state: EditorState.create({
         doc: spec.doc,
         selection,
-        extensions: [autocompletion({override: spec.sources, interactionDelay: 0}), EditorState.allowMultipleSelections.of(true)]
+        extensions: [autocompletion({override: spec.sources, interactionDelay: 0, updateSyncTime: 40}), EditorState.allowMultipleSelections.of(true)]
       }),
       parent: document.querySelector("#workspace")! as HTMLElement,
       dispatchTransactions: trs => {
