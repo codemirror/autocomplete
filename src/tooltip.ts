@@ -93,6 +93,7 @@ class CompletionTooltip {
     this.dom.className = "cm-tooltip-autocomplete"
     this.updateTooltipClass(view.state)
     this.dom.addEventListener("mousedown", (e: MouseEvent) => {
+      let {options} = view.state.field(stateField).open!
       for (let dom = e.target as HTMLElement | null, match; dom && dom != this.dom; dom = dom.parentNode as HTMLElement) {
         if (dom.nodeName == "LI" && (match = /-(\d+)$/.exec(dom.id)) && +match[1] < options.length) {
           this.applyCompletion(view, options[+match[1]])
