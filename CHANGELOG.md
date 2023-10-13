@@ -1,3 +1,9 @@
+## 6.10.2 (2023-10-13)
+
+### Bug fixes
+
+Fix a bug that caused `updateSyncTime` to always delay the initial population of the tooltip.
+
 ## 6.10.1 (2023-10-11)
 
 ### Bug fixes
