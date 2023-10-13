@@ -103,7 +103,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
     if (this.debounceUpdate > -1) clearTimeout(this.debounceUpdate)
     this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.active.source == a.source))
-      ? setTimeout(() => this.startUpdate(), update.state.facet(completionConfig).updateSyncTime) : -1
+      ? setTimeout(() => this.startUpdate(), 50) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
       if (getUserEvent(tr) == "input")
