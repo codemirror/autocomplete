@@ -52,7 +52,7 @@ export interface CompletionConfig {
   /// other added widgets and the standard content. The default icons
   /// have position 20, the label position 50, and the detail position
   /// 80.
-  addToOptions?: {render: (completion: Completion, state: EditorState) => Node | null,
+  addToOptions?: {render: (completion: Completion, state: EditorState, view: EditorView) => Node | null,
                   position: number}[]
   /// By default, [info](#autocomplete.Completion.info) tooltips are
   /// placed to the side of the selected completion. This option can

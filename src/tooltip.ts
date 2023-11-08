@@ -4,7 +4,8 @@ import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, Completion, CompletionInfo, closeCompletionEffect} from "./completion"
 
-type OptionContentSource = (completion: Completion, state: EditorState, match: readonly number[]) => Node | null
+type OptionContentSource =
+  (completion: Completion, state: EditorState, view: EditorView, match: readonly number[]) => Node | null
 
 function optionContent(config: Required<CompletionConfig>): OptionContentSource[] {
   let content = config.addToOptions.slice() as {render: OptionContentSource, position: number}[]
@@ -20,7 +21,7 @@ function optionContent(config: Required<CompletionConfig>): OptionContentSource[
     position: 20
   })
   content.push({
-    render(completion: Completion, _s: EditorState, match: readonly number[]) {
+    render(completion: Completion, _s: EditorState, _v: EditorView, match: readonly number[]) {
       let labelElt = document.createElement("span")
       labelElt.className = "cm-completionLabel"
       let label = completion.displayLabel || completion.label, off = 0
@@ -267,7 +268,7 @@ class CompletionTooltip {
       let cls = this.optionClass(completion)
       if (cls) li.className = cls
       for (let source of this.optionContent) {
-        let node = source(completion, this.view.state, match)
+        let node = source(completion, this.view.state, this.view, match)
         if (node) li.appendChild(node)
       }
     }
