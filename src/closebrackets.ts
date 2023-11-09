@@ -42,10 +42,8 @@ const bracketState = StateField.define<RangeSet<typeof closedBracket>>({
   create() { return RangeSet.empty },
   update(value, tr) {
     if (tr.selection) {
-      let lineStart = tr.state.doc.lineAt(tr.selection.main.head).from
-      let prevLineStart = tr.startState.doc.lineAt(tr.startState.selection.main.head).from
-      if (lineStart != tr.changes.mapPos(prevLineStart, -1))
-        value = RangeSet.empty
+      let line = tr.state.doc.lineAt(tr.selection.main.head)
+      value = value.update({filter: from => from >= line.from && from <= line.to})
     }
     value = value.map(tr.changes)
     for (let effect of tr.effects) if (effect.is(closeBracketEffect))
