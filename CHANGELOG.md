@@ -1,3 +1,13 @@
+## 6.11.0 (2023-11-09)
+
+### Bug fixes
+
+Fix an issue that would prevent typing over closed brackets after starting a new line with enter.
+
+### New features
+
+Additional elements rendered in completion options with `addToOptions` are now given access to the editor view.
+
 ## 6.10.2 (2023-10-13)
 
 ### Bug fixes
