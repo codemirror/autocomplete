@@ -1,3 +1,9 @@
+## 6.11.1 (2023-11-27)
+
+### Bug fixes
+
+Fix a bug that caused typing over closed brackets after pressing enter to still not work in many situations.
+
 ## 6.11.0 (2023-11-09)
 
 ### Bug fixes
