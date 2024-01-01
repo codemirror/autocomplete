@@ -171,7 +171,7 @@ export function snippet(template: string) {
     let spec: TransactionSpec = {
       changes: {from, to, insert: Text.of(text)},
       scrollIntoView: true,
-      annotations: completion ? pickedCompletion.of(completion) : undefined
+      annotations: completion ? [pickedCompletion.of(completion), Transaction.userEvent.of("input.complete")] : undefined
     }
     if (ranges.length) spec.selection = fieldSelection(ranges, 0)
     if (ranges.length > 1) {
