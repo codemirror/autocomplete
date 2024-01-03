@@ -77,7 +77,7 @@ export interface CompletionConfig {
   /// milliseconds.
   updateSyncTime?: number
   /// This controls the minimum delay time in milliseconds before
-  /// before processing the latest input. Defaults to 500
+  /// before processing the latest input. Defaults to 50
   /// milliseconds.
   debounceTime?: number
 }
@@ -100,7 +100,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       compareCompletions: (a, b) => a.label.localeCompare(b.label),
       interactionDelay: 75,
       updateSyncTime: 100,
-      debounceTime: 500,
+      debounceTime: 50,
     }, {
       defaultKeymap: (a, b) => a && b,
       closeOnBlur: (a, b) => a && b,
