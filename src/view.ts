@@ -196,7 +196,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       if (state && state.tooltip && this.view.state.facet(completionConfig).closeOnBlur) {
         let dialog = state.open && getTooltip(this.view, state.open.tooltip)
         if (!dialog || !dialog.dom.contains(event.relatedTarget as HTMLElement))
-          this.view.dispatch({effects: closeCompletionEffect.of(null)})
+          setTimeout(() => this.view.dispatch({effects: closeCompletionEffect.of(null)}), 10)
       }
     },
     compositionstart() {
