@@ -174,7 +174,7 @@ export function snippet(template: string) {
       annotations: completion ? [pickedCompletion.of(completion), Transaction.userEvent.of("input.complete")] : undefined
     }
     if (ranges.length) spec.selection = fieldSelection(ranges, 0)
-    if (ranges.length > 1) {
+    if (ranges.some(r => r.field > 0)) {
       let active = new ActiveSnippet(ranges, 0)
       let effects: StateEffect<unknown>[] = spec.effects = [setActive.of(active)]
       if (editor.state.field(snippetState, false) === undefined)
