@@ -72,6 +72,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
   debounceUpdate = -1
   running: RunningQuery[] = []
   debounceAccept = -1
+  pendingStart = false
   composing = CompositionState.None
 
   constructor(readonly view: EditorView) {
@@ -102,8 +103,10 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     }
 
     if (this.debounceUpdate > -1) clearTimeout(this.debounceUpdate)
+    if (update.transactions.some(tr => tr.effects.some(e => e.is(startCompletionEffect)))) this.pendingStart = true
+    let delay = this.pendingStart ? 50 : update.state.facet(completionConfig).activateOnTypingDelay
     this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.active.source == a.source))
-      ? setTimeout(() => this.startUpdate(), 50) : -1
+      ? setTimeout(() => this.startUpdate(), delay) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
       if (getUserEvent(tr) == "input")
@@ -115,6 +118,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
   startUpdate() {
     this.debounceUpdate = -1
+    this.pendingStart = false
     let {state} = this.view, cState = state.field(completionState)
     for (let active of cState.active) {
       if (active.state == State.Pending && !this.running.some(r => r.active.source == active.source))
