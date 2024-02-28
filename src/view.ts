@@ -1,6 +1,6 @@
 import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException,
         getTooltip, TooltipView} from "@codemirror/view"
-import {Transaction} from "@codemirror/state"
+import {Transaction, Prec} from "@codemirror/state"
 import {completionState, setSelectedEffect, setActiveEffect, State,
         ActiveSource, ActiveResult, getUserEvent, applyCompletion} from "./state"
 import {completionConfig} from "./config"
@@ -216,3 +216,20 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     }
   }
 })
+
+const windows = typeof navigator == "object" && /Win/.test(navigator.platform)
+
+export const commitCharacters = Prec.highest(EditorView.domEventHandlers({
+  keydown(event, view) {
+    let field = view.state.field(completionState, false)
+    if (!field || !field.open || field.open.disabled || field.open.selected < 0 ||
+        event.key.length > 1 || event.ctrlKey && !(windows && event.altKey) || event.metaKey)
+      return false
+    let option = field.open.options[field.open.selected]
+    let result = field.active.find(a => a.source == option.source) as ActiveResult
+    let commitChars = option.completion.commitCharacters || result.result.commitCharacters
+    if (commitChars && commitChars.indexOf(event.key) > -1)
+      applyCompletion(view, option)
+    return false
+  }
+}))

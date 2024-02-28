@@ -3,7 +3,8 @@ import {keymap, KeyBinding} from "@codemirror/view"
 import {Completion, Option} from "./completion"
 import {completionState, State, setSelectedEffect} from "./state"
 import {CompletionConfig, completionConfig} from "./config"
-import {completionPlugin, moveCompletionSelection, acceptCompletion, startCompletion, closeCompletion} from "./view"
+import {completionPlugin, moveCompletionSelection, acceptCompletion,
+        startCompletion, closeCompletion, commitCharacters} from "./view"
 import {baseTheme} from "./theme"
 
 export {snippet, snippetCompletion, nextSnippetField, prevSnippetField,
@@ -17,6 +18,7 @@ export {CloseBracketConfig, closeBrackets, closeBracketsKeymap, deleteBracketPai
 /// Returns an extension that enables autocompletion.
 export function autocompletion(config: CompletionConfig = {}): Extension {
   return [
+    commitCharacters,
     completionState,
     completionConfig.of(config),
     completionPlugin,
