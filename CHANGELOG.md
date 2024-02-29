@@ -1,3 +1,9 @@
+## 6.13.0 (2024-02-29)
+
+### New features
+
+Completions may now provide 'commit characters' that, when typed, commit the completion before inserting the character.
+
 ## 6.12.0 (2024-01-12)
 
 ### Bug fixes
