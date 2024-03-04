@@ -1,5 +1,5 @@
 import {EditorView} from "@codemirror/view"
-import {EditorState, StateEffect, Annotation, EditorSelection, TransactionSpec} from "@codemirror/state"
+import {EditorState, StateEffect, Annotation, EditorSelection, TransactionSpec, ChangeDesc} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 
@@ -232,6 +232,12 @@ export interface CompletionResult {
   /// [`validFor`](#autocomplete.CompletionResult.validFor)) that the
   /// completion still applies in the new state.
   update?: (current: CompletionResult, from: number, to: number, context: CompletionContext) => CompletionResult | null
+  /// When results contain position-dependent information in, for
+  /// example, `apply` methods, you can provide this method to update
+  /// the result for transactions that happen after the query. It is
+  /// not necessary to update `from` and `to`—those are tracked
+  /// automatically.
+  map?: (current: CompletionResult, changes: ChangeDesc) => CompletionResult | null
   /// Set a default set of [commit
   /// characters](#autocomplete.Completion.commitCharacters) for all
   /// options in this result.

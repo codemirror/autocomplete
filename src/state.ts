@@ -240,18 +240,20 @@ export class ActiveResult extends ActiveSource {
   hasResult(): this is ActiveResult { return true }
 
   handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
+    let result = this.result as CompletionResult | null
+    if (result!.map && !tr.changes.empty) result = result!.map(result!, tr.changes)
     let from = tr.changes.mapPos(this.from), to = tr.changes.mapPos(this.to, 1)
     let pos = cur(tr.state)
     if ((this.explicitPos < 0 ? pos <= from : pos < this.from) ||
-        pos > to ||
+        pos > to || !result ||
         type == "delete" && cur(tr.startState) == this.from)
       return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive)
-    let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos), updated
-    if (checkValid(this.result.validFor, tr.state, from, to))
-      return new ActiveResult(this.source, explicitPos, this.result, from, to)
-    if (this.result.update &&
-        (updated = this.result.update(this.result, from, to, new CompletionContext(tr.state, pos, explicitPos >= 0))))
-      return new ActiveResult(this.source, explicitPos, updated, updated.from, updated.to ?? cur(tr.state))
+    let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos)
+    if (checkValid(result.validFor, tr.state, from, to))
+      return new ActiveResult(this.source, explicitPos, result, from, to)
+    if (result.update &&
+        (result = result.update(result, from, to, new CompletionContext(tr.state, pos, explicitPos >= 0))))
+      return new ActiveResult(this.source, explicitPos, result, result.from, result.to ?? cur(tr.state))
     return new ActiveSource(this.source, State.Pending, explicitPos)
   }
 
@@ -260,9 +262,11 @@ export class ActiveResult extends ActiveSource {
   }
 
   map(mapping: ChangeDesc) {
-    return mapping.empty ? this :
-      new ActiveResult(this.source, this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos), this.result,
-                       mapping.mapPos(this.from), mapping.mapPos(this.to, 1))
+    if (mapping.empty) return this
+    let result = this.result.map ? this.result.map(this.result, mapping) : this.result
+    if (!result) return new ActiveSource(this.source, State.Inactive)
+    return new ActiveResult(this.source, this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos), this.result,
+                            mapping.mapPos(this.from), mapping.mapPos(this.to, 1))
   }
 }
 
