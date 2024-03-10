@@ -1,3 +1,9 @@
+## 6.14.0 (2024-03-10)
+
+### New features
+
+Completion results can now define a `map` method that can be used to adjust position-dependent information for document changes.
+
 ## 6.13.0 (2024-02-29)
 
 ### New features
