@@ -43,7 +43,7 @@ export class FuzzyMatcher {
   ret(score: number, matched: readonly number[]) {
     this.score = score
     this.matched = matched
-    return true
+    return this
   }
 
   // Matches a given word (completion) against the pattern (input).
@@ -53,9 +53,9 @@ export class FuzzyMatcher {
   //
   // The score is a number that is more negative the worse the match
   // is. See `Penalty` above.
-  match(word: string): boolean {
+  match(word: string): {score: number, matched: readonly number[]} | null {
     if (this.pattern.length == 0) return this.ret(Penalty.NotFull, [])
-    if (word.length < this.pattern.length) return false
+    if (word.length < this.pattern.length) return null
     let {chars, folded, any, precise, byWord} = this
     // For single-character queries, only match when they occur right
     // at the start
@@ -64,7 +64,7 @@ export class FuzzyMatcher {
       let score = firstSize == word.length ? 0 : Penalty.NotFull
       if (first == chars[0]) {}
       else if (first == folded[0]) score += Penalty.CaseFold
-      else return false
+      else return null
       return this.ret(score, [0, firstSize])
     }
     let direct = word.indexOf(this.pattern)
@@ -78,7 +78,7 @@ export class FuzzyMatcher {
         i += codePointSize(next)
       }
       // No match, exit immediately
-      if (anyTo < len) return false
+      if (anyTo < len) return null
     }
 
     // This tracks the extent of the precise (non-folded, not
@@ -129,7 +129,7 @@ export class FuzzyMatcher {
     if (byWordTo == len)
       return this.result(Penalty.ByWord + (byWordFolded ? Penalty.CaseFold : 0) + Penalty.NotStart +
         (wordAdjacent ? 0 : Penalty.Gap), byWord, word)
-    return chars.length == 2 ? false
+    return chars.length == 2 ? null
       : this.result((any[0] ? Penalty.NotStart : 0) + Penalty.CaseFold + Penalty.Gap, any, word)
   }
 

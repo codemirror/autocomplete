@@ -35,10 +35,10 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
         addOption(new Option(option, a.source, getMatch ? getMatch(option) : [], 1e9 - options.length))
       }
     } else {
-      let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to))
-      for (let option of a.result.options) if (matcher.match(option.label)) {
-        let matched = !option.displayLabel ? matcher.matched : getMatch ? getMatch(option, matcher.matched) : []
-        addOption(new Option(option, a.source, matched, matcher.score + (option.boost || 0)))
+      let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
+      for (let option of a.result.options) if (match = matcher.match(option.label)) {
+        let matched = !option.displayLabel ? match.matched : getMatch ? getMatch(option, match.matched) : []
+        addOption(new Option(option, a.source, matched, match.score + (option.boost || 0)))
       }
     }
   }
