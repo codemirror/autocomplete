@@ -4,7 +4,7 @@ import {Option, CompletionSource, CompletionResult, cur, asSource,
         Completion, ensureAnchor, CompletionContext, CompletionSection,
         startCompletionEffect, closeCompletionEffect,
         insertCompletionText, pickedCompletion} from "./completion"
-import {FuzzyMatcher} from "./filter"
+import {FuzzyMatcher, StrictMatcher} from "./filter"
 import {completionTooltip} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
 
@@ -28,6 +28,7 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
     }
   }
 
+  let conf = state.facet(completionConfig)
   for (let a of active) if (a.hasResult()) {
     let getMatch = a.result.getMatch
     if (a.result.filter === false) {
@@ -35,7 +36,8 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
         addOption(new Option(option, a.source, getMatch ? getMatch(option) : [], 1e9 - options.length))
       }
     } else {
-      let matcher = new FuzzyMatcher(state.sliceDoc(a.from, a.to)), match
+      let pattern = state.sliceDoc(a.from, a.to), match
+      let matcher = conf.filterStrict ? new StrictMatcher(pattern) : new FuzzyMatcher(pattern)
       for (let option of a.result.options) if (match = matcher.match(option.label)) {
         let matched = !option.displayLabel ? match.matched : getMatch ? getMatch(option, match.matched) : []
         addOption(new Option(option, a.source, matched, match.score + (option.boost || 0)))
@@ -57,7 +59,7 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
   }
 
   let result = [], prev = null
-  let compare = state.facet(completionConfig).compareCompletions
+  let compare = conf.compareCompletions
   for (let opt of options.sort((a, b) => (b.score - a.score) || compare(a.completion, b.completion))) {
     let cur = opt.completion
     if (!prev || prev.label != cur.label || prev.detail != cur.detail ||

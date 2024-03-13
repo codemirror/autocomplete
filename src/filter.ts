@@ -143,3 +143,24 @@ export class FuzzyMatcher {
     return this.ret(score - word.length, result)
   }
 }
+
+
+export class StrictMatcher {
+  matched: readonly number[] = []
+  score: number = 0
+  folded: string
+
+  constructor(readonly pattern: string) {
+    this.folded = pattern.toLowerCase()
+  }
+
+  match(word: string): {score: number, matched: readonly number[]} | null {
+    if (word.length < this.pattern.length) return null
+    let start = word.slice(0, this.pattern.length)
+    let match = start == this.pattern ? 0 : start.toLowerCase() == this.folded ? Penalty.CaseFold : null
+    if (match == null) return null
+    this.matched = [0, start.length]
+    this.score = match + (word.length == this.pattern.length ? 0 : Penalty.NotFull)
+    return this
+  }
+}
