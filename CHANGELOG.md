@@ -1,3 +1,9 @@
+## 6.15.0 (2024-03-13)
+
+### New features
+
+The new `filterStrict` option can be used to turn off fuzzy matching of completions.
+
 ## 6.14.0 (2024-03-10)
 
 ### New features
