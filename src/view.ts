@@ -82,10 +82,11 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
   update(update: ViewUpdate) {
     let cState = update.state.field(completionState)
+    let conf = update.state.facet(completionConfig)
     if (!update.selectionSet && !update.docChanged && update.startState.field(completionState) == cState) return
 
     let doesReset = update.transactions.some(tr => {
-      return (tr.selection || tr.docChanged) && !getUserEvent(tr)
+      return (tr.selection || tr.docChanged) && !getUserEvent(tr, conf)
     })
     for (let i = 0; i < this.running.length; i++) {
       let query = this.running[i]
@@ -104,12 +105,12 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
     if (this.debounceUpdate > -1) clearTimeout(this.debounceUpdate)
     if (update.transactions.some(tr => tr.effects.some(e => e.is(startCompletionEffect)))) this.pendingStart = true
-    let delay = this.pendingStart ? 50 : update.state.facet(completionConfig).activateOnTypingDelay
+    let delay = this.pendingStart ? 50 : conf.activateOnTypingDelay
     this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.active.source == a.source))
       ? setTimeout(() => this.startUpdate(), delay) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
-      if (getUserEvent(tr) == "input")
+      if (getUserEvent(tr, conf) == "input")
         this.composing = CompositionState.Changed
       else if (this.composing == CompositionState.Changed && tr.selection)
         this.composing = CompositionState.ChangedAndMoved

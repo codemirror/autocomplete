@@ -7,6 +7,9 @@ export interface CompletionConfig {
   /// When enabled (defaults to true), autocompletion will start
   /// whenever the user types something that can be completed.
   activateOnTyping?: boolean
+  /// When given, if a completion that matches the predicate is
+  /// picked, reactivate completion again as if it was typed normally.
+  activateOnCompletion?: (completion: Completion) => boolean
   /// The amount of time to wait for further typing before querying
   /// completion sources via
   /// [`activateOnTyping`](#autocomplete.autocompletion^config.activateOnTyping).
@@ -93,6 +96,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
   combine(configs) {
     return combineConfig<Required<CompletionConfig>>(configs, {
       activateOnTyping: true,
+      activateOnCompletion: () => false,
       activateOnTypingDelay: 100,
       selectOnOpen: true,
       override: null,
