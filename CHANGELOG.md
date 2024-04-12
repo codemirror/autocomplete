@@ -1,3 +1,9 @@
+## 6.16.0 (2024-04-12)
+
+### New features
+
+The new `activateOnCompletion` option allows autocompletion to be configured to chain completion activation for some types of completions.
+
 ## 6.15.0 (2024-03-13)
 
 ### New features
