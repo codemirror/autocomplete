@@ -46,7 +46,7 @@ class Snippet {
 
   static parse(template: string) {
     let fields: {seq: number | null, name: string}[] = []
-    let lines = [], positions = [], m
+    let lines = [], positions: FieldPos[] = [], m
     for (let line of template.split(/\r\n?|\n/)) {
       while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|([^}]*))\}/.exec(line)) {
         let seq = m[1] ? +m[1] : null, name = m[2] || m[3] || "", found = -1
@@ -63,13 +63,13 @@ class Snippet {
         positions.push(new FieldPos(found, lines.length, m.index, m.index + name.length))
         line = line.slice(0, m.index) + name + line.slice(m.index + m[0].length)
       }
-      for (let esc; esc = /\\([{}])/.exec(line);) {
-        line = line.slice(0, esc.index) + esc[1] + line.slice(esc.index + esc[0].length)
-        for (let pos of positions) if (pos.line == lines.length && pos.from > esc.index) {
+      line = line.replace(/\\([{}])/g, (_, brace, index) => {
+        for (let pos of positions) if (pos.line == lines.length && pos.from > index) {
           pos.from--
           pos.to--
         }
-      }
+        return brace
+      })
       lines.push(line)
     }
     return new Snippet(lines, positions)
