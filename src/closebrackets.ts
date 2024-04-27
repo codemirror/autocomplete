@@ -11,7 +11,7 @@ import {syntaxTree} from "@codemirror/language"
 export interface CloseBracketConfig {
   /// The opening brackets to close. Defaults to `["(", "[", "{", "'",
   /// '"']`. Brackets may be single characters or a triple of quotes
-  /// (as in `"''''"`).
+  /// (as in `"'''"`).
   brackets?: string[]
   /// Characters in front of which newly opened brackets are
   /// automatically closed. Closing always happens in front of
