@@ -1,3 +1,9 @@
+## 6.16.1 (2024-05-29)
+
+### Bug fixes
+
+Fix a bug where multiple backslashes before a brace in a snippet were all removed.
+
 ## 6.16.0 (2024-04-12)
 
 ### New features
