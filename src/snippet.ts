@@ -48,8 +48,9 @@ class Snippet {
     let fields: {seq: number | null, name: string}[] = []
     let lines = [], positions: FieldPos[] = [], m
     for (let line of template.split(/\r\n?|\n/)) {
-      while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|([^}]*))\}/.exec(line)) {
-        let seq = m[1] ? +m[1] : null, name = m[2] || m[3] || "", found = -1
+      while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|((?:\\[{}]|[^}])*))\}/.exec(line)) {
+        let seq = m[1] ? +m[1] : null, rawName = m[2] || m[3] || "", found = -1
+        let name = rawName.replace(/\\[{}]/g, m => m[1])
         for (let i = 0; i < fields.length; i++) {
           if (seq != null ? fields[i].seq == seq : name ? fields[i].name == name : false) found = i
         }
@@ -61,7 +62,7 @@ class Snippet {
           for (let pos of positions) if (pos.field >= found) pos.field++
         }
         positions.push(new FieldPos(found, lines.length, m.index, m.index + name.length))
-        line = line.slice(0, m.index) + name + line.slice(m.index + m[0].length)
+        line = line.slice(0, m.index) + rawName + line.slice(m.index + m[0].length)
       }
       line = line.replace(/\\([{}])/g, (_, brace, index) => {
         for (let pos of positions) if (pos.line == lines.length && pos.from > index) {
