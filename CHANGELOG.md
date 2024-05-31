@@ -1,3 +1,9 @@
+## 6.16.2 (2024-05-31)
+
+### Bug fixes
+
+Allow backslash-escaped closing braces inside snippet field names/content.
+
 ## 6.16.1 (2024-05-29)
 
 ### Bug fixes
