@@ -1,3 +1,9 @@
+## 6.16.3 (2024-06-19)
+
+### Bug fixes
+
+Avoid adding an `aria-autocomplete` attribute to the editor when there are no active sources active.
+
 ## 6.16.2 (2024-05-31)
 
 ### Bug fixes
