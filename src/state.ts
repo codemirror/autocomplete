@@ -257,7 +257,7 @@ export class ActiveResult extends ActiveSource {
         type == "delete" && cur(tr.startState) == this.from)
       return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive)
     let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos)
-    if (checkValid(result.validFor, tr, from, to, ))
+    if (checkValid(result.validFor, tr, from, to))
       return new ActiveResult(this.source, explicitPos, result, from, to)
     if (result.update &&
         (result = result.update(result, from, to, new CompletionContext(tr.state, pos, explicitPos >= 0))))
@@ -278,11 +278,11 @@ export class ActiveResult extends ActiveSource {
   }
 }
 
-function checkValid(validFor: undefined | RegExp | ((text: string, from: number, to: number, state: EditorState, tr: Transaction) => boolean),
+function checkValid(validFor: undefined | RegExp | ((text: string, from: number, to: number, state: EditorState) => boolean),
                     tr: Transaction, from: number, to: number) {
-  if (!validFor) return false
+  if (!validFor || tr.isUserEvent("input.complete")) return false
   let text = tr.state.sliceDoc(from, to)
-  return typeof validFor == "function" ? validFor(text, from, to, tr.state, tr) : ensureAnchor(validFor, true).test(text)
+  return typeof validFor == "function" ? validFor(text, from, to, tr.state) : ensureAnchor(validFor, true).test(text)
 }
 
 export const setActiveEffect = StateEffect.define<readonly ActiveSource[]>({
