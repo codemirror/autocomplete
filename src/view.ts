@@ -2,7 +2,7 @@ import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException,
         getTooltip, TooltipView} from "@codemirror/view"
 import {Transaction, Prec} from "@codemirror/state"
 import {completionState, setSelectedEffect, setActiveEffect, State,
-        ActiveSource, ActiveResult, getUserEvent, applyCompletion} from "./state"
+        ActiveSource, ActiveResult, getUpdateType, UpdateType, applyCompletion} from "./state"
 import {completionConfig} from "./config"
 import {cur, CompletionResult, CompletionContext, startCompletionEffect, closeCompletionEffect} from "./completion"
 
@@ -86,7 +86,8 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     if (!update.selectionSet && !update.docChanged && update.startState.field(completionState) == cState) return
 
     let doesReset = update.transactions.some(tr => {
-      return (tr.selection || tr.docChanged) && !getUserEvent(tr, conf)
+      let type = getUpdateType(tr, conf)
+      return (type & UpdateType.Reset) || (tr.selection || tr.docChanged) && !(type & UpdateType.SimpleInteraction)
     })
     for (let i = 0; i < this.running.length; i++) {
       let query = this.running[i]
@@ -110,7 +111,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       ? setTimeout(() => this.startUpdate(), delay) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
-      if (getUserEvent(tr, conf) == "input")
+      if (tr.isUserEvent("input.type"))
         this.composing = CompositionState.Changed
       else if (this.composing == CompositionState.Changed && tr.selection)
         this.composing = CompositionState.ChangedAndMoved

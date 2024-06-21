@@ -188,12 +188,27 @@ const none: readonly any[] = []
 
 export const enum State { Inactive = 0, Pending = 1, Result = 2 }
 
-export function getUserEvent(tr: Transaction, conf: Required<CompletionConfig>): "input" | "delete" | null {
+export const enum UpdateType {
+  None = 0,
+  Typing = 1,
+  Backspacing = 2,
+  SimpleInteraction = Typing | Backspacing,
+  Activate = 4,
+  Reset = 8,
+  ResetIfTouching = 16
+}
+  
+export function getUpdateType(tr: Transaction, conf: Required<CompletionConfig>): UpdateType {
   if (tr.isUserEvent("input.complete")) {
     let completion = tr.annotation(pickedCompletion)
-    if (completion && conf.activateOnCompletion(completion)) return "input"
+    if (completion && conf.activateOnCompletion(completion)) return UpdateType.Activate | UpdateType.Reset
   }
-  return tr.isUserEvent("input.type") ? "input" : tr.isUserEvent("delete.backward") ? "delete" : null
+  let typing = tr.isUserEvent("input.type")
+  return typing && conf.activateOnTyping ? UpdateType.Activate | UpdateType.Typing
+    : typing ? UpdateType.Typing
+    : tr.isUserEvent("delete.backward") ? UpdateType.Backspacing
+    : tr.selection ? UpdateType.Reset
+    : tr.docChanged ? UpdateType.ResetIfTouching : UpdateType.None
 }
 
 export class ActiveSource {
@@ -204,13 +219,12 @@ export class ActiveSource {
   hasResult(): this is ActiveResult { return false }
 
   update(tr: Transaction, conf: Required<CompletionConfig>): ActiveSource {
-    let event = getUserEvent(tr, conf), value: ActiveSource = this
-    if (event)
-      value = value.handleUserEvent(tr, event, conf)
-    else if (tr.docChanged)
-      value = value.handleChange(tr)
-    else if (tr.selection && value.state != State.Inactive)
+    let type = getUpdateType(tr, conf), value: ActiveSource = this
+    if ((type & UpdateType.Reset) || (type & UpdateType.ResetIfTouching) && this.touches(tr))
       value = new ActiveSource(value.source, State.Inactive)
+    if ((type & UpdateType.Activate) && value.state == State.Inactive)
+      value = new ActiveSource(this.source, State.Pending)
+    value = value.updateFor(tr, type)
 
     for (let effect of tr.effects) {
       if (effect.is(startCompletionEffect))
@@ -223,16 +237,14 @@ export class ActiveSource {
     return value
   }
 
-  handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
-    return type == "delete" || !conf.activateOnTyping ? this.map(tr.changes) : new ActiveSource(this.source, State.Pending)
-  }
-
-  handleChange(tr: Transaction): ActiveSource {
-    return tr.changes.touchesRange(cur(tr.startState)) ? new ActiveSource(this.source, State.Inactive) : this.map(tr.changes)
-  }
+  updateFor(tr: Transaction, type: UpdateType): ActiveSource { return this.map(tr.changes) }
 
   map(changes: ChangeDesc) {
     return changes.empty || this.explicitPos < 0 ? this : new ActiveSource(this.source, this.state, changes.mapPos(this.explicitPos))
+  }
+
+  touches(tr: Transaction) {
+    return tr.changes.touchesRange(cur(tr.state))
   }
 }
 
@@ -247,15 +259,16 @@ export class ActiveResult extends ActiveSource {
 
   hasResult(): this is ActiveResult { return true }
 
-  handleUserEvent(tr: Transaction, type: "input" | "delete", conf: Required<CompletionConfig>): ActiveSource {
+  updateFor(tr: Transaction, type: UpdateType) {
+    if (!(type & UpdateType.SimpleInteraction)) return this.map(tr.changes)
     let result = this.result as CompletionResult | null
     if (result!.map && !tr.changes.empty) result = result!.map(result!, tr.changes)
     let from = tr.changes.mapPos(this.from), to = tr.changes.mapPos(this.to, 1)
     let pos = cur(tr.state)
     if ((this.explicitPos < 0 ? pos <= from : pos < this.from) ||
         pos > to || !result ||
-        type == "delete" && cur(tr.startState) == this.from)
-      return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? State.Pending : State.Inactive)
+        (type & UpdateType.Backspacing) && cur(tr.startState) == this.from)
+      return new ActiveSource(this.source, type & UpdateType.Activate ? State.Pending : State.Inactive)
     let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos)
     if (checkValid(result.validFor, tr.state, from, to))
       return new ActiveResult(this.source, explicitPos, result, from, to)
@@ -265,16 +278,16 @@ export class ActiveResult extends ActiveSource {
     return new ActiveSource(this.source, State.Pending, explicitPos)
   }
 
-  handleChange(tr: Transaction): ActiveSource {
-    return tr.changes.touchesRange(this.from, this.to) ? new ActiveSource(this.source, State.Inactive) : this.map(tr.changes)
-  }
-
   map(mapping: ChangeDesc) {
     if (mapping.empty) return this
     let result = this.result.map ? this.result.map(this.result, mapping) : this.result
     if (!result) return new ActiveSource(this.source, State.Inactive)
     return new ActiveResult(this.source, this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos), this.result,
                             mapping.mapPos(this.from), mapping.mapPos(this.to, 1))
+  }
+
+  touches(tr: Transaction) {
+    return tr.changes.touchesRange(this.from, this.to)
   }
 }
 
