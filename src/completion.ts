@@ -96,7 +96,13 @@ export class CompletionContext {
     /// implicitly by typing. The usual way to respond to this is to
     /// only return completions when either there is part of a
     /// completable entity before the cursor, or `explicit` is true.
-    readonly explicit: boolean
+    readonly explicit: boolean,
+    /// The editor view. May be undefined if the context was created
+    /// in a situation where there is no such view available, such as
+    /// in synchronous updates via
+    /// [`CompletionResult.update`](#autocomplete.CompletionResult.update)
+    /// or when called by test code.
+    readonly view?: EditorView
   ) {}
 
   /// Get the extent, content, and (if there is a token) type of the

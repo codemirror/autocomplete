@@ -130,7 +130,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
   startQuery(active: ActiveSource) {
     let {state} = this.view, pos = cur(state)
-    let context = new CompletionContext(state, pos, active.explicitPos == pos)
+    let context = new CompletionContext(state, pos, active.explicitPos == pos, this.view)
     let pending = new RunningQuery(active, context)
     this.running.push(pending)
     Promise.resolve(active.source(context)).then(result => {
