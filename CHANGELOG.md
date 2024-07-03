@@ -1,3 +1,13 @@
+## 6.17.0 (2024-07-03)
+
+### Bug fixes
+
+Fix an issue where completions weren't properly reset when starting a new completion through `activateOnCompletion`.
+
+### New features
+
+`CompletionContext` objects now have a `view` property that holds the editor view when the query context has a view available.
+
 ## 6.16.3 (2024-06-19)
 
 ### Bug fixes
