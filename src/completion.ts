@@ -83,6 +83,8 @@ export interface CompletionSection {
 export class CompletionContext {
   /// @internal
   abortListeners: (() => void)[] | null = []
+  /// @internal
+  abortOnDocChange = false
 
   /// Create a new completion context. (Mostly useful for testing
   /// completion sources—in the editor, the extension will create
@@ -132,8 +134,19 @@ export class CompletionContext {
   /// Allows you to register abort handlers, which will be called when
   /// the query is
   /// [aborted](#autocomplete.CompletionContext.aborted).
-  addEventListener(type: "abort", listener: () => void) {
-    if (type == "abort" && this.abortListeners) this.abortListeners.push(listener)
+  ///
+  /// By default, running queries will not be aborted for regular
+  /// typing or backspacing, on the assumption that they are likely to
+  /// return a result with a
+  /// [`validFor`](#autocomplete.CompletionResult.validFor) field that
+  /// allows the result to be used after all. Passing `onDocChange:
+  /// true` will cause this query to be aborted for any document
+  /// change.
+  addEventListener(type: "abort", listener: () => void, options?: {onDocChange: boolean}) {
+    if (type == "abort" && this.abortListeners) {
+      this.abortListeners.push(listener)
+      if (options && options.onDocChange) this.abortOnDocChange = true
+    }
   }
 }
 
