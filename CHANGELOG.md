@@ -1,3 +1,13 @@
+## 6.18.0 (2024-08-05)
+
+### Bug fixes
+
+Style the info element so that newlines are preserved, to make it easier to display multi-line info from a string source.
+
+### New features
+
+When registering an `abort` handler for a completion query, you can now use the `onDocChange` option to indicate that your query should be aborted as soon as the document changes while it is running.
+
 ## 6.17.0 (2024-07-03)
 
 ### Bug fixes
