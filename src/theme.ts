@@ -65,7 +65,8 @@ export const baseTheme = EditorView.baseTheme({
     padding: "3px 9px",
     width: "max-content",
     maxWidth: `${Info.Width}px`,
-    boxSizing: "border-box"
+    boxSizing: "border-box",
+    whiteSpace: "pre-line"
   },
 
   ".cm-completionInfo.cm-completionInfo-left": { right: "100%" },
