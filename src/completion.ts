@@ -296,9 +296,10 @@ export function insertCompletionText(state: EditorState, text: string, from: num
       if (range != main && from != to &&
           state.sliceDoc(range.from + fromOff, range.from + toOff) != state.sliceDoc(from, to))
         return {range}
+      let lines = state.toText(text)
       return {
-        changes: {from: range.from + fromOff, to: to == main.from ? range.to : range.from + toOff, insert: text},
-        range: EditorSelection.cursor(range.from + fromOff + text.length)
+        changes: {from: range.from + fromOff, to: to == main.from ? range.to : range.from + toOff, insert: lines},
+        range: EditorSelection.cursor(range.from + fromOff + lines.length)
       }
     }),
     scrollIntoView: true,
