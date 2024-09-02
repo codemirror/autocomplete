@@ -34,7 +34,6 @@ export const acceptCompletion: Command = (view: EditorView) => {
       Date.now() - cState.open.timestamp < view.state.facet(completionConfig).interactionDelay)
     return false
   return applyCompletion(view, cState.open.options[cState.open.selected])
-  return true
 }
 
 /// Explicitly start autocompletion.
