@@ -1,3 +1,11 @@
+## 6.18.1 (2024-09-14)
+
+### Bug fixes
+
+Fix an issue where `insertCompletionText` would get confused about the length of the inserted text when it contained CRLF line breaks, and create an invalid selection.
+
+Add Alt-Backtick as additional binding on macOS, where IME can take over Ctrl-Space.
+
 ## 6.18.0 (2024-08-05)
 
 ### Bug fixes
