@@ -126,6 +126,9 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       if (active.state == State.Pending && !this.running.some(r => r.active.source == active.source))
         this.startQuery(active)
     }
+    if (this.running.length && cState.open && cState.open.disabled)
+      this.debounceAccept = setTimeout(() => this.accept(),
+                                       this.view.state.facet(completionConfig).updateSyncTime)
   }
 
   startQuery(active: ActiveSource) {
@@ -159,7 +162,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     this.debounceAccept = -1
 
     let updated: ActiveSource[] = []
-    let conf = this.view.state.facet(completionConfig)
+    let conf = this.view.state.facet(completionConfig), cState = this.view.state.field(completionState)
     for (let i = 0; i < this.running.length; i++) {
       let query = this.running[i]
       if (query.done === undefined) continue
@@ -178,7 +181,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
         }
       }
 
-      let current = this.view.state.field(completionState).active.find(a => a.source == query.active.source)
+      let current = cState.active.find(a => a.source == query.active.source)
       if (current && current.state == State.Pending) {
         if (query.done == null) {
           // Explicitly failed. Should clear the pending status if it
@@ -193,7 +196,8 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       }
     }
 
-    if (updated.length) this.view.dispatch({effects: setActiveEffect.of(updated)})
+    if (updated.length || cState.open && cState.open.disabled)
+      this.view.dispatch({effects: setActiveEffect.of(updated)})
   }
 }, {
   eventHandlers: {

@@ -89,13 +89,14 @@ class CompletionDialog {
     state: EditorState,
     id: string,
     prev: CompletionDialog | null,
-    conf: Required<CompletionConfig>
+    conf: Required<CompletionConfig>,
+    didSetActive: boolean
   ): CompletionDialog | null {
+    if (prev && !didSetActive && active.some(s => s.state == State.Pending))
+      return prev.setDisabled()
     let options = sortOptions(active, state)
-    if (!options.length) {
-      return prev && active.some(a => a.state == State.Pending) ?
-        new CompletionDialog(prev.options, prev.attrs, prev.tooltip, prev.timestamp, prev.selected, true) : null
-    }
+    if (!options.length)
+      return prev && active.some(a => a.state == State.Pending) ? prev.setDisabled() : null
     let selected = state.facet(completionConfig).selectOnOpen ? 0 : -1
     if (prev && prev.selected != selected && prev.selected != -1) {
       let selectedValue = prev.options[prev.selected].completion
@@ -114,6 +115,10 @@ class CompletionDialog {
   map(changes: ChangeDesc) {
     return new CompletionDialog(this.options, this.attrs, {...this.tooltip, pos: changes.mapPos(this.tooltip.pos)},
                                 this.timestamp, this.selected, this.disabled)
+  }
+
+  setDisabled() {
+    return new CompletionDialog(this.options, this.attrs, this.tooltip, this.timestamp, this.selected, true)
   }
 }
 
@@ -137,11 +142,11 @@ export class CompletionState {
     })
     if (active.length == this.active.length && active.every((a, i) => a == this.active[i])) active = this.active
 
-    let open = this.open
+    let open = this.open, didSet = tr.effects.some(e => e.is(setActiveEffect))
     if (open && tr.docChanged) open = open.map(tr.changes)
     if (tr.selection || active.some(a => a.hasResult() && tr.changes.touchesRange(a.from, a.to)) ||
-        !sameResults(active, this.active))
-      open = CompletionDialog.build(active, state, this.id, open, conf)
+        !sameResults(active, this.active) || didSet)
+      open = CompletionDialog.build(active, state, this.id, open, conf, didSet)
     else if (open && open.disabled && !active.some(a => a.state == State.Pending))
       open = null
 
