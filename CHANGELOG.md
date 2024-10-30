@@ -1,3 +1,9 @@
+## 6.18.2 (2024-10-30)
+
+### Bug fixes
+
+Don't immediately show synchronously updated completions when there are some sources that still need to return.
+
 ## 6.18.1 (2024-09-14)
 
 ### Bug fixes
