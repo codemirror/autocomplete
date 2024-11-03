@@ -56,7 +56,7 @@ const completionKeymapExt = Prec.highest(keymap.computeN([completionConfig], sta
 /// returns `null`.
 export function completionStatus(state: EditorState): null | "active" | "pending" {
   let cState = state.field(completionState, false)
-  return cState && cState.active.some(a => a.state == State.Pending) ? "pending"
+  return cState && cState.active.some(a => a.isPending) ? "pending"
     : cState && cState.active.some(a => a.state != State.Inactive) ? "active" : null
 }
 

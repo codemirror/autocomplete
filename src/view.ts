@@ -76,7 +76,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
   constructor(readonly view: EditorView) {
     for (let active of view.state.field(completionState).active)
-      if (active.state == State.Pending) this.startQuery(active)
+      if (active.isPending) this.startQuery(active)
   }
 
   update(update: ViewUpdate) {
@@ -107,7 +107,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     if (this.debounceUpdate > -1) clearTimeout(this.debounceUpdate)
     if (update.transactions.some(tr => tr.effects.some(e => e.is(startCompletionEffect)))) this.pendingStart = true
     let delay = this.pendingStart ? 50 : conf.activateOnTypingDelay
-    this.debounceUpdate = cState.active.some(a => a.state == State.Pending && !this.running.some(q => q.active.source == a.source))
+    this.debounceUpdate = cState.active.some(a => a.isPending && !this.running.some(q => q.active.source == a.source))
       ? setTimeout(() => this.startUpdate(), delay) : -1
 
     if (this.composing != CompositionState.None) for (let tr of update.transactions) {
@@ -123,7 +123,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
     this.pendingStart = false
     let {state} = this.view, cState = state.field(completionState)
     for (let active of cState.active) {
-      if (active.state == State.Pending && !this.running.some(r => r.active.source == active.source))
+      if (active.isPending && !this.running.some(r => r.active.source == active.source))
         this.startQuery(active)
     }
     if (this.running.length && cState.open && cState.open.disabled)
@@ -133,7 +133,7 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
 
   startQuery(active: ActiveSource) {
     let {state} = this.view, pos = cur(state)
-    let context = new CompletionContext(state, pos, active.explicitPos == pos, this.view)
+    let context = new CompletionContext(state, pos, active.explicit, this.view)
     let pending = new RunningQuery(active, context)
     this.running.push(pending)
     Promise.resolve(active.source(context)).then(result => {
@@ -169,9 +169,11 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       this.running.splice(i--, 1)
 
       if (query.done) {
+        let pos = cur(query.updates.length ? query.updates[0].startState : this.view.state)
+        let limit = Math.min(pos, query.done.from + (query.active.explicit ? 0 : 1))
         let active: ActiveSource = new ActiveResult(
-          query.active.source, query.active.explicitPos, query.done, query.done.from,
-          query.done.to ?? cur(query.updates.length ? query.updates[0].startState : this.view.state))
+          query.active.source, query.active.explicit, limit, query.done, query.done.from,
+          query.done.to ?? pos)
         // Replay the transactions that happened since the start of
         // the request and see if that preserves the result
         for (let tr of query.updates) active = active.update(tr, conf)
@@ -182,13 +184,13 @@ export const completionPlugin = ViewPlugin.fromClass(class implements PluginValu
       }
 
       let current = cState.active.find(a => a.source == query.active.source)
-      if (current && current.state == State.Pending) {
+      if (current && current.isPending) {
         if (query.done == null) {
           // Explicitly failed. Should clear the pending status if it
           // hasn't been re-set in the meantime.
           let active = new ActiveSource(query.active.source, State.Inactive)
           for (let tr of query.updates) active = active.update(tr, conf)
-          if (active.state != State.Pending) updated.push(active)
+          if (!active.isPending) updated.push(active)
         } else {
           // Cleared by subsequent transactions. Restart.
           this.startQuery(current)
