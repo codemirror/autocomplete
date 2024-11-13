@@ -1,3 +1,9 @@
+## 6.18.3 (2024-11-13)
+
+### Bug fixes
+
+Backspacing to the start of the completed range will no longer close the completion tooltip when it was triggered implicitly by typing the character before that range.
+
 ## 6.18.2 (2024-10-30)
 
 ### Bug fixes
