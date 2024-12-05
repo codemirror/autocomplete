@@ -169,8 +169,9 @@ export function snippet(template: string) {
   let snippet = Snippet.parse(template)
   return (editor: {state: EditorState, dispatch: (tr: Transaction) => void}, completion: Completion | null, from: number, to: number) => {
     let {text, ranges} = snippet.instantiate(editor.state, from)
+    let {main} = editor.state.selection
     let spec: TransactionSpec = {
-      changes: {from, to, insert: Text.of(text)},
+      changes: {from, to: to == main.from ? main.to : to, insert: Text.of(text)},
       scrollIntoView: true,
       annotations: completion ? [pickedCompletion.of(completion), Transaction.userEvent.of("input.complete")] : undefined
     }
