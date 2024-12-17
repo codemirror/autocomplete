@@ -1,3 +1,9 @@
+## 6.18.4 (2024-12-17)
+
+### Bug fixes
+
+Align the behavior of snippet completions with text completions in that they overwrite the selected text.
+
 ## 6.18.3 (2024-11-13)
 
 ### Bug fixes
