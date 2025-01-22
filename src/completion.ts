@@ -123,7 +123,15 @@ export class CompletionContext {
     let line = this.state.doc.lineAt(this.pos)
     let start = Math.max(line.from, this.pos - 250)
     let str = line.text.slice(start - line.from, this.pos - line.from)
-    let found = str.search(ensureAnchor(expr, false))
+    let found = -1
+    if (expr.global) {
+      let match
+      /// Use the last match in case of a global expression.
+      while ((match = expr.exec(str)) !== null) found = match.index
+    } else {
+      found = str.search(ensureAnchor(expr, false))
+    }
+
     return found < 0 ? null : {from: start + found, to: this.pos, text: str.slice(found)}
   }
 
