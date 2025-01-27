@@ -220,8 +220,8 @@ class CompletionTooltip {
     let selRect = sel.getBoundingClientRect()
     let space = this.space
     if (!space) {
-      let win = this.dom.ownerDocument.defaultView || window
-      space = {left: 0, top: 0, right: win.innerWidth, bottom: win.innerHeight}
+      let docElt = this.dom.ownerDocument.documentElement
+      space = {left: 0, top: 0, right: docElt.clientWidth, bottom: docElt.clientHeight}
     }
     if (selRect.top > Math.min(space.bottom, listRect.bottom) - 10 ||
         selRect.bottom < Math.max(space.top, listRect.top) + 10)
