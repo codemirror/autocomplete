@@ -247,6 +247,10 @@ class CompletionTooltip {
     ul.setAttribute("role", "listbox")
     ul.setAttribute("aria-expanded", "true")
     ul.setAttribute("aria-label", this.view.state.phrase("Completions"))
+    ul.addEventListener("mousedown", e => {
+      // Prevent focus change when clicking the scrollbar
+      if (e.target == ul) e.preventDefault()
+    })
     let curSection: string | null = null
     for (let i = range.from; i < range.to; i++) {
       let {completion, match} = options[i], {section} = completion
