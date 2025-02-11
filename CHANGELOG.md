@@ -1,3 +1,9 @@
+## 6.18.5 (2025-02-11)
+
+### Bug fixes
+
+Fix an issue where clicking on the scrollbar for the completion list could move focus out of the editor.
+
 ## 6.18.4 (2024-12-17)
 
 ### Bug fixes
