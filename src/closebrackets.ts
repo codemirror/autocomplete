@@ -61,7 +61,7 @@ export function closeBrackets(): Extension {
   return [inputHandler, bracketState]
 }
 
-const definedClosing = "()[]{}<>"
+const definedClosing = "()[]{}<>«»»«［］｛｝"
 
 function closing(ch: number) {
   for (let i = 0; i < definedClosing.length; i += 2)
