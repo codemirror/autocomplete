@@ -1,3 +1,9 @@
+## 6.18.6 (2025-02-12)
+
+### Bug fixes
+
+Fix an issue where the closing character for double-angle quotation marks and full-width brackets was computed incorrectly.
+
 ## 6.18.5 (2025-02-11)
 
 ### Bug fixes
