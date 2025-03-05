@@ -34,7 +34,7 @@ export function autocompletion(config: CompletionConfig = {}): Extension {
 ///  - ArrowDown: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(true)`
 ///  - ArrowUp: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(false)`
 ///  - PageDown: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(true, "page")`
-///  - PageDown: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(true, "page")`
+///  - PageUp: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(false, "page")`
 ///  - Enter: [`acceptCompletion`](#autocomplete.acceptCompletion)
 export const completionKeymap: readonly KeyBinding[] = [
   {key: "Ctrl-Space", run: startCompletion},
