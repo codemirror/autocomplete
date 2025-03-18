@@ -65,7 +65,7 @@ class CompletionTooltip {
   dom: HTMLElement
   info: HTMLElement | null = null
   infoDestroy: (() => void) | null = null
-  list!: HTMLElement
+  declare list: HTMLElement
   placeInfoReq = {
     read: () => this.measureInfo(),
     write: (pos: {style?: string, class?: string} | null) => this.placeInfo(pos),
