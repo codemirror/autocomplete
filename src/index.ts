@@ -29,7 +29,7 @@ export function autocompletion(config: CompletionConfig = {}): Extension {
 
 /// Basic keybindings for autocompletion.
 ///
-///  - Ctrl-Space (and Alt-\` on macOS): [`startCompletion`](#autocomplete.startCompletion)
+///  - Ctrl-Space (and Alt-\` or Alt-i on macOS): [`startCompletion`](#autocomplete.startCompletion)
 ///  - Escape: [`closeCompletion`](#autocomplete.closeCompletion)
 ///  - ArrowDown: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(true)`
 ///  - ArrowUp: [`moveCompletionSelection`](#autocomplete.moveCompletionSelection)`(false)`
@@ -39,6 +39,7 @@ export function autocompletion(config: CompletionConfig = {}): Extension {
 export const completionKeymap: readonly KeyBinding[] = [
   {key: "Ctrl-Space", run: startCompletion},
   {mac: "Alt-`", run: startCompletion},
+  {mac: "Alt-i", run: startCompletion},
   {key: "Escape", run: closeCompletion},
   {key: "ArrowDown", run: moveCompletionSelection(true)},
   {key: "ArrowUp", run: moveCompletionSelection(false)},
