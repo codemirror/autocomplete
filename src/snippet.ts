@@ -48,7 +48,7 @@ class Snippet {
     let fields: {seq: number | null, name: string}[] = []
     let lines = [], positions: FieldPos[] = [], m
     for (let line of template.split(/\r\n?|\n/)) {
-      while (m = /[#$]\{(?:(\d+)(?::([^}]*))?|((?:\\[{}]|[^}])*))\}/.exec(line)) {
+      while (m = /[#$]\{(?:(\d+)(?::([^{}]*))?|((?:\\[{}]|[^{}])*))\}/.exec(line)) {
         let seq = m[1] ? +m[1] : null, rawName = m[2] || m[3] || "", found = -1
         let name = rawName.replace(/\\[{}]/g, m => m[1])
         for (let i = 0; i < fields.length; i++) {
@@ -60,6 +60,11 @@ class Snippet {
           fields.splice(i, 0, {seq, name})
           found = i
           for (let pos of positions) if (pos.field >= found) pos.field++
+        }
+        for (let pos of positions) if (pos.line == lines.length && pos.from > m.index) {
+          let snip = m[2] ? 3 + (m[1] || "").length : 2
+          pos.from -= snip
+          pos.to -= snip
         }
         positions.push(new FieldPos(found, lines.length, m.index, m.index + name.length))
         line = line.slice(0, m.index) + rawName + line.slice(m.index + m[0].length)
@@ -92,7 +97,7 @@ class ActiveSnippet {
 
   constructor(readonly ranges: readonly FieldRange[],
               readonly active: number) {
-    this.deco = Decoration.set(ranges.map(r => (r.from == r.to ? fieldMarker : fieldRange).range(r.from, r.to)))
+    this.deco = Decoration.set(ranges.map(r => (r.from == r.to ? fieldMarker : fieldRange).range(r.from, r.to)), true)
   }
 
   map(changes: ChangeDesc) {
