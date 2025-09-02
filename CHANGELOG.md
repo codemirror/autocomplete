@@ -1,3 +1,11 @@
+## 6.18.7 (2025-09-02)
+
+### Bug fixes
+
+Add a binding for Alt-i to trigger `startCompletion`, following VS Code's current default bindings.
+
+Improve handling of nested fields in snippets.
+
 ## 6.18.6 (2025-02-12)
 
 ### Bug fixes
