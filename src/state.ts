@@ -17,7 +17,7 @@ function score(option: Completion) {
 
 function sortOptions(active: readonly ActiveSource[], state: EditorState) {
   let options: Option[] = []
-  let sections: null | CompletionSection[] = null
+  let sections: null | CompletionSection[] = null, dynamicSectionScore: Record<string, number> | null = null
   let addOption = (option: Option) => {
     options.push(option)
     let {section} = option.completion
@@ -40,14 +40,24 @@ function sortOptions(active: readonly ActiveSource[], state: EditorState) {
       let matcher = conf.filterStrict ? new StrictMatcher(pattern) : new FuzzyMatcher(pattern)
       for (let option of a.result.options) if (match = matcher.match(option.label)) {
         let matched = !option.displayLabel ? match.matched : getMatch ? getMatch(option, match.matched) : []
-        addOption(new Option(option, a.source, matched, match.score + (option.boost || 0)))
+        let score = match.score + (option.boost || 0)
+        addOption(new Option(option, a.source, matched, score))
+        if (typeof option.section == "object" && option.section.rank === "dynamic") {
+          let {name} = option.section
+          if (!dynamicSectionScore) dynamicSectionScore = Object.create(null) as Record<string, number>
+          dynamicSectionScore[name] = Math.max(score, dynamicSectionScore[name] || -1e9)
+        }
       }
     }
   }
 
   if (sections) {
     let sectionOrder: {[name: string]: number} = Object.create(null), pos = 0
-    let cmp = (a: CompletionSection, b: CompletionSection) => (a.rank ?? 1e9) - (b.rank ?? 1e9) || (a.name < b.name ? -1 : 1)
+    let cmp = (a: CompletionSection, b: CompletionSection) => {
+      return (a.rank === "dynamic" && b.rank === "dynamic" ? dynamicSectionScore![b.name] - dynamicSectionScore![a.name] : 0) ||
+        (typeof a.rank == "number" ? a.rank : 1e9) - (typeof b.rank == "number" ? b.rank : 1e9) ||
+        (a.name < b.name ? -1 : 1)
+    }
     for (let s of (sections as CompletionSection[]).sort(cmp)) {
       pos -= 1e5
       sectionOrder[s.name] = pos

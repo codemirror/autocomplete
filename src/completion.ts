@@ -76,7 +76,11 @@ export interface CompletionSection {
   /// By default, sections are ordered alphabetically by name. To
   /// specify an explicit order, `rank` can be used. Sections with a
   /// lower rank will be shown above sections with a higher rank.
-  rank?: number
+  ///
+  /// When set to `"dynamic"`, the section's position compared to
+  /// other dynamic sections depends on the matching score of the
+  /// best-matching option in the sections.
+  rank?: number | "dynamic"
 }
 
 /// An instance of this is passed to completion source functions.
