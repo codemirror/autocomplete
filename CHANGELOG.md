@@ -1,3 +1,9 @@
+## 6.19.0 (2025-09-26)
+
+### New features
+
+Completion sections may now set their rank to `dynamic` to indicate their order should be determined by the matching score of their best-matching option.
+
 ## 6.18.7 (2025-09-02)
 
 ### Bug fixes
