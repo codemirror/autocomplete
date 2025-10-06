@@ -159,7 +159,8 @@ class CompletionTooltip {
                                        this.view.state.facet(completionConfig).maxRenderedOptions)
       this.showOptions(open.options, cState.id)
     }
-    if (this.updateSelectedOption(open.selected)) {
+    let newSel = this.updateSelectedOption(open.selected)
+    if (newSel) {
       this.destroyInfo()
       let {completion} = open.options[open.selected]
       let {info} = completion
@@ -173,6 +174,7 @@ class CompletionTooltip {
         }).catch(e => logException(this.view.state, e, "completion info"))
       } else {
         this.addInfoPane(infoResult, completion)
+        newSel.setAttribute("aria-describedby", this.info!.id)
       }
     }
   }
@@ -181,6 +183,7 @@ class CompletionTooltip {
     this.destroyInfo()
     let wrap = this.info = document.createElement("div")
     wrap.className = "cm-tooltip cm-completionInfo"
+    wrap.id = "cm-completionInfo-" + Math.floor(Math.random() * 0xffff).toString(16)
     if ((content as Node).nodeType != null) {
       wrap.appendChild(content as Node)
       this.infoDestroy = null
@@ -205,7 +208,10 @@ class CompletionTooltip {
           set = opt
         }
       } else {
-        if (opt.hasAttribute("aria-selected")) opt.removeAttribute("aria-selected")
+        if (opt.hasAttribute("aria-selected")) {
+          opt.removeAttribute("aria-selected")
+          opt.removeAttribute("aria-describedby")
+        }
       }
     }
     if (set) scrollIntoView(this.list, set)
