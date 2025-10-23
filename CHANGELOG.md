@@ -1,3 +1,9 @@
+## 6.19.1 (2025-10-23)
+
+### Bug fixes
+
+Make sure a completion's info panel is associated with that completion in the accessibility tree.
+
 ## 6.19.0 (2025-09-26)
 
 ### New features
