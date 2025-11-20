@@ -14,6 +14,9 @@ export interface Completion {
   /// provide a [`getMatch`](#autocomplete.CompletionResult.getMatch)
   /// function.
   displayLabel?: string
+  /// Overrides the text that is used to sort completions. Will
+  /// default to `label` if not given.
+  sortText?: string
   /// An optional short piece of information to show (with a different
   /// style) after the label.
   detail?: string

@@ -148,6 +148,9 @@ describe("autocomplete", () => {
 
     run.options("sorts alphabetically when score is equal", "a", [from("ac ab acc")], "ab ac acc")
 
+    run.options("sorts by sortText when given", "a",
+                [cx => ({from: 0, to: 1, options: [{label: "ab"}, {label: "ac", sortText: "aa"}]})], "ac ab")
+
     run.options("removes duplicate options", "t", [from("two"), from("two three")], "three two")
 
     run.options("handles all-uppercase words", "sel", [from("SCOPE_CATALOG SELECT SELECTIVE")], "SELECT SELECTIVE SCOPE_CATALOG")

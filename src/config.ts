@@ -110,7 +110,7 @@ export const completionConfig = Facet.define<CompletionConfig, Required<Completi
       addToOptions: [],
       positionInfo: defaultPositionInfo as any,
       filterStrict: false,
-      compareCompletions: (a, b) => a.label.localeCompare(b.label),
+      compareCompletions: (a, b) => (a.sortText || a.label).localeCompare(b.sortText || b.label),
       interactionDelay: 75,
       updateSyncTime: 100
     }, {
