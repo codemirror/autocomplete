@@ -1,3 +1,9 @@
+## 6.20.0 (2025-11-20)
+
+### New features
+
+Completions now support a `sortText` property to influence sort order.
+
 ## 6.19.1 (2025-10-23)
 
 ### Bug fixes
