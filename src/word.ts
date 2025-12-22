@@ -69,7 +69,7 @@ function collectWords(doc: Text, cache: WeakMap<Text, readonly Completion[]>, wo
 /// [character categorizer](#state.EditorState.charCategorizer)), and
 /// return those as completions.
 export const completeAnyWord: CompletionSource = context => {
-  let wordChars = context.state.languageDataAt<string>("wordChars", context.pos).join("")
+  let wordChars = context.state.languageDataAt<string>("wordChars", context.pos)[0] ?? ""
   let re = wordRE(wordChars)
   let token = context.matchBefore(mapRE(re, s => s + "$"))
   if (!token && !context.explicit) return null
