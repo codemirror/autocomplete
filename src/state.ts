@@ -5,7 +5,7 @@ import {Option, CompletionSource, CompletionResult, cur, asSource,
         startCompletionEffect, closeCompletionEffect,
         insertCompletionText, pickedCompletion} from "./completion"
 import {FuzzyMatcher, StrictMatcher} from "./filter"
-import {completionTooltip} from "./tooltip"
+import {completionTooltip, setSelectedEffect} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
 
 // Used to pick a preferred option when two options with the same
@@ -316,7 +316,6 @@ function checkValid(validFor: undefined | RegExp | ((text: string, from: number,
 export const setActiveEffect = StateEffect.define<readonly ActiveSource[]>({
   map(sources, mapping) { return sources.map(s => s.map(mapping)) }
 })
-export const setSelectedEffect = StateEffect.define<number>()
 
 export const completionState = StateField.define<CompletionState>({
   create() { return CompletionState.start() },

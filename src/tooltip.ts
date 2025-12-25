@@ -1,8 +1,10 @@
 import {EditorView, ViewUpdate, logException, TooltipView, Rect} from "@codemirror/view"
-import {StateField, EditorState} from "@codemirror/state"
+import {StateField, StateEffect, EditorState} from "@codemirror/state"
 import {CompletionState} from "./state"
 import {completionConfig, CompletionConfig} from "./config"
 import {Option, Completion, CompletionInfo, closeCompletionEffect} from "./completion"
+
+export const setSelectedEffect = StateEffect.define<number>()
 
 type OptionContentSource =
   (completion: Completion, state: EditorState, view: EditorView, match: readonly number[]) => Node | null
@@ -102,6 +104,16 @@ class CompletionTooltip {
           return
         }
       }
+      if (e.target == this.list) {
+        let move = this.list.classList.contains("cm-completionListIncompleteTop") &&
+          e.clientY < (this.list.firstChild as HTMLElement).getBoundingClientRect().top ? this.range.from - 1 :
+          this.list.classList.contains("cm-completionListIncompleteBottom") &&
+          e.clientY > (this.list.lastChild as HTMLElement).getBoundingClientRect().bottom ? this.range.to : null
+        if (move != null) {
+          view.dispatch({effects: setSelectedEffect.of(move)})
+          e.preventDefault()
+        }
+      }
     })
     this.dom.addEventListener("focusout", (e: FocusEvent) => {
       let state = view.state.field(this.stateField, false)
@@ -129,7 +141,7 @@ class CompletionTooltip {
     if (cState != prevState) {
       let {options, selected, disabled} = cState.open!
       if (!prevState.open || prevState.open.options != options) {
-         this.range = rangeAroundSelected(options.length, selected, update.state.facet(completionConfig).maxRenderedOptions)
+        this.range = rangeAroundSelected(options.length, selected, update.state.facet(completionConfig).maxRenderedOptions)
         this.showOptions(options, cState.id)
       }
       this.updateSel()

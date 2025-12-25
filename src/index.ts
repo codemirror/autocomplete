@@ -1,7 +1,8 @@
 import {Prec, Extension, EditorState, StateEffect} from "@codemirror/state"
 import {keymap, KeyBinding} from "@codemirror/view"
 import {Completion, Option} from "./completion"
-import {completionState, State, setSelectedEffect} from "./state"
+import {completionState, State} from "./state"
+import {setSelectedEffect} from "./tooltip"
 import {CompletionConfig, completionConfig} from "./config"
 import {completionPlugin, moveCompletionSelection, acceptCompletion,
         startCompletion, closeCompletion, commitCharacters} from "./view"

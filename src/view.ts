@@ -1,8 +1,9 @@
 import {EditorView, Command, ViewPlugin, PluginValue, ViewUpdate, logException,
         getTooltip, TooltipView} from "@codemirror/view"
 import {Transaction, Prec} from "@codemirror/state"
-import {completionState, setSelectedEffect, setActiveEffect, State,
+import {completionState, setActiveEffect, State,
         ActiveSource, ActiveResult, getUpdateType, UpdateType, applyCompletion} from "./state"
+import {setSelectedEffect} from "./tooltip"
 import {completionConfig} from "./config"
 import {cur, CompletionResult, CompletionContext, startCompletionEffect, closeCompletionEffect} from "./completion"
 
