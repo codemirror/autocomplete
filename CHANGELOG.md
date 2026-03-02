@@ -1,3 +1,8 @@
+## 6.20.1 (2026-03-02)
+
+### Bug fixes
+
+Clicking the horizontal dots at the top/bottom of a list of completion options now moves the selection there, so that more completions become visible.
 ## 6.20.0 (2025-11-20)
 
 ### New features
