@@ -1,3 +1,5 @@
+**This repository has moved to https://code.haverbeke.berlin/codemirror/autocomplete**
+
 # @codemirror/autocomplete [![NPM version](https://img.shields.io/npm/v/@codemirror/autocomplete.svg)](https://www.npmjs.org/package/@codemirror/autocomplete)
 
 [ [**WEBSITE**](https://codemirror.net/) | [**DOCS**](https://codemirror.net/docs/ref/#autocomplete) | [**ISSUES**](https://code.haverbeke.berlin/codemirror/dev/issues) | [**FORUM**](https://discuss.codemirror.net/) | [**CHANGELOG**](https://code.haverbeke.berlin/codemirror/autocomplete/src/branch/main/CHANGELOG.md) ]
